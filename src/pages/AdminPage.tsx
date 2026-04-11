@@ -22,6 +22,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/context/AuthContext";
+import { cn } from "@/lib/utils";
 import type { Battle } from "@/types";
 
 interface ParticipantInput {
@@ -202,6 +203,16 @@ export default function AdminPage() {
     }
   };
 
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
       <div className="fixed inset-0 -z-10">
@@ -209,34 +220,76 @@ export default function AdminPage() {
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-campaign-blue/5 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
       
-      <div className="campaign-accent-bar w-full h-1" />
+      <div className="campaign-accent-bar w-full h-1 fixed top-0 z-[60]" />
 
-      <nav className="sticky top-0 z-50 campaign-card border-b border-border/30">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <img src="/logo_fn.png" alt="F*cks News" className="h-10 drop-shadow-lg" />
-            <div>
-              <h1 className="text-lg font-bold campaign-gold-gradient">PANEL ADMIN</h1>
-              <p className="text-xs text-muted-foreground">Gestión de Batallas</p>
+      <nav 
+        className={cn(
+          "fixed top-1 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
+          scrolled 
+            ? "px-2 sm:px-4 py-2" 
+            : "px-0 py-0"
+        )}
+      >
+        <div 
+          className={cn(
+            "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between campaign-card border-b border-border/30",
+            scrolled 
+              ? "max-w-4xl h-14 rounded-full shadow-lg border px-4 sm:px-6 bg-card/90 backdrop-blur-md" 
+              : "max-w-6xl h-16 rounded-none border-x-0 border-t-0 px-6 bg-card/60 backdrop-blur-sm"
+          )}
+        >
+          <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+            <img 
+              src="/logo_fn.png" 
+              alt="F*cks News" 
+              className={cn(
+                "drop-shadow-lg transition-all duration-300",
+                scrolled ? "h-8" : "h-10"
+              )} 
+            />
+            <div className={cn("transition-all duration-300 min-w-0", scrolled ? "hidden sm:block" : "block")}>
+              <h1 className={cn(
+                "font-bold campaign-gold-gradient truncate transition-all duration-300",
+                scrolled ? "text-base" : "text-lg"
+              )}>PANEL ADMIN</h1>
+              <p className={cn(
+                "text-muted-foreground transition-all duration-300",
+                scrolled ? "text-[10px]" : "text-xs"
+              )}>Gestión de Batallas</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/usuarios")} className="text-foreground hover:text-campaign-gold">
-              <Users className="h-4 w-4 mr-2" />
-              Usuarios
+          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+            <Button 
+              variant="ghost" 
+              size={scrolled ? "icon" : "sm"} 
+              onClick={() => navigate("/admin/usuarios")} 
+              className="text-foreground hover:text-campaign-gold transition-all"
+              title="Usuarios"
+            >
+              <Users className={cn("transition-all", scrolled ? "h-5 w-5" : "h-4 w-4 mr-2")} />
+              {!scrolled && <span className="hidden sm:inline">Usuarios</span>}
             </Button>
-            <div className="text-right hidden sm:block">
+            <div className={cn(
+              "text-right transition-all duration-300",
+              scrolled ? "hidden" : "hidden sm:block"
+            )}>
               <p className="text-xs text-campaign-gold font-medium">{username}</p>
               <p className="text-[10px] text-muted-foreground">Administrador</p>
             </div>
-            <Button variant="destructive" size="sm" onClick={handleLogout}>
+            <Button 
+              variant="destructive" 
+              size={scrolled ? "icon" : "sm"} 
+              onClick={handleLogout}
+              className={cn("transition-all", scrolled && "h-8 w-8 rounded-full")}
+              title="Cerrar Sesión"
+            >
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-6 py-8 w-full flex-1">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 pt-24 sm:pt-28 w-full flex-1">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-white mb-1">Gestión de Batallas</h1>

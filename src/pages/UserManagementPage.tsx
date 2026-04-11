@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Plus, Edit2, Trash2, Key, User, ArrowLeft, Loader2, LogOut } from "lucide-react";
+import { Plus, Edit2, Trash2, Key, User, ArrowLeft, Loader2, LogOut, Swords } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/context/AuthContext";
+import { cn } from "@/lib/utils";
 
 interface AdminUser {
   id: number;
@@ -154,42 +155,95 @@ export default function UserManagementPage() {
     navigate("/login", { replace: true });
   };
 
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
       <div className="fixed inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-campaign-gold/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-campaign-blue/5 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-campaign-blue/5 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
       
-      <div className="campaign-accent-bar w-full h-1" />
+      <div className="campaign-accent-bar w-full h-1 fixed top-0 z-[60]" />
 
-      <nav className="sticky top-0 z-50 campaign-card border-b border-border/30">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-            <Link to="/admin">
-              <Button variant="ghost" size="icon" className="text-foreground hover:text-campaign-gold shrink-0">
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            </Link>
-            <img src="/logo_fn.png" alt="F*cks News" className="h-8 sm:h-10 drop-shadow-lg shrink-0" />
-            <div className="min-w-0">
-              <h1 className="text-sm sm:text-lg font-bold campaign-gold-gradient truncate">USUARIOS</h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">Gestión de Administradores</p>
+      <nav 
+        className={cn(
+          "fixed top-1 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
+          scrolled 
+            ? "px-2 sm:px-4 py-2" 
+            : "px-0 py-0"
+        )}
+      >
+        <div 
+          className={cn(
+            "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between campaign-card border-b border-border/30",
+            scrolled 
+              ? "max-w-4xl h-14 rounded-full shadow-lg border px-4 sm:px-6 bg-card/90 backdrop-blur-md" 
+              : "max-w-6xl h-16 rounded-none border-x-0 border-t-0 px-6 bg-card/60 backdrop-blur-sm"
+          )}
+        >
+          <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+            <img 
+              src="/logo_fn.png" 
+              alt="F*cks News" 
+              className={cn(
+                "drop-shadow-lg transition-all duration-300",
+                scrolled ? "h-8" : "h-10"
+              )} 
+            />
+            <div className={cn("transition-all duration-300 min-w-0", scrolled ? "hidden sm:block" : "block")}>
+              <h1 className={cn(
+                "font-bold campaign-gold-gradient truncate transition-all duration-300",
+                scrolled ? "text-base" : "text-lg"
+              )}>PANEL ADMIN</h1>
+              <p className={cn(
+                "text-muted-foreground transition-all duration-300",
+                scrolled ? "text-[10px]" : "text-xs"
+              )}>Gestión de Usuarios</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <div className="text-right hidden sm:block">
+          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+            <Button 
+              variant="ghost" 
+              size={scrolled ? "icon" : "sm"} 
+              asChild 
+              className="text-foreground hover:text-campaign-gold transition-all"
+              title="Batallas"
+            >
+              <Link to="/admin">
+                <Swords className={cn("transition-all", scrolled ? "h-5 w-5" : "h-4 w-4 mr-2")} />
+                {!scrolled && <span className="hidden sm:inline">Batallas</span>}
+              </Link>
+            </Button>
+            <div className={cn(
+              "text-right transition-all duration-300",
+              scrolled ? "hidden" : "hidden sm:block"
+            )}>
               <p className="text-xs text-campaign-gold font-medium">{username}</p>
               <p className="text-[10px] text-muted-foreground">Administrador</p>
             </div>
-            <Button variant="destructive" size="sm" onClick={handleLogout} className="shrink-0">
+            <Button 
+              variant="destructive" 
+              size={scrolled ? "icon" : "sm"} 
+              onClick={handleLogout}
+              className={cn("transition-all", scrolled && "h-8 w-8 rounded-full")}
+              title="Cerrar Sesión"
+            >
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 w-full flex-1">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 pt-24 sm:pt-28 w-full flex-1">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-white mobile-title">Administradores</h1>

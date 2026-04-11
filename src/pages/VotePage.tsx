@@ -232,6 +232,16 @@ export default function VotePage() {
     );
   }
 
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
       <div className="fixed inset-0 -z-10">
@@ -239,13 +249,61 @@ export default function VotePage() {
         <div className="absolute bottom-1/3 left-1/3 w-64 h-64 bg-campaign-red/5 rounded-full blur-3xl animate-pulse delay-700" />
       </div>
       
-      <div className="campaign-accent-bar w-full h-1" />
+      <div className="campaign-accent-bar w-full h-1 fixed top-0 z-[60]" />
 
       {/* Header */}
-      <VoteHeader battle={battle} expired={expired} onExpire={() => setExpired(true)} />
+      <div className={cn(
+        "fixed top-1 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
+        scrolled ? "px-2 sm:px-4 py-2" : "px-0 py-0"
+      )}>
+        <div className={cn(
+          "mx-auto transition-all duration-300 ease-in-out campaign-card border-b border-border/30",
+          scrolled 
+            ? "max-w-3xl rounded-3xl shadow-lg border px-4 sm:px-6 py-2 bg-card/90 backdrop-blur-md flex items-center justify-between" 
+            : "w-full rounded-none border-x-0 border-t-0 px-4 sm:px-6 pt-6 sm:pt-8 pb-4 sm:pb-6 text-center bg-card/60 backdrop-blur-sm block"
+        )}>
+          {scrolled ? (
+            // Scrolled State (Compact horizontal)
+            <>
+              <div className="flex items-center gap-3">
+                <img src="/logo_fn.png" alt="F*cks News" className="h-8 drop-shadow-lg" />
+                <div className="text-left hidden sm:block">
+                  <h1 className="text-sm font-bold text-white leading-tight">{battle.title}</h1>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-center">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</p>
+                  <p className="text-sm font-bold text-campaign-gold">{battle.totalVotes || 0}</p>
+                </div>
+                <VoteTimer expiresAt={battle.expiresAt} expired={expired} onExpire={() => setExpired(true)} compact />
+              </div>
+            </>
+          ) : (
+            // Expanded State (Original vertical)
+            <>
+              <img src="/logo_fn.png" alt="F*cks News" className="h-12 sm:h-14 mx-auto mb-4 sm:mb-6 drop-shadow-lg" />
+              <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-tight px-2">{battle.title}</h1>
+              {battle.description && (
+                <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4 px-2">{battle.description}</p>
+              )}
+              <div className="flex items-center justify-center gap-4 sm:gap-6 mt-4">
+                <div className="text-center">
+                  <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider mb-1">Total Votos</p>
+                  <p className="text-lg sm:text-xl font-bold text-campaign-gold">{battle.totalVotes || 0}</p>
+                </div>
+                <VoteTimer expiresAt={battle.expiresAt} expired={expired} onExpire={() => setExpired(true)} />
+              </div>
+            </>
+          )}
+        </div>
+      </div>
 
       {/* Mobile-Optimized Voting area */}
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full">
+      <div className={cn(
+        "max-w-2xl mx-auto px-4 sm:px-6 flex-1 w-full transition-all duration-300",
+        scrolled ? "pt-24 sm:pt-28 pb-6 sm:pb-8" : "pt-8 sm:pt-10 pb-6 sm:pb-8"
+      )}>
         {hasVoted && (
           <div className="mb-6 sm:mb-8 campaign-card p-4 sm:p-6 text-center border border-campaign-gold/30 mx-2 sm:mx-0">
             <CheckCircle2 className="h-8 w-8 sm:h-10 sm:w-10 text-campaign-gold mx-auto mb-2 sm:mb-3" />
@@ -347,42 +405,32 @@ export default function VotePage() {
   );
 }
 
-function VoteHeader({ battle, expired, onExpire }: { battle: Battle; expired: boolean; onExpire: () => void }) {
-  const countdown = useCountdown(battle.expiresAt);
+function VoteTimer({ expiresAt, expired, onExpire, compact = false }: { expiresAt?: string | null; expired: boolean; onExpire: () => void; compact?: boolean }) {
+  const countdown = useCountdown(expiresAt);
 
   if (countdown?.isExpired && !expired) {
     onExpire();
   }
 
+  if (countdown?.isExpired || expired) {
+    return (
+      <div className="text-center">
+        <p className={cn("text-muted-foreground uppercase tracking-wider mb-1", compact ? "text-[10px]" : "text-xs sm:text-sm")}>Estado</p>
+        <span className={cn("font-bold text-campaign-red", compact ? "text-sm" : "text-base sm:text-lg")}>FINALIZADA</span>
+      </div>
+    );
+  }
+
+  if (!countdown) return null;
+
   return (
-    <div className="campaign-card border-b border-border/30 text-center pt-6 sm:pt-8 pb-4 sm:pb-6 px-4 sm:px-6">
-      <img src="/logo_fn.png" alt="F*cks News" className="h-12 sm:h-14 mx-auto mb-4 sm:mb-6 drop-shadow-lg" />
-      <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-tight px-2">{battle.title}</h1>
-      {battle.description && (
-        <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4 px-2">{battle.description}</p>
-      )}
-      <div className="flex items-center justify-center gap-4 sm:gap-6">
-        <div className="text-center">
-          <p className="text-xs sm:text-sm text-muted-foreground">Total</p>
-          <p className="text-lg sm:text-xl font-bold text-campaign-gold">{battle.totalVotes || 0}</p>
-        </div>
-        {countdown && !countdown.isExpired && (
-          <div className="text-center">
-            <p className="text-xs sm:text-sm text-muted-foreground">Tiempo</p>
-            <div className="inline-flex items-center gap-1 sm:gap-2">
-              <Timer className="h-3 w-3 sm:h-4 sm:w-4 text-campaign-red" />
-              <span className="text-lg sm:text-xl font-bold font-mono text-campaign-red">
-                {countdown.display}
-              </span>
-            </div>
-          </div>
-        )}
-        {countdown?.isExpired && (
-          <div className="text-center">
-            <p className="text-xs sm:text-sm text-muted-foreground">Estado</p>
-            <span className="text-base sm:text-lg font-bold text-campaign-red">FINALIZADA</span>
-          </div>
-        )}
+    <div className="text-center">
+      <p className={cn("text-muted-foreground uppercase tracking-wider mb-1", compact ? "text-[10px]" : "text-xs sm:text-sm")}>Tiempo</p>
+      <div className="inline-flex items-center gap-1 sm:gap-2">
+        <Timer className={cn("text-campaign-red", compact ? "h-3 w-3" : "h-3 w-3 sm:h-4 sm:w-4")} />
+        <span className={cn("font-bold font-mono text-campaign-red", compact ? "text-sm" : "text-lg sm:text-xl")}>
+          {countdown.display}
+        </span>
       </div>
     </div>
   );
