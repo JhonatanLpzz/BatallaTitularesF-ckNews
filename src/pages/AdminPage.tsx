@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Plus,
   Trash2,
@@ -12,6 +12,7 @@ import {
   X,
   LogOut,
   Users,
+  Swords,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -191,95 +192,130 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="fn-accent-bar w-full" />
+    <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-campaign-blue/5 rounded-full blur-3xl animate-pulse delay-1000" />
+      </div>
+      
+      <div className="campaign-accent-bar w-full h-1" />
 
-      <nav className="sticky top-0 z-50 bg-white border-b">
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/logo_fn.png" alt="F*cks News" className="h-8" />
-            <span className="text-sm text-muted-foreground">/ Admin</span>
+      <nav className="sticky top-0 z-50 campaign-card border-b border-border/30">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <img src="/logo_fn.png" alt="F*cks News" className="h-10 drop-shadow-lg" />
+            <div>
+              <h1 className="text-lg font-bold campaign-gold-gradient">PANEL ADMIN</h1>
+              <p className="text-xs text-muted-foreground">Gestión de Batallas</p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/usuarios")}>
-              <Users className="h-4 w-4 mr-1.5" />
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin/usuarios")} className="text-foreground hover:text-campaign-gold">
+              <Users className="h-4 w-4 mr-2" />
               Usuarios
             </Button>
-            <span className="text-xs text-muted-foreground hidden sm:block">{username}</span>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
+            <div className="text-right hidden sm:block">
+              <p className="text-xs text-campaign-gold font-medium">{username}</p>
+              <p className="text-[10px] text-muted-foreground">Administrador</p>
+            </div>
+            <Button variant="destructive" size="sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-4 py-6 w-full flex-1">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-lg font-semibold">Batallas</h1>
-          <Button size="sm" onClick={() => setShowCreate(true)}>
-            <Plus className="h-4 w-4 mr-1.5" />
+      <main className="max-w-6xl mx-auto px-6 py-8 w-full flex-1">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-white mb-1">Gestión de Batallas</h1>
+            <p className="text-muted-foreground">Crea y administra competencias en tiempo real</p>
+          </div>
+          <Button onClick={() => setShowCreate(true)} className="campaign-button font-semibold">
+            <Plus className="h-5 w-5 mr-2" />
             Nueva Batalla
           </Button>
         </div>
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <Loader2 className="h-8 w-8 animate-spin text-campaign-gold" />
           </div>
         ) : battles.length === 0 ? (
-          <div className="text-center py-20 animate-fade-in">
-            <p className="text-muted-foreground mb-4">No hay batallas creadas</p>
-            <Button size="sm" onClick={() => setShowCreate(true)}>
-              <Plus className="h-4 w-4 mr-1.5" />
-              Crear Batalla
-            </Button>
+          <div className="campaign-card p-12 text-center">
+            <Swords className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
+            <p className="text-lg text-muted-foreground mb-2">No hay batallas creadas</p>
+            <p className="text-sm text-muted-foreground/60">Crea tu primera batalla épica</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {battles.map((battle) => (
-              <Card key={battle.id} className="bg-white">
-                <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <h3 className="font-medium truncate">{battle.title}</h3>
-                        {statusBadge(battle.status)}
-                      </div>
-                      {battle.description && (
-                        <p className="text-sm text-muted-foreground truncate">{battle.description}</p>
-                      )}
-                      <p className="text-xs text-muted-foreground mt-0.5 font-mono">/{battle.code}</p>
+          <div className="grid gap-6">
+            {battles.map((battle, idx) => (
+              <div key={battle.id} className="campaign-card p-6 animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-xl font-bold text-white">{battle.title}</h3>
+                      <Badge 
+                        variant={battle.status === "active" ? "success" : battle.status === "closed" ? "destructive" : "outline"}
+                        className="font-medium"
+                      >
+                        {battle.status.toUpperCase()}
+                      </Badge>
                     </div>
-
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      {battle.status === "draft" && (
-                        <Button size="sm" onClick={() => updateStatus(battle.id, "active")}>
-                          <Play className="h-3.5 w-3.5 mr-1" />
-                          Activar
-                        </Button>
+                    {battle.description && (
+                      <p className="text-muted-foreground mb-3">{battle.description}</p>
+                    )}
+                    <div className="flex items-center gap-4 text-sm">
+                      <span className="font-mono text-campaign-gold font-semibold">{battle.code}</span>
+                      <span className="text-muted-foreground">
+                        {new Date(battle.createdAt).toLocaleDateString()}
+                      </span>
+                      {battle.durationMinutes && (
+                        <span className="text-campaign-blue font-medium">
+                          {battle.durationMinutes} min timer
+                        </span>
                       )}
-                      {battle.status === "active" && (
-                        <Button size="sm" variant="outline" onClick={() => updateStatus(battle.id, "closed")}>
-                          <Square className="h-3.5 w-3.5 mr-1" />
-                          Cerrar
-                        </Button>
-                      )}
-                      <Button size="sm" variant="outline" onClick={() => showQR(battle)}>
-                        <QrCode className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => navigate(`/resultados/${battle.code}`)}>
-                        <BarChart3 className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => resetVotes(battle.id)}>
-                        <RotateCcw className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => deleteBattle(battle.id)}>
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="flex items-center gap-2">
+                    <Button size="sm" variant="outline" onClick={() => showQR(battle)} className="hover:border-campaign-gold hover:text-campaign-gold">
+                      <QrCode className="h-4 w-4 mr-1" />
+                      QR
+                    </Button>
+                    <Button size="sm" variant="outline" asChild className="hover:border-campaign-blue hover:text-campaign-blue">
+                      <Link to={`/resultados/${battle.code}`}>
+                        <BarChart3 className="h-4 w-4 mr-1" />
+                        Resultados
+                      </Link>
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant={battle.status === "active" ? "destructive" : "default"}
+                      onClick={() =>
+                        updateStatus(
+                          battle.id,
+                          battle.status === "active" ? "closed" : "active"
+                        )
+                      }
+                      className={battle.status !== "active" ? "campaign-button" : ""}
+                    >
+                      {battle.status === "active" ? (
+                        <><Square className="h-4 w-4 mr-1" /> Cerrar</>
+                      ) : (
+                        <><Play className="h-4 w-4 mr-1" /> Activar</>
+                      )}
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => resetVotes(battle.id)} className="hover:border-yellow-500 hover:text-yellow-500">
+                      <RotateCcw className="h-4 w-4" />
+                    </Button>
+                    <Button size="sm" variant="destructive" onClick={() => deleteBattle(battle.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         )}
@@ -287,9 +323,10 @@ export default function AdminPage() {
 
       {/* Create Dialog */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent onClose={() => setShowCreate(false)} className="max-h-[90vh] overflow-y-auto">
+        <DialogContent onClose={() => setShowCreate(false)} className="campaign-card border-border/50 max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Nueva Batalla</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-white mb-2">Nueva Batalla Épica</DialogTitle>
+            <p className="text-muted-foreground">Configura los detalles de la competencia</p>
           </DialogHeader>
 
           <div className="space-y-4 mt-4">

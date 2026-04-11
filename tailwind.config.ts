@@ -41,6 +41,11 @@ const config: Config = {
         },
         "fn-blue": "hsl(var(--fn-blue))",
         "fn-red": "hsl(var(--fn-red))",
+        // Campaign-inspired colors
+        "campaign-gold": "hsl(var(--campaign-gold))",
+        "campaign-blue": "hsl(var(--campaign-blue))",
+        "campaign-red": "hsl(var(--campaign-red))",
+        "campaign-purple": "hsl(var(--campaign-purple))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -51,6 +56,16 @@ const config: Config = {
         sans: ["Inter", "system-ui", "sans-serif"],
         display: ["Inter", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
+      },
+      backgroundImage: {
+        'campaign-gradient': 'linear-gradient(135deg, hsl(217 78% 25%) 0%, hsl(270 60% 35%) 50%, hsl(0 72% 25%) 100%)',
+        'gold-gradient': 'linear-gradient(135deg, hsl(45 96% 65%) 0%, hsl(35 85% 55%) 100%)',
+        'vote-gradient': 'linear-gradient(135deg, hsl(220 25% 8%) 0%, hsl(270 60% 12%) 50%, hsl(217 78% 8%) 100%)',
+      },
+      boxShadow: {
+        'campaign': '0 25px 50px -12px hsl(220 25% 8% / 0.8)',
+        'gold': '0 25px 50px -12px hsl(45 96% 65% / 0.2)',
+        'glow': '0 0 30px hsl(45 96% 65% / 0.3)',
       },
       keyframes: {
         "fade-in": {

@@ -164,22 +164,26 @@ export default function VotePage() {
   // Voter identification form
   if (!voterReady && !hasVoted) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <div className="fn-accent-bar w-full" />
-        <div className="flex-1 flex items-center justify-center px-4">
-          <div className="w-full max-w-sm">
-            <div className="text-center mb-6">
-              <img src="/logo_fn.png" alt="F*cks News" className="h-16 mx-auto mb-4" />
-              <h1 className="text-lg font-semibold">{battle.title}</h1>
+      <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
+        <div className="fixed inset-0 -z-10">
+          <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-campaign-gold/5 rounded-full blur-3xl animate-pulse" />
+        </div>
+        <div className="campaign-accent-bar w-full h-1" />
+        
+        <div className="flex-1 flex items-center justify-center px-6">
+          <div className="w-full max-w-md campaign-card p-8 animate-fade-in-up">
+            <div className="text-center mb-8">
+              <img src="/logo_fn.png" alt="F*cks News" className="h-20 mx-auto mb-6 drop-shadow-lg" />
+              <h1 className="text-2xl font-bold text-white mb-2">{battle.title}</h1>
               {battle.description && (
-                <p className="text-sm text-muted-foreground mt-1">{battle.description}</p>
+                <p className="text-muted-foreground">{battle.description}</p>
               )}
             </div>
 
-            <form onSubmit={handleVoterSubmit} className="space-y-3">
+            <form onSubmit={handleVoterSubmit} className="space-y-6">
               <div>
-                <label className="text-sm font-medium block mb-1">
-                  Tu nombre <span className="text-fn-red">*</span>
+                <label className="text-sm font-semibold block mb-2 text-foreground">
+                  Tu nombre <span className="text-campaign-red">*</span>
                 </label>
                 <Input
                   placeholder="Nombre completo"
@@ -187,37 +191,40 @@ export default function VotePage() {
                   onChange={(e) => setVoterName(e.target.value)}
                   autoFocus
                   required
+                  className="h-12 text-base"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium block mb-1">
+                <label className="text-sm font-medium block mb-2 text-foreground/80">
                   Documento <span className="text-muted-foreground font-normal">(opcional)</span>
                 </label>
                 <Input
-                  placeholder="Cedula o documento"
+                  placeholder="Cédula o documento"
                   value={voterDocument}
                   onChange={(e) => setVoterDocument(e.target.value)}
+                  className="h-12"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium block mb-1">
+                <label className="text-sm font-medium block mb-2 text-foreground/80">
                   Celular <span className="text-muted-foreground font-normal">(opcional)</span>
                 </label>
                 <Input
-                  placeholder="Numero de celular"
+                  placeholder="Número de celular"
                   value={voterPhone}
                   onChange={(e) => setVoterPhone(e.target.value)}
                   type="tel"
+                  className="h-12"
                 />
               </div>
-              <Button type="submit" className="w-full">
-                <User className="h-4 w-4 mr-2" />
+              <Button type="submit" className="w-full h-12 campaign-button text-base font-semibold">
+                <User className="h-5 w-5 mr-3" />
                 Continuar a Votar
               </Button>
             </form>
 
-            <p className="text-center text-[11px] text-muted-foreground mt-4">
-              Solo tu nombre es obligatorio para votar
+            <p className="text-center text-xs text-muted-foreground mt-6">
+              Solo tu nombre es obligatorio para participar
             </p>
           </div>
         </div>
@@ -226,103 +233,115 @@ export default function VotePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="fn-accent-bar w-full" />
+    <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-campaign-gold/8 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/3 left-1/3 w-64 h-64 bg-campaign-red/5 rounded-full blur-3xl animate-pulse delay-700" />
+      </div>
+      
+      <div className="campaign-accent-bar w-full h-1" />
 
       {/* Header */}
       <VoteHeader battle={battle} expired={expired} onExpire={() => setExpired(true)} />
 
       {/* Voting area */}
-      <div className="max-w-lg mx-auto px-4 py-6 flex-1 w-full">
+      <div className="max-w-2xl mx-auto px-6 py-8 flex-1 w-full">
         {hasVoted && (
-          <div className="mb-5 p-3 rounded-md bg-green-50 border border-green-200 text-center">
-            <CheckCircle2 className="h-6 w-6 text-green-600 mx-auto mb-1" />
-            <p className="text-sm font-medium text-green-700">Voto registrado</p>
-            <p className="text-xs text-green-600 mt-0.5">Los resultados se actualizan en tiempo real</p>
+          <div className="mb-8 campaign-card p-6 text-center border border-campaign-gold/30">
+            <CheckCircle2 className="h-10 w-10 text-campaign-gold mx-auto mb-3" />
+            <p className="text-lg font-semibold text-white mb-1">¡Voto Registrado!</p>
+            <p className="text-muted-foreground">Los resultados se actualizan en tiempo real</p>
           </div>
         )}
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           {battle.participants?.map((participant: Participant, idx: number) => {
             const isVotedFor = votedFor === participant.id;
 
             return (
-              <button
+              <div
                 key={participant.id}
-                onClick={() => !hasVoted && castVote(participant.id)}
-                disabled={hasVoted || voting !== null}
                 className={cn(
-                  "w-full text-left rounded-md border p-4 transition-all relative overflow-hidden",
-                  hasVoted
-                    ? "cursor-default"
-                    : "cursor-pointer hover:border-primary active:scale-[0.99]",
-                  isVotedFor
-                    ? "border-green-500 bg-green-50"
-                    : "border-border bg-white"
+                  "voting-card p-6 relative group animate-fade-in-up",
+                  isVotedFor && "battle-winner"
                 )}
+                style={{ animationDelay: `${idx * 0.1}s` }}
               >
-                {/* Progress bar */}
-                {hasVoted && (
-                  <div
-                    className="absolute inset-y-0 left-0 opacity-10 transition-all duration-1000"
-                    style={{
-                      backgroundColor: participant.color,
-                      width: `${participant.percentage}%`,
-                    }}
-                  />
-                )}
+                <button
+                  onClick={() => !hasVoted && castVote(participant.id)}
+                  disabled={hasVoted || voting !== null}
+                  className="w-full text-left"
+                >
+                  {/* Progress bar */}
+                  {hasVoted && (
+                    <div
+                      className="absolute inset-y-0 left-0 opacity-20 transition-all duration-1000 rounded-l-lg"
+                      style={{
+                        backgroundColor: participant.color,
+                        width: `${participant.percentage}%`,
+                      }}
+                    />
+                  )}
 
-                <div className="relative z-10">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div
-                          className="w-2.5 h-2.5 rounded-full shrink-0"
-                          style={{ backgroundColor: participant.color }}
-                        />
-                        <span className="font-medium text-sm">{participant.name}</span>
+                  <div className="relative z-10">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div
+                            className="w-4 h-4 rounded-full shrink-0 shadow-glow"
+                            style={{ backgroundColor: participant.color }}
+                          />
+                          <span className="font-bold text-base text-white">{participant.name}</span>
+                        </div>
+                        <p className="text-base md:text-lg text-foreground/90 leading-relaxed font-medium">
+                          "{participant.headline}"
+                        </p>
                       </div>
-                      <p className="text-sm leading-snug text-foreground">
-                        "{participant.headline}"
-                      </p>
+
+                      {hasVoted && (
+                        <div className="text-right shrink-0">
+                          <div 
+                            className="text-3xl font-bold mb-1"
+                            style={{ color: participant.color }}
+                          >
+                            {participant.percentage}%
+                          </div>
+                          <div className="text-xs text-muted-foreground">{participant.votes} votos</div>
+                        </div>
+                      )}
                     </div>
 
-                    {hasVoted && (
-                      <div className="text-right shrink-0">
-                        <div className="text-xl font-bold" style={{ color: participant.color }}>
-                          {participant.percentage}%
-                        </div>
-                        <div className="text-[11px] text-muted-foreground">{participant.votes} votos</div>
+                    {voting === participant.id && (
+                      <div className="flex items-center justify-center mt-4">
+                        <Loader2 className="h-6 w-6 animate-spin text-campaign-gold" />
                       </div>
                     )}
                   </div>
-
-                  {voting === participant.id && (
-                    <Loader2 className="h-4 w-4 animate-spin text-primary mt-2" />
-                  )}
-                </div>
-              </button>
+                </button>
+              </div>
             );
           })}
         </div>
 
         {!hasVoted && (
-          <p className="text-center text-xs text-muted-foreground mt-5">
-            Toca el titular que mas te guste para votar
+          <p className="text-center text-sm text-muted-foreground mt-8 font-medium">
+            Selecciona el titular que más te guste para votar
           </p>
         )}
       </div>
 
       {/* Fan message */}
-      <div className="border-t bg-white px-4 py-5 text-center">
-        <p className="text-xs text-muted-foreground leading-relaxed max-w-md mx-auto">
-          Gracias a <strong className="text-primary">F*cks News Noticreo</strong> por esa comedia acida
+      <div className="border-t border-border/30 campaign-card px-6 py-8 text-center">
+        <p className="text-sm text-foreground/70 leading-relaxed max-w-2xl mx-auto mb-4">
+          Gracias a <strong className="campaign-gold-gradient">F*cks News Noticreo</strong> por esa comedia ácida
           y bien pensada. Son el apoyo y la risa de mucha gente.
-          Esperamos verlos pronto en tarima — la ultima vez no alcanzamos a comprar boletas!
+          ¡Esperamos verlos pronto en tarima — la última vez no alcanzamos a comprar boletas!
         </p>
-        <p className="text-[10px] text-muted-foreground mt-2">
-          Desarrollado con cariño por <strong>Jhonatan Lopez Conde</strong> — Bogota, Colombia
-        </p>
+        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+          <span>Desarrollado con ❤️ por <strong className="text-campaign-gold">Jhonatan Lopez Conde</strong></span>
+          <span>•</span>
+          <span>Bogotá, Colombia</span>
+        </div>
       </div>
     </div>
   );
@@ -336,24 +355,33 @@ function VoteHeader({ battle, expired, onExpire }: { battle: Battle; expired: bo
   }
 
   return (
-    <div className="text-center pt-6 pb-4 px-4 border-b bg-white">
-      <img src="/logo_fn.png" alt="F*cks News" className="h-10 mx-auto mb-3" />
-      <h1 className="text-lg font-semibold mb-0.5">{battle.title}</h1>
+    <div className="campaign-card border-b border-border/30 text-center pt-8 pb-6 px-6">
+      <img src="/logo_fn.png" alt="F*cks News" className="h-14 mx-auto mb-6 drop-shadow-lg" />
+      <h1 className="text-2xl font-bold text-white mb-2">{battle.title}</h1>
       {battle.description && (
-        <p className="text-xs text-muted-foreground">{battle.description}</p>
+        <p className="text-muted-foreground mb-4">{battle.description}</p>
       )}
-      <div className="flex items-center justify-center gap-3 mt-1">
-        <p className="text-xs text-muted-foreground">
-          {battle.totalVotes || 0} votos
-        </p>
+      <div className="flex items-center justify-center gap-6">
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground">Total</p>
+          <p className="text-xl font-bold text-campaign-gold">{battle.totalVotes || 0}</p>
+        </div>
         {countdown && !countdown.isExpired && (
-          <span className="inline-flex items-center gap-1 text-xs font-mono font-medium text-fn-red">
-            <Timer className="h-3 w-3" />
-            {countdown.display}
-          </span>
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">Tiempo</p>
+            <div className="inline-flex items-center gap-2">
+              <Timer className="h-4 w-4 text-campaign-red" />
+              <span className="text-xl font-bold font-mono text-campaign-red">
+                {countdown.display}
+              </span>
+            </div>
+          </div>
         )}
         {countdown?.isExpired && (
-          <span className="text-xs font-medium text-fn-red">Tiempo agotado</span>
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">Estado</p>
+            <span className="text-lg font-bold text-campaign-red">FINALIZADA</span>
+          </div>
         )}
       </div>
     </div>

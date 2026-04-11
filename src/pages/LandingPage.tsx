@@ -1,86 +1,142 @@
 import { Link } from "react-router-dom";
-import { Zap, QrCode, Trophy, ArrowRight, Shield } from "lucide-react";
+import { Swords, Users, BarChart3, Zap, Star, Globe, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const FEATURES = [
+  { icon: Swords, title: "Batallas en Vivo", desc: "Competencias épicas de titulares con timer automático" },
+  { icon: Users, title: "Votación Masiva", desc: "Miles de fans votan simultáneamente desde sus celulares" },
+  { icon: BarChart3, title: "Resultados Dramáticos", desc: "Porcentajes en tiempo real con efectos visuales" },
+  { icon: Timer, title: "Control Total", desc: "Timer configurable y auto-cierre de batallas" },
+];
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Top accent bar */}
-      <div className="fn-accent-bar w-full" />
+    <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-campaign-red/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      </div>
+
+      <div className="campaign-accent-bar w-full h-1" />
 
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-white border-b">
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <img src="/logo_fn.png" alt="F*cks News" className="h-9" />
+      <nav className="sticky top-0 z-50 campaign-card border-b border-border/30">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <img src="/logo_fn.png" alt="F*cks News" className="h-10 drop-shadow-lg" />
+            <div className="hidden sm:block">
+              <h1 className="text-lg font-bold campaign-gold-gradient">BATALLA DE TITULARES</h1>
+              <p className="text-xs text-muted-foreground">Sistema de Votación Interactivo</p>
+            </div>
+          </div>
           <Link to="/login">
-            <Button variant="outline" size="sm">
-              <Shield className="h-4 w-4 mr-1.5" />
-              Admin
+            <Button size="sm" className="campaign-button font-medium">
+              <Star className="h-4 w-4 mr-2" />
+              Panel Admin
             </Button>
           </Link>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="max-w-5xl mx-auto px-4 pt-16 pb-20 text-center flex-1">
-        <div className="animate-fade-in">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground mb-4 tracking-tight">
-            Batalla de Titulares
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-10">
-            Los comediantes compiten con los titulares mas absurdos.
-            <strong className="text-foreground"> Tu decides quien gana.</strong>
+      {/* Hero Section */}
+      <section className="flex-1 flex items-center justify-center px-6 py-20">
+        <div className="max-w-4xl mx-auto text-center animate-fade-in-up">
+          <div className="mb-8">
+            <h1 className="text-4xl md:text-7xl font-bold tracking-tight mb-6">
+              <span className="campaign-gold-gradient animate-glow-pulse">BATALLA DE</span>
+              <br />
+              <span className="text-white text-5xl md:text-8xl">TITULARES</span>
+            </h1>
+            <div className="w-24 h-1 bg-gold-gradient mx-auto mb-8 rounded-full" />
+          </div>
+          
+          <p className="text-foreground/80 text-xl md:text-2xl mb-12 leading-relaxed font-light max-w-3xl mx-auto">
+            La competencia más <strong className="campaign-gold-gradient">épica</strong> de comedia 
+            donde los titulares más <strong className="text-campaign-red">absurdos</strong> 
+            se enfrentan y el público decide quién reina supremo
           </p>
-          <Link to="/login">
-            <Button size="lg" className="group">
-              Crear Batalla
-              <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
-            </Button>
-          </Link>
-        </div>
 
-        {/* Features */}
-        <div className="grid md:grid-cols-3 gap-6 mt-24">
-          {[
-            {
-              icon: Zap,
-              title: "Tiempo Real",
-              desc: "Los votos se actualizan al instante para vivir la emocion.",
-            },
-            {
-              icon: QrCode,
-              title: "Escanea y Vota",
-              desc: "Comparte el QR y que el publico vote desde su celular.",
-            },
-            {
-              icon: Trophy,
-              title: "Resultados en Vivo",
-              desc: "Graficas animadas con porcentajes y el ganador destacado.",
-            },
-          ].map((feature, i) => (
-            <div
-              key={i}
-              className="border rounded-lg p-6 text-left hover:border-primary/40 transition-colors bg-white"
-            >
-              <feature.icon className="h-8 w-8 text-primary mb-3" />
-              <h3 className="font-semibold text-base mb-1">{feature.title}</h3>
-              <p className="text-muted-foreground text-sm">{feature.desc}</p>
-            </div>
-          ))}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+            <Link to="/login">
+              <Button size="lg" className="campaign-button text-lg px-8 py-4 h-auto font-semibold">
+                <Globe className="h-5 w-5 mr-3" />
+                Acceder al Panel Admin
+              </Button>
+            </Link>
+          </div>
+
+          {/* Live indicator */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-campaign-red/20 border border-campaign-red/30">
+            <div className="w-2 h-2 bg-campaign-red rounded-full animate-pulse" />
+            <span className="text-sm font-medium text-campaign-red">Sistema Activo</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="px-6 py-20 relative">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <span className="campaign-gold-gradient">Tecnología</span> de Vanguardia
+            </h2>
+            <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
+              Sistema completo de votación interactiva diseñado para shows en vivo
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {FEATURES.map((feature, idx) => (
+              <div
+                key={feature.title}
+                className="campaign-card p-8 text-center group hover:shadow-gold transition-all duration-300 animate-fade-in-up"
+                style={{ animationDelay: `${idx * 0.1}s` }}
+              >
+                <div className="w-16 h-16 mx-auto mb-6 bg-campaign-gradient rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <feature.icon className="h-8 w-8 text-campaign-gold" />
+                </div>
+                <h3 className="font-bold text-lg mb-3 text-white">{feature.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="px-6 py-20">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="campaign-card p-12 animate-fade-in-up">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-white">
+              ¿Listo para la <span className="campaign-gold-gradient">Batalla?</span>
+            </h2>
+            <p className="text-foreground/80 text-lg mb-8 max-w-2xl mx-auto">
+              Crea batallas épicas, genera códigos QR, y deja que el público decida 
+              quién tiene los titulares más geniales
+            </p>
+            <Link to="/login">
+              <Button size="lg" className="campaign-button text-lg px-10 py-4 h-auto font-semibold">
+                Empezar Ahora
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t bg-white px-4 py-6">
-        <div className="max-w-5xl mx-auto text-center">
-          <p className="text-xs text-muted-foreground leading-relaxed max-w-md mx-auto">
-            Gracias a <strong className="text-primary">F*cks News Noticreo</strong> por esa comedia acida
+      <footer className="border-t border-border/30 campaign-card px-6 py-8">
+        <div className="max-w-6xl mx-auto text-center">
+          <p className="text-sm text-foreground/70 leading-relaxed max-w-2xl mx-auto mb-4">
+            Gracias a <strong className="campaign-gold-gradient">F*cks News Noticreo</strong> por esa comedia ácida
             y bien pensada. Son el apoyo y la risa de mucha gente.
-            Esperamos verlos pronto en tarima — la ultima vez no alcanzamos a comprar boletas!
+            ¡Esperamos verlos pronto en tarima — la última vez no alcanzamos a comprar boletas!
           </p>
-          <p className="text-[10px] text-muted-foreground mt-3">
-            Desarrollado con cariño por <strong>Jhonatan Lopez Conde</strong> — Bogota, Colombia
-          </p>
+          <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+            <span>Desarrollado con ❤️ por <strong className="text-campaign-gold">Jhonatan Lopez Conde</strong></span>
+            <span>•</span>
+            <span>Bogotá, Colombia</span>
+          </div>
         </div>
       </footer>
     </div>
