@@ -44,7 +44,6 @@ export default function LoginPage() {
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-campaign-gold/8 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/3 right-1/3 w-64 h-64 bg-campaign-blue/5 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
-      <div className="campaign-accent-bar w-full h-1" />
       
       <div className="flex-1 flex items-center justify-center px-6">
         <div className="w-full max-w-lg">

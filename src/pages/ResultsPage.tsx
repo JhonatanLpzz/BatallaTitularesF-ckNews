@@ -74,7 +74,6 @@ export default function ResultsPage() {
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-campaign-red/5 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
       
-      <div className="campaign-accent-bar w-full h-1" />
 
       {/* Mobile-Optimized Navbar */}
       <nav className="sticky top-0 z-50 campaign-card border-b border-border/30">

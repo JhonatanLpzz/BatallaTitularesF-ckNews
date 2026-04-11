@@ -30,8 +30,6 @@ export default function LandingPage() {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-campaign-red/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
-      <div className="campaign-accent-bar w-full h-1" />
-
       {/* Mobile-Optimized Navbar */}
       <nav className="sticky top-0 z-50 campaign-card border-b border-border/30 transition-transform duration-300 hover:scale-[1.01] hover:shadow-gold/20 hover:border-campaign-gold/30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
@@ -68,7 +66,7 @@ export default function LandingPage() {
           
           <p className="text-foreground/80 text-lg sm:text-xl md:text-3xl mb-12 sm:mb-16 leading-relaxed font-light max-w-4xl mx-auto px-4">
             La competencia más <strong className="campaign-gold-gradient">épica</strong> de comedia 
-            donde los titulares más <strong className="text-campaign-red">absurdos</strong> 
+            donde los titulares más <strong className="text-campaign-red">absurdos </strong> 
             se enfrentan y el público decide quién reina supremo
           </p>
 

@@ -179,7 +179,6 @@ export default function VotePage() {
         <div className="fixed inset-0 -z-10">
           <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-campaign-gold/5 rounded-full blur-3xl animate-pulse" />
         </div>
-        <div className="campaign-accent-bar w-full h-1" />
         
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6">
           <div className="w-full max-w-md campaign-card backdrop-blur-xl bg-card/60 p-6 sm:p-8 animate-fade-in-up mx-4 shadow-2xl border border-white/5">
@@ -250,63 +249,28 @@ export default function VotePage() {
         <div className="absolute bottom-1/3 left-1/3 w-64 h-64 bg-campaign-red/5 rounded-full blur-3xl animate-pulse delay-700" />
       </div>
       
-      <div className="campaign-accent-bar w-full h-1 fixed top-0 z-[60]" />
 
       {/* Header */}
-      <div className={cn(
-        "fixed top-1 left-0 right-0 z-50 transition-all duration-500 ease-out",
-        scrolled ? "px-2 sm:px-4 py-2" : "px-0 py-0"
-      )}>
-        <div className={cn(
-          "mx-auto transition-all duration-500 ease-out campaign-card border-b border-white/5",
-          scrolled 
-            ? "max-w-3xl rounded-3xl shadow-xl border px-4 sm:px-6 py-2 bg-card/80 backdrop-blur-xl flex items-center justify-between transform scale-95 sm:scale-100" 
-            : "w-full rounded-none border-x-0 border-t-0 px-4 sm:px-6 pt-6 sm:pt-8 pb-4 sm:pb-6 text-center bg-card/40 backdrop-blur-md block"
-        )}>
-          {scrolled ? (
-            // Scrolled State (Compact horizontal)
-            <>
-              <div className="flex items-center gap-3">
-                <img src="/logo_fn.png" alt="F*cks News" className="h-8 drop-shadow-lg transition-transform duration-300" />
-                <div className="text-left hidden sm:block animate-fade-in">
-                  <h1 className="text-sm font-bold text-white leading-tight">{battle.title}</h1>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 animate-fade-in">
-                <div className="text-center">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</p>
-                  <p className="text-sm font-bold text-campaign-gold">{battle.totalVotes || 0}</p>
-                </div>
-                <VoteTimer expiresAt={battle.expiresAt} expired={expired} onExpire={() => setExpired(true)} compact />
-              </div>
-            </>
-          ) : (
-            // Expanded State (Original vertical)
-            <div className="animate-fade-in-up">
-              <img src="/logo_fn.png" alt="F*cks News" className="h-12 sm:h-14 mx-auto mb-4 sm:mb-6 drop-shadow-2xl transition-transform duration-300 hover:scale-105" />
-              <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-tight px-2 drop-shadow-md">{battle.title}</h1>
-              {battle.description && (
-                <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4 px-2">{battle.description}</p>
-              )}
-              <div className="flex items-center justify-center gap-4 sm:gap-6 mt-4">
-                <div className="text-center bg-background/30 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/5">
-                  <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider mb-1">Total Votos</p>
-                  <p className="text-lg sm:text-xl font-bold text-campaign-gold">{battle.totalVotes || 0}</p>
-                </div>
-                <div className="bg-background/30 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/5">
-                  <VoteTimer expiresAt={battle.expiresAt} expired={expired} onExpire={() => setExpired(true)} />
-                </div>
-              </div>
+      <div className="sticky top-0 z-50 campaign-card border-b border-white/5 bg-card/80 backdrop-blur-xl px-4 sm:px-6 py-3 sm:py-4">
+        <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <img src="/logo_fn.png" alt="F*cks News" className="h-8 sm:h-10 drop-shadow-lg" />
+            <div className="hidden sm:block">
+              <h1 className="text-sm sm:text-base font-bold text-white leading-tight">{battle.title}</h1>
             </div>
-          )}
+          </div>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="text-center">
+              <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Votos</p>
+              <p className="text-sm sm:text-base font-bold text-campaign-gold">{battle.totalVotes || 0}</p>
+            </div>
+            <VoteTimer expiresAt={battle.expiresAt} expired={expired} onExpire={() => setExpired(true)} compact />
+          </div>
         </div>
       </div>
 
-      {/* Mobile-Optimized Voting area */}
-      <div className={cn(
-        "max-w-2xl mx-auto px-4 sm:px-6 flex-1 w-full transition-all duration-500 ease-out",
-        scrolled ? "pt-24 sm:pt-28 pb-6 sm:pb-8" : "pt-8 sm:pt-10 pb-6 sm:pb-8"
-      )}>
+      {/* Voting area */}
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 flex-1 w-full pt-6 sm:pt-8 pb-6 sm:pb-8">
         {hasVoted && (
           <div className="mb-6 sm:mb-8 campaign-card backdrop-blur-xl bg-card/60 p-4 sm:p-6 text-center border border-campaign-gold/30 mx-2 sm:mx-0 shadow-lg animate-in zoom-in duration-300">
             <CheckCircle2 className="h-8 w-8 sm:h-10 sm:w-10 text-campaign-gold mx-auto mb-2 sm:mb-3 animate-bounce" />

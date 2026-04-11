@@ -219,8 +219,6 @@ export default function AdminPage() {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/5 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-campaign-blue/5 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
-      
-      <div className="campaign-accent-bar w-full h-1 fixed top-0 z-[60]" />
 
       <nav 
         className={cn(

@@ -172,7 +172,6 @@ export default function UserManagementPage() {
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-campaign-blue/5 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
       
-      <div className="campaign-accent-bar w-full h-1 fixed top-0 z-[60]" />
 
       <nav 
         className={cn(
