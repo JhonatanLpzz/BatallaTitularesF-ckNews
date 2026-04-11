@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Lock } from "lucide-react";
 import { toast } from "sonner";
@@ -13,10 +13,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (isAuthenticated) {
-    navigate("/admin", { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/admin", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,11 +31,6 @@ export default function LoginPage() {
       } else {
         await login(username.trim(), password.trim());
       }
-      
-      // Wait a bit for auth state to update before navigation
-      setTimeout(() => {
-        navigate("/admin", { replace: true });
-      }, 100);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error");
     } finally {

@@ -1,7 +1,7 @@
 // Production configuration with environment variables
 export const config = {
   // Server
-  port: parseInt(process.env.PORT || '3001'),
+  port: parseInt(process.env.PORT || '3001') || 3001,
   host: process.env.HOST || '0.0.0.0',
   nodeEnv: process.env.NODE_ENV || 'development',
   
@@ -9,9 +9,9 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-in-production-immediately',
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   
-  // Database (Railway persistent volume)
-  dbPath: process.env.DB_PATH || '/storage/data/batalla.db',
-  dbBackupPath: process.env.DB_BACKUP_PATH || '/storage/data/backups',
+  // Database - use local path in development, Railway volume in production
+  dbPath: process.env.DB_PATH || (process.env.NODE_ENV === 'production' ? '/storage/data/batalla.db' : './data/batalla.db'),
+  dbBackupPath: process.env.DB_BACKUP_PATH || (process.env.NODE_ENV === 'production' ? '/storage/data/backups' : './data/backups'),
   
   // Rate limiting (anti-spam)
   rateLimitVotes: parseInt(process.env.RATE_LIMIT_VOTES || '10'),

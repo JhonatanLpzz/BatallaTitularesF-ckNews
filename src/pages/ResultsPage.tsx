@@ -76,48 +76,51 @@ export default function ResultsPage() {
       
       <div className="campaign-accent-bar w-full h-1" />
 
-      {/* Navbar */}
+      {/* Mobile-Optimized Navbar */}
       <nav className="sticky top-0 z-50 campaign-card border-b border-border/30">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
             <Link to="/">
-              <Button variant="ghost" size="icon" className="text-foreground hover:text-campaign-gold">
+              <Button variant="ghost" size="icon" className="text-foreground hover:text-campaign-gold h-9 w-9 sm:h-10 sm:w-10">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
-            <img src="/logo_fn.png" alt="F*cks News" className="h-10 drop-shadow-lg" />
-            <div>
-              <h1 className="text-lg font-bold campaign-gold-gradient">RESULTADOS EN VIVO</h1>
-              <p className="text-xs text-muted-foreground">Batalla de Titulares</p>
+            <img src="/logo_fn.png" alt="F*cks News" className="h-8 sm:h-10 drop-shadow-lg" />
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-lg font-bold campaign-gold-gradient truncate">RESULTADOS</h1>
+              <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">Batalla de Titulares</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Badge variant="outline" className="font-mono text-sm border-campaign-gold/30 text-campaign-gold">
+          
+          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+            <Badge variant="outline" className="font-mono text-[10px] sm:text-sm border-campaign-gold/30 text-campaign-gold px-2 py-1">
               <Users className="h-3 w-3 mr-1" />
-              {battle.totalVotes || 0} votos
+              <span className="hidden sm:inline">votos</span>
+              <span className="sm:hidden">{battle.totalVotes || 0}</span>
+              <span className="hidden sm:inline">{battle.totalVotes || 0}</span>
             </Badge>
             {battle.status === "active" && (
-              <Badge variant="success" className="text-xs animate-pulse">EN VIVO</Badge>
+              <Badge variant="success" className="text-[10px] sm:text-xs animate-pulse px-2">VIVO</Badge>
             )}
             <CountdownBadge expiresAt={battle.expiresAt} />
           </div>
         </div>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-6 py-10 w-full flex-1">
-        {/* Title */}
-        <div className="text-center mb-12 animate-fade-in-up">
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-            <span className="campaign-gold-gradient animate-glow-pulse">{battle.title}</span>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full flex-1">
+        {/* Mobile-Optimized Title */}
+        <div className="text-center mb-8 sm:mb-12 animate-fade-in-up">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight mb-2 sm:mb-4 px-2">
+            <span className="campaign-gold-gradient animate-glow-pulse leading-tight">{battle.title}</span>
           </h1>
           {battle.description && (
-            <p className="text-foreground/80 text-lg">{battle.description}</p>
+            <p className="text-foreground/80 text-sm sm:text-lg px-4 leading-relaxed">{battle.description}</p>
           )}
-          <div className="w-24 h-1 bg-gold-gradient mx-auto mt-6 rounded-full" />
+          <div className="w-16 sm:w-24 h-1 bg-gold-gradient mx-auto mt-4 sm:mt-6 rounded-full" />
         </div>
 
-        {/* Results */}
-        <div className="space-y-6">
+        {/* Mobile-Optimized Results */}
+        <div className="space-y-4 sm:space-y-6">
           {sorted.map((participant: Participant, idx: number) => {
             const isWinner = idx === 0 && participant.votes > 0;
             const barWidth = maxVotes > 0 ? (participant.votes / maxVotes) * 100 : 0;
@@ -126,26 +129,59 @@ export default function ResultsPage() {
               <div
                 key={participant.id}
                 className={cn(
-                  "campaign-card p-8 transition-all animate-fade-in-up",
+                  "campaign-card p-4 sm:p-8 transition-all animate-fade-in-up",
                   isWinner && "battle-winner shadow-glow"
                 )}
                 style={{ animationDelay: `${idx * 0.15}s` }}
               >
-                <div className="flex items-center gap-6">
-                  {/* Position */}
-                  <div
-                    className={cn(
-                      "w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-xl shrink-0",
-                      isWinner
-                        ? "bg-campaign-gradient text-campaign-gold shadow-glow"
-                        : "bg-muted/20 text-muted-foreground"
-                    )}
-                  >
-                    {isWinner ? <Crown className="h-8 w-8" /> : idx + 1}
+                {/* Mobile Layout: Stack on mobile, side-by-side on desktop */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+                  
+                  {/* Header Row - Position + Name + Percentage */}
+                  <div className="flex items-center justify-between sm:justify-start gap-3 sm:gap-6">
+                    {/* Position Icon/Number */}
+                    <div
+                      className={cn(
+                        "w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center font-bold text-lg sm:text-xl shrink-0",
+                        isWinner
+                          ? "bg-campaign-gradient text-campaign-gold shadow-glow"
+                          : "bg-muted/20 text-muted-foreground"
+                      )}
+                    >
+                      {isWinner ? <Crown className="h-6 w-6 sm:h-8 sm:w-8" /> : idx + 1}
+                    </div>
+
+                    {/* Name + Champion Badge (Mobile) */}
+                    <div className="flex items-center gap-2 flex-1 min-w-0 sm:hidden">
+                      <div
+                        className="w-3 h-3 rounded-full shadow-glow"
+                        style={{ backgroundColor: participant.color }}
+                      />
+                      <span className="font-bold text-lg text-white truncate">{participant.name}</span>
+                      {isWinner && (
+                        <span className="text-[10px] font-bold text-campaign-gold bg-campaign-gold/10 px-2 py-1 rounded-full whitespace-nowrap">
+                          CAMPEÓN
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Percentage (Mobile) */}
+                    <div className="flex flex-col items-end sm:hidden">
+                      <span
+                        className="text-2xl font-bold leading-none"
+                        style={{ color: participant.color }}
+                      >
+                        {participant.percentage}%
+                      </span>
+                      <span className="text-xs text-muted-foreground font-medium mt-1">
+                        {participant.votes} votos
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    {/* Name and percentage */}
+                  {/* Desktop Layout Content */}
+                  <div className="flex-1 min-w-0 hidden sm:block">
+                    {/* Name and percentage - Desktop */}
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
                         <div
@@ -171,23 +207,25 @@ export default function ResultsPage() {
                         </span>
                       </div>
                     </div>
+                  </div>
+                </div>
 
-                    {/* Headline */}
-                    <p className="text-base text-foreground/80 mb-4 font-medium leading-relaxed">
-                      "{participant.headline}"
-                    </p>
+                {/* Headline - Full Width */}
+                <div className="mt-3 sm:mt-0 sm:ml-20">
+                  <p className="text-sm sm:text-base text-foreground/80 mb-3 sm:mb-4 font-medium leading-relaxed">
+                    "{participant.headline}"
+                  </p>
 
-                    {/* Progress bar */}
-                    <div className="h-4 rounded-full bg-muted/20 overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-1500 ease-out shadow-glow"
-                        style={{
-                          backgroundColor: participant.color,
-                          width: `${barWidth}%`,
-                          boxShadow: `0 0 20px ${participant.color}40`,
-                        }}
-                      />
-                    </div>
+                  {/* Progress bar */}
+                  <div className="h-3 sm:h-4 rounded-full bg-muted/20 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-1500 ease-out shadow-glow"
+                      style={{
+                        backgroundColor: participant.color,
+                        width: `${barWidth}%`,
+                        boxShadow: `0 0 20px ${participant.color}40`,
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -203,17 +241,17 @@ export default function ResultsPage() {
         )}
       </main>
 
-      {/* Fan message + Footer */}
-      <footer className="border-t border-border/30 campaign-card px-6 py-8">
+      {/* Mobile-Optimized Footer */}
+      <footer className="border-t border-border/30 campaign-card px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-sm text-foreground/70 leading-relaxed max-w-2xl mx-auto mb-4">
+          <p className="text-xs sm:text-sm text-foreground/70 leading-relaxed max-w-2xl mx-auto mb-3 sm:mb-4 px-2">
             Gracias a <strong className="campaign-gold-gradient">F*cks News Noticreo</strong> por esa comedia ácida
             y bien pensada. Son el apoyo y la risa de mucha gente.
             ¡Esperamos verlos pronto en tarima — la última vez no alcanzamos a comprar boletas!
           </p>
-          <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-muted-foreground">
             <span>Desarrollado con ❤️ por <strong className="text-campaign-gold">Jhonatan Lopez Conde</strong></span>
-            <span>•</span>
+            <span className="hidden sm:inline">•</span>
             <span>Bogotá, Colombia</span>
           </div>
         </div>
@@ -227,13 +265,14 @@ function CountdownBadge({ expiresAt }: { expiresAt?: string | null }) {
   if (!countdown) return null;
 
   if (countdown.isExpired) {
-    return <Badge variant="destructive" className="text-[10px]">FINALIZADA</Badge>;
+    return <Badge variant="destructive" className="text-[10px] px-2">FINALIZADA</Badge>;
   }
 
   return (
-    <Badge variant="outline" className="font-mono text-xs text-fn-red border-fn-red/30">
+    <Badge variant="outline" className="font-mono text-[10px] sm:text-xs text-fn-red border-fn-red/30 px-2">
       <Timer className="h-3 w-3 mr-1" />
-      {countdown.display}
+      <span className="hidden sm:inline">{countdown.display}</span>
+      <span className="sm:hidden">{countdown.display.split(':')[0]}m</span>
     </Badge>
   );
 }

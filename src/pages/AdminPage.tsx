@@ -34,7 +34,7 @@ const DEFAULT_COLORS = ["#1a56a8", "#dc2626", "#10b981", "#f59e0b", "#7c3aed", "
 
 export default function AdminPage() {
   const navigate = useNavigate();
-  const { token, username, logout } = useAuth();
+  const { token, username, logout, isAuthenticated } = useAuth();
   const [battles, setBattles] = useState<Battle[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -54,6 +54,12 @@ export default function AdminPage() {
   const authHeaders = { Authorization: `Bearer ${token}` };
 
   const fetchBattles = useCallback(async () => {
+    // Don't fetch if not authenticated or still loading auth state
+    if (!isAuthenticated || !token) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/battles", { headers: authHeaders });
       if (!res.ok) throw new Error();
@@ -64,11 +70,16 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, isAuthenticated]);
 
   useEffect(() => {
-    fetchBattles();
-  }, [fetchBattles]);
+    // Only fetch when auth state is ready and user is authenticated
+    if (isAuthenticated && token) {
+      fetchBattles();
+    } else {
+      setLoading(false);
+    }
+  }, [fetchBattles, isAuthenticated, token]);
 
   const addParticipant = () => {
     if (participants.length >= 6) return;
