@@ -22,6 +22,24 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Prevent body scroll when any modal is open
+  useEffect(() => {
+    const checkModals = () => {
+      const hasOpenModal = !!document.querySelector('[role="dialog"]');
+      document.body.style.overflow = hasOpenModal ? 'hidden' : '';
+    };
+
+    const observer = new MutationObserver(checkModals);
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    checkModals();
+    
+    return () => {
+      observer.disconnect();
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
       {/* Animated background elements */}
@@ -30,8 +48,8 @@ export default function LandingPage() {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-campaign-red/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
-      {/* Mobile-Optimized Navbar */}
-      <nav className="sticky top-0 z-50 campaign-card border-b border-border/30 transition-transform duration-300 hover:scale-[1.01] hover:shadow-gold/20 hover:border-campaign-gold/30">
+      {/* Fixed Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-40 campaign-card border-b border-border/30 transition-transform duration-300 hover:scale-[1.01] hover:shadow-gold/20 hover:border-campaign-gold/30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
           <div className="flex items-center gap-3 sm:gap-5 flex-1 min-w-0">
             <Link to="/" className="shrink-0">
@@ -52,8 +70,8 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Mobile-Optimized Hero Section */}
-      <section className="flex-1 flex items-center justify-center px-4 sm:px-6 py-16 sm:py-24">
+      {/* Hero Section */}
+      <section className="flex-1 flex items-center justify-center px-4 sm:px-6 pt-20 sm:pt-24 pb-16 sm:py-24">
         <div className="max-w-5xl mx-auto text-center animate-fade-in-up">
           <div className="mb-8 sm:mb-12">
             <h1 className="text-3xl sm:text-4xl md:text-7xl font-bold tracking-tight mb-4 sm:mb-6 leading-tight">

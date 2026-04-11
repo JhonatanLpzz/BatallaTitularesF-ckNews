@@ -43,8 +43,8 @@ export default function AdminPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [participants, setParticipants] = useState<ParticipantInput[]>([
-    { name: "Camilo Pardo 'El mago'", headline: "[Titular sera dado en vivo]", color: DEFAULT_COLORS[0] },
-    { name: "Camilo Sanchez 'El Inquieto'", headline: "[Titular sera dado en vivo]", color: DEFAULT_COLORS[1] },
+    { name: "Camilo Pardo 'El Mago'", headline: "Titulares en vivo", color: DEFAULT_COLORS[0] },
+    { name: "Camilo Sanchez 'El Inquieto'", headline: "Titulares en vivo", color: DEFAULT_COLORS[1] },
   ]);
   const [durationMinutes, setDurationMinutes] = useState("");
   const [creating, setCreating] = useState(false);

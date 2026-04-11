@@ -52,19 +52,21 @@ function DialogContent({
   return (
     <div
       className={cn(
-        "relative z-50 w-full max-w-lg rounded-xl border bg-background p-6 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200 pointer-events-auto",
+        "relative z-50 w-full max-w-lg rounded-xl border bg-background shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200 pointer-events-auto flex flex-col max-h-[90vh]",
         className
       )}
       onClick={(e) => e.stopPropagation()}
     >
       <button
         onClick={handleClose}
-        className="absolute right-4 top-4 rounded-full p-2 bg-muted/50 text-muted-foreground opacity-70 transition-all hover:opacity-100 hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        className="absolute right-4 top-4 rounded-full p-2 bg-muted/50 text-muted-foreground opacity-70 transition-all hover:opacity-100 hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
         aria-label="Close"
       >
         <X className="h-4 w-4" />
       </button>
-      {children}
+      <div className="flex-1 overflow-y-auto p-6">
+        {children}
+      </div>
     </div>
   );
 }
