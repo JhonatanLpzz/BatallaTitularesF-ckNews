@@ -4,27 +4,27 @@
 
 @layer base {
   :root {
-    /* F*ck News Campaign Colors - Inspired by show posters */
+    /* F*ck News Campaign Colors - Mobile Optimized */
     --background: 220 25% 8%;
-    --foreground: 0 0% 95%;
-    --card: 220 20% 12%;
-    --card-foreground: 0 0% 95%;
-    --popover: 220 20% 12%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 45 96% 65%;
+    --foreground: 0 0% 98%;
+    --card: 220 18% 15%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 18% 15%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 45 96% 68%;
     --primary-foreground: 220 25% 8%;
-    --secondary: 217 78% 45%;
-    --secondary-foreground: 0 0% 95%;
-    --muted: 220 15% 20%;
-    --muted-foreground: 220 9% 65%;
-    --accent: 0 72% 55%;
-    --accent-foreground: 0 0% 95%;
-    --destructive: 0 62% 50%;
+    --secondary: 217 78% 50%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 220 12% 25%;
+    --muted-foreground: 220 8% 75%;
+    --accent: 0 72% 58%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 65% 55%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 25%;
-    --input: 220 15% 20%;
-    --ring: 45 96% 65%;
-    --radius: 0.75rem;
+    --border: 220 12% 35%;
+    --input: 220 12% 25%;
+    --ring: 45 96% 68%;
+    --radius: 0.875rem;
 
     /* Campaign-inspired tokens */
     --campaign-gold: 45 96% 65%;
@@ -59,13 +59,37 @@
   }
 
   .campaign-card {
-    @apply bg-gradient-to-br from-card to-card/80 backdrop-blur-xl border border-border/50;
-    box-shadow: 0 25px 50px -12px hsl(220 25% 8% / 0.8);
+    @apply bg-gradient-to-br from-card to-card/90 backdrop-blur-xl border border-border;
+    box-shadow: 0 10px 40px -8px hsl(220 25% 4% / 0.9);
   }
 
   .campaign-button {
-    @apply bg-gradient-to-r from-primary to-campaign-gold hover:shadow-lg hover:shadow-primary/25;
+    @apply bg-gradient-to-r from-primary to-campaign-gold hover:shadow-lg hover:shadow-primary/30 font-semibold;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 44px; /* Touch-friendly minimum */
+  }
+
+  /* Mobile-optimized styles */
+  @media (max-width: 640px) {
+    .campaign-card {
+      @apply p-4 rounded-xl;
+      box-shadow: 0 8px 32px -6px hsl(220 25% 4% / 0.9);
+    }
+    
+    .mobile-title {
+      font-size: clamp(1.25rem, 4vw, 1.75rem);
+      line-height: 1.2;
+    }
+    
+    .mobile-text {
+      font-size: clamp(0.875rem, 3vw, 1rem);
+      line-height: 1.4;
+    }
+    
+    .mobile-button {
+      min-height: 48px;
+      font-size: 1rem;
+    }
   }
 
   .campaign-accent-bar {

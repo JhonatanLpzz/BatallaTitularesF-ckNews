@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Plus, Edit2, Trash2, Key, User, ArrowLeft, Loader2, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -155,76 +155,108 @@ export default function UserManagementPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="fn-accent-bar w-full" />
+    <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-campaign-gold/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-campaign-blue/5 rounded-full blur-3xl animate-pulse delay-1000" />
+      </div>
+      
+      <div className="campaign-accent-bar w-full h-1" />
 
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-white border-b">
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <img src="/logo_fn.png" alt="F*cks News" className="h-8" />
-            <span className="text-sm text-muted-foreground">/ Usuarios</span>
+      <nav className="sticky top-0 z-50 campaign-card border-b border-border/30">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <Link to="/admin">
+              <Button variant="ghost" size="icon" className="text-foreground hover:text-campaign-gold shrink-0">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <img src="/logo_fn.png" alt="F*cks News" className="h-8 sm:h-10 drop-shadow-lg shrink-0" />
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-lg font-bold campaign-gold-gradient truncate">USUARIOS</h1>
+              <p className="text-xs text-muted-foreground hidden sm:block">Gestión de Administradores</p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground hidden sm:block">{username}</span>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="text-right hidden sm:block">
+              <p className="text-xs text-campaign-gold font-medium">{username}</p>
+              <p className="text-[10px] text-muted-foreground">Administrador</p>
+            </div>
+            <Button variant="destructive" size="sm" onClick={handleLogout} className="shrink-0">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-4 py-6 w-full flex-1">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-lg font-semibold">Administradores</h1>
-          <Button size="sm" onClick={() => setShowCreate(true)}>
-            <Plus className="h-4 w-4 mr-1.5" />
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 w-full flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-white mobile-title">Administradores</h1>
+            <p className="text-muted-foreground mobile-text">Gestión de usuarios del sistema</p>
+          </div>
+          <Button 
+            onClick={() => setShowCreate(true)} 
+            className="campaign-button mobile-button w-full sm:w-auto"
+          >
+            <Plus className="h-4 w-4 mr-2" />
             Nuevo Usuario
           </Button>
         </div>
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <Loader2 className="h-8 w-8 animate-spin text-campaign-gold" />
+          </div>
+        ) : users.length === 0 ? (
+          <div className="campaign-card p-8 sm:p-12 text-center">
+            <User className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
+            <p className="text-lg text-muted-foreground mb-2">No hay usuarios</p>
+            <p className="text-sm text-muted-foreground/60">Crea el primer administrador</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {users.map((user) => (
-              <Card key={user.id} className="bg-white">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <User className="h-8 w-8 text-muted-foreground" />
-                      <div>
-                        <p className="font-medium">{user.username}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Creado: {new Date(user.createdAt).toLocaleDateString()}
+          <div className="space-y-4">
+            {users.map((user, idx) => (
+              <div 
+                key={user.id} 
+                className="campaign-card p-4 sm:p-6 animate-fade-in-up"
+                style={{ animationDelay: `${idx * 0.1}s` }}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 bg-campaign-gradient rounded-xl flex items-center justify-center shrink-0">
+                        <User className="h-5 w-5 text-campaign-gold" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-bold text-lg text-white mobile-title truncate">{user.username}</h3>
+                        <p className="text-sm text-muted-foreground mobile-text">
+                          Creado: {new Date(user.createdAt).toLocaleDateString('es-ES')}
                         </p>
                       </div>
-                      {user.username === username && (
-                        <span className="text-[10px] bg-primary/10 text-primary px-2 py-1 rounded">TU</span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <Button size="sm" variant="outline" onClick={() => openEdit(user)}>
-                        <Edit2 className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => deleteUser(user)}
-                        disabled={user.username === username || users.length <= 1}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => openEdit(user)}
+                      className="flex-1 sm:flex-none hover:border-campaign-gold hover:text-campaign-gold"
+                    >
+                      <Edit2 className="h-4 w-4 mr-1 sm:mr-0" />
+                      <span className="sm:hidden">Editar</span>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => deleteUser(user)}
+                      className="shrink-0"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         )}
