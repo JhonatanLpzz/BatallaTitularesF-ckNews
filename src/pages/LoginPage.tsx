@@ -30,7 +30,11 @@ export default function LoginPage() {
       } else {
         await login(username.trim(), password.trim());
       }
-      navigate("/admin", { replace: true });
+      
+      // Wait a bit for auth state to update before navigation
+      setTimeout(() => {
+        navigate("/admin", { replace: true });
+      }, 100);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error");
     } finally {

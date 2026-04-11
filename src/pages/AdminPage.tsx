@@ -255,122 +255,124 @@ export default function AdminPage() {
           <div className="space-y-6">
             {battles.map((battle, idx) => (
               <div key={battle.id} className="campaign-card overflow-hidden animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
-                {/* Battle Header */}
-                <div className="px-8 py-6 border-b border-border/10">
-                  <div className="flex items-start justify-between gap-6">
-                    <div className="flex-1 min-w-0">
-                      {/* Title and Status */}
-                      <div className="flex items-center gap-4 mb-4">
-                        <h2 className="text-2xl font-bold text-white truncate">{battle.title}</h2>
-                        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold tracking-wide ${
-                          battle.status === 'active' 
-                            ? 'bg-gradient-to-r from-green-500/20 to-green-400/20 text-green-300 border border-green-500/30 shadow-lg shadow-green-500/10' 
-                            : battle.status === 'closed' 
-                            ? 'bg-gradient-to-r from-red-500/20 to-red-400/20 text-red-300 border border-red-500/30'
-                            : 'bg-gradient-to-r from-gray-500/20 to-gray-400/20 text-gray-300 border border-gray-500/30'
-                        }`}>
-                          <div className={`w-2 h-2 rounded-full ${
-                            battle.status === 'active' ? 'bg-green-400 animate-pulse' :
-                            battle.status === 'closed' ? 'bg-red-400' : 'bg-gray-400'
-                          }`} />
-                          {battle.status === 'active' ? 'EN VIVO' : battle.status === 'closed' ? 'CERRADA' : 'BORRADOR'}
-                        </div>
+                {/* Mobile-Optimized Header */}
+                <div className="px-4 sm:px-8 py-4 sm:py-6 border-b border-border/10">
+                  <div className="space-y-4">
+                    {/* Title and Status - Mobile Stack */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                      <h2 className="text-xl sm:text-2xl font-bold text-white">{battle.title}</h2>
+                      <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold tracking-wide self-start ${
+                        battle.status === 'active' 
+                          ? 'bg-gradient-to-r from-green-500/20 to-green-400/20 text-green-300 border border-green-500/30 shadow-lg shadow-green-500/10' 
+                          : battle.status === 'closed' 
+                          ? 'bg-gradient-to-r from-red-500/20 to-red-400/20 text-red-300 border border-red-500/30'
+                          : 'bg-gradient-to-r from-gray-500/20 to-gray-400/20 text-gray-300 border border-gray-500/30'
+                      }`}>
+                        <div className={`w-2 h-2 rounded-full ${
+                          battle.status === 'active' ? 'bg-green-400 animate-pulse' :
+                          battle.status === 'closed' ? 'bg-red-400' : 'bg-gray-400'
+                        }`} />
+                        {battle.status === 'active' ? 'EN VIVO' : battle.status === 'closed' ? 'CERRADA' : 'BORRADOR'}
+                      </div>
+                    </div>
+                    
+                    {/* Description */}
+                    {battle.description && (
+                      <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">{battle.description}</p>
+                    )}
+                    
+                    {/* Mobile-Friendly Metadata */}
+                    <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:gap-6 text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">Código:</span>
+                        <code className="font-mono text-campaign-gold font-bold text-sm sm:text-base px-2 sm:px-3 py-1 sm:py-1.5 bg-campaign-gold/10 border border-campaign-gold/20 rounded">
+                          {battle.code}
+                        </code>
                       </div>
                       
-                      {/* Description */}
-                      {battle.description && (
-                        <p className="text-muted-foreground mb-4 leading-relaxed text-base">{battle.description}</p>
-                      )}
-                      
-                      {/* Metadata */}
-                      <div className="flex items-center gap-6 text-sm">
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground">Código de Batalla:</span>
-                          <code className="font-mono text-campaign-gold font-bold text-base px-3 py-1.5 bg-campaign-gold/10 border border-campaign-gold/20 rounded-md">
-                            {battle.code}
-                          </code>
-                        </div>
-                        
+                      <div className="flex items-center justify-between sm:justify-start gap-4 sm:gap-6">
                         {battle.durationMinutes && (
-                          <div className="flex items-center gap-2 text-campaign-blue font-medium">
+                          <div className="flex items-center gap-2 text-campaign-blue font-medium text-sm">
                             <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M12,20A7,7 0 0,1 5,13A7,7 0 0,1 12,6A7,7 0 0,1 19,13A7,7 0 0,1 12,20M19.03,7.39L20.45,5.97C20,5.46 19.55,5 19.04,4.56L17.62,6C16.07,4.74 14.12,4 12,4A9,9 0 0,0 3,13A9,9 0 0,0 12,22C17,22 21,17.97 21,13C21,10.88 20.26,8.93 19.03,7.39M11,14H13V8H11M15,1H9V3H15V1Z"/>
                             </svg>
-                            Timer: {battle.durationMinutes} minutos
+                            {battle.durationMinutes} min
                           </div>
                         )}
                         
-                        <div className="flex items-center gap-2 text-muted-foreground ml-auto">
-                          <span>Creada:</span>
+                        <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                          <span className="hidden sm:inline">Creada:</span>
                           <time>{new Date(battle.createdAt).toLocaleDateString('es-ES', { 
-                            day: 'numeric', month: 'short', year: 'numeric' 
+                            day: 'numeric', month: 'short', year: battle.durationMinutes ? undefined : 'numeric' 
                           })}</time>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                {/* Professional Action Bar */}
-                <div className="px-8 py-5 bg-card/20 border-t border-border/10">
-                  <div className="flex items-center justify-between">
+                {/* Mobile-Optimized Action Bar */}
+                <div className="px-4 sm:px-8 py-4 sm:py-5 bg-card/20 border-t border-border/10">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     {/* Primary CTA */}
-                    <div className="flex items-center gap-4">
-                      <Button
-                        size="lg"
-                        variant={battle.status === "active" ? "destructive" : "default"}
-                        onClick={() =>
-                          updateStatus(
-                            battle.id,
-                            battle.status === "active" ? "closed" : "active"
-                          )
-                        }
-                        className={`h-12 px-8 font-semibold text-base ${
-                          battle.status !== "active" ? "campaign-button" : ""
-                        }`}
-                      >
-                        {battle.status === "active" ? (
-                          <><Square className="h-5 w-5 mr-3" />Cerrar Batalla</>
-                        ) : (
-                          <><Play className="h-5 w-5 mr-3" />Activar Batalla</>
-                        )}
-                      </Button>
-                    </div>
+                    <Button
+                      size="lg"
+                      variant={battle.status === "active" ? "destructive" : "default"}
+                      onClick={() =>
+                        updateStatus(
+                          battle.id,
+                          battle.status === "active" ? "closed" : "active"
+                        )
+                      }
+                      className={`w-full sm:w-auto h-12 px-6 sm:px-8 font-semibold text-base ${
+                        battle.status !== "active" ? "campaign-button" : ""
+                      }`}
+                    >
+                      {battle.status === "active" ? (
+                        <><Square className="h-5 w-5 mr-2 sm:mr-3" />Cerrar Batalla</>
+                      ) : (
+                        <><Play className="h-5 w-5 mr-2 sm:mr-3" />Activar Batalla</>
+                      )}
+                    </Button>
                     
-                    {/* Secondary Actions Group */}
-                    <div className="flex items-center gap-3">
-                      <Button 
-                        variant="outline" 
-                        onClick={() => showQR(battle)} 
-                        className="h-10 px-6 hover:border-campaign-gold hover:text-campaign-gold font-medium"
-                      >
-                        <QrCode className="h-4 w-4 mr-2" />
-                        Mostrar QR
-                      </Button>
-                      
-                      <Button variant="outline" asChild className="h-10 px-6 hover:border-campaign-blue hover:text-campaign-blue font-medium">
-                        <Link to={`/resultados/${battle.code}`}>
-                          <BarChart3 className="h-4 w-4 mr-2" />
-                          Ver Resultados
-                        </Link>
-                      </Button>
-                      
-                      {/* Utility Actions */}
-                      <div className="flex items-center gap-1 ml-3 border-l border-border/30 pl-3">
+                    {/* Secondary Actions - Mobile Stack */}
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
+                      <div className="flex gap-2">
                         <Button 
-                          variant="ghost" 
+                          variant="outline" 
+                          onClick={() => showQR(battle)} 
+                          className="flex-1 sm:flex-none h-11 sm:h-10 px-4 sm:px-6 hover:border-campaign-gold hover:text-campaign-gold font-medium"
+                        >
+                          <QrCode className="h-4 w-4 mr-2" />
+                          <span className="sm:hidden">QR</span>
+                          <span className="hidden sm:inline">Mostrar QR</span>
+                        </Button>
+                        
+                        <Button variant="outline" asChild className="flex-1 sm:flex-none h-11 sm:h-10 px-4 sm:px-6 hover:border-campaign-blue hover:text-campaign-blue font-medium">
+                          <Link to={`/resultados/${battle.code}`}>
+                            <BarChart3 className="h-4 w-4 mr-2" />
+                            <span className="sm:hidden">Resultados</span>
+                            <span className="hidden sm:inline">Ver Resultados</span>
+                          </Link>
+                        </Button>
+                      </div>
+                      
+                      {/* Utility Actions - Mobile Friendly */}
+                      <div className="flex items-center gap-2 justify-center sm:justify-start sm:ml-3 sm:border-l sm:border-border/30 sm:pl-3">
+                        <Button 
+                          variant="outline" 
                           size="sm"
                           onClick={() => resetVotes(battle.id)} 
-                          className="h-9 w-9 p-0 hover:bg-amber-500/10 hover:text-amber-400 rounded-lg"
+                          className="h-11 sm:h-9 w-11 sm:w-9 p-0 hover:bg-amber-500/10 hover:text-amber-400 rounded-lg"
                           title="Reiniciar votos"
                         >
                           <RotateCcw className="h-4 w-4" />
                         </Button>
                         
                         <Button 
-                          variant="ghost" 
+                          variant="outline"
                           size="sm"
                           onClick={() => deleteBattle(battle.id)} 
-                          className="h-9 w-9 p-0 hover:bg-red-500/10 hover:text-red-400 rounded-lg"
+                          className="h-11 sm:h-9 w-11 sm:w-9 p-0 hover:bg-red-500/10 hover:text-red-400 rounded-lg"
                           title="Eliminar batalla"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -483,28 +485,40 @@ export default function AdminPage() {
         </DialogContent>
       </Dialog>
 
-      {/* QR Dialog */}
+      {/* QR Dialog - Mobile Optimized */}
       <Dialog open={!!qrData} onOpenChange={() => { setQrData(null); setQrBattle(null); }}>
-        <DialogContent onClose={() => { setQrData(null); setQrBattle(null); }} className="text-center">
-          <DialogHeader>
-            <DialogTitle>{qrBattle?.title}</DialogTitle>
+        <DialogContent className="campaign-card max-w-sm mx-4 max-h-[90vh] overflow-y-auto p-6">
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="text-xl text-center text-white">{qrBattle?.title}</DialogTitle>
+            <p className="text-sm text-muted-foreground text-center">Escanea para votar</p>
           </DialogHeader>
+          
           {qrData && (
-            <div className="space-y-4 mt-4">
-              <div className="bg-white rounded-lg border p-4 inline-block mx-auto">
-                <img src={qrData.qr} alt="QR Code" className="w-56 h-56 mx-auto" />
+            <div className="space-y-6 mt-6">
+              <div className="bg-white rounded-xl p-4 mx-auto max-w-fit">
+                <img 
+                  src={qrData.qr} 
+                  alt="QR Code" 
+                  className="w-48 h-48 sm:w-56 sm:h-56 mx-auto block" 
+                />
               </div>
-              <p className="text-sm text-muted-foreground break-all font-mono">{qrData.url}</p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  navigator.clipboard.writeText(qrData.url);
-                  toast.success("URL copiada");
-                }}
-              >
-                Copiar URL
-              </Button>
+              
+              <div className="text-center space-y-4">
+                <p className="text-xs text-muted-foreground break-all font-mono px-2 py-2 bg-muted/20 rounded-lg">
+                  {qrData.url}
+                </p>
+                
+                <Button
+                  variant="outline"
+                  className="w-full h-12 font-medium"
+                  onClick={() => {
+                    navigator.clipboard.writeText(qrData.url);
+                    toast.success("URL copiada al portapapeles");
+                  }}
+                >
+                  📋 Copiar URL
+                </Button>
+              </div>
             </div>
           )}
         </DialogContent>
