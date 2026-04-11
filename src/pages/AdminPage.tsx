@@ -13,6 +13,7 @@ import {
   LogOut,
   Users,
   Swords,
+  Clipboard,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -583,7 +584,8 @@ export default function AdminPage() {
                     toast.success("URL copiada al portapapeles");
                   }}
                 >
-                  📋 Copiar URL
+                  <Clipboard className="w-4 h-4 mr-2" />
+                  Copiar URL
                 </Button>
               </div>
             </div>

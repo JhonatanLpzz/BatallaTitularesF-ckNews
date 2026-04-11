@@ -1,1 +1,198 @@
-@tailwind base; @tailwind components; @tailwind utilities; @layer base { :root { /* F*ck News Campaign Colors - Mobile Optimized */ --background: 220 25% 8%; --foreground: 0 0% 98%; --card: 220 18% 15%; --card-foreground: 0 0% 98%; --popover: 220 18% 15%; --popover-foreground: 0 0% 98%; --primary: 45 96% 68%; --primary-foreground: 220 25% 8%; --secondary: 217 78% 50%; --secondary-foreground: 0 0% 98%; --muted: 220 12% 25%; --muted-foreground: 220 8% 75%; --accent: 0 72% 58%; --accent-foreground: 0 0% 98%; --destructive: 0 65% 55%; --destructive-foreground: 0 0% 98%; --border: 220 12% 35%; --input: 220 12% 25%; --ring: 45 96% 68%; --radius: 0.875rem; /* Campaign-inspired tokens */ --campaign-gold: 45 96% 65%; --campaign-blue: 212 96% 25%; /* Navy Blue from logo */ --campaign-red: 355 78% 48%; /* Bright Red from logo */ --campaign-purple: 212 96% 25%; /* Replaced purple with Navy Blue */ } * { @apply border-border; } body { @apply bg-background text-foreground font-sans antialiased; background: linear-gradient(135deg, hsl(220 25% 8%) 0%, hsl(212 96% 12%) 50%, hsl(220 25% 8%) 100%); min-height: 100vh; } .campaign-gradient { background: linear-gradient(135deg, hsl(212 96% 25%) 0%, hsl(212 96% 15%) 50%, hsl(355 78% 48%) 100%); } .campaign-gold-gradient { background: linear-gradient(135deg, hsl(45 96% 65%) 0%, hsl(35 85% 55%) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; } .campaign-text-glow { text-shadow: 0 0 20px hsl(45 96% 65% / 0.5); } .campaign-card { @apply bg-gradient-to-br from-card/60 to-card/40 backdrop-blur-2xl border border-border/30; box-shadow: 0 10px 40px -8px hsl(220 25% 4% / 0.9); } .campaign-button { @apply bg-gradient-to-r from-primary to-campaign-gold hover:shadow-lg hover:shadow-primary/30 font-semibold; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); min-height: 44px; /* Touch-friendly minimum */ } /* Mobile-optimized styles */ @media (max-width: 640px) { .campaign-card { @apply p-4 rounded-xl; box-shadow: 0 8px 32px -6px hsl(220 25% 4% / 0.9); } .mobile-title { font-size: clamp(1.25rem, 4vw, 1.75rem); line-height: 1.2; } .mobile-text { font-size: clamp(0.875rem, 3vw, 1rem); line-height: 1.4; } .mobile-button { min-height: 48px; font-size: 1rem; } } .battle-winner { @apply relative; background: linear-gradient(135deg, hsl(45 96% 65% / 0.1) 0%, hsl(0 72% 55% / 0.1) 100%); border: 1px solid hsl(45 96% 65% / 0.3); box-shadow: 0 0 30px hsl(45 96% 65% / 0.2); } .voting-card { @apply campaign-card hover:scale-[1.02] active:scale-[0.98]; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); } .voting-card:hover { box-shadow: 0 25px 50px -12px hsl(45 96% 65% / 0.2); } /* Professional scrollbar */ ::-webkit-scrollbar { @apply w-2; } ::-webkit-scrollbar-track { @apply bg-transparent; } ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, hsl(45 96% 65%) 0%, hsl(212 96% 25%) 100%); @apply rounded-full; } ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, hsl(45 96% 75%) 0%, hsl(212 96% 35%) 100%); } /* Modern animations */ @keyframes fade-in-up { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } } @keyframes glow-pulse { 0%, 100% { text-shadow: 0 0 20px hsl(45 96% 65% / 0.5); } 50% { text-shadow: 0 0 30px hsl(45 96% 65% / 0.8); } } @keyframes gradient-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } } .animate-fade-in-up { animation: fade-in-up 0.6s cubic-bezier(0.4, 0, 0.2, 1); } .animate-glow-pulse { animation: glow-pulse 3s ease-in-out infinite; } .animate-gradient-shift { background-size: 200% 200%; animation: gradient-shift 8s ease infinite; } } /* Flat accent bar */ .fn-accent-bar { height: 3px; background: hsl(var(--fn-red)); } /* Battle winner highlight */ .battle-winner { border-left: 3px solid hsl(var(--fn-red)); }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        /* F*ck News Campaign Colors - Mobile Optimized */
+        --background: 220 25% 8%;
+        --foreground: 0 0% 98%;
+        --card: 220 18% 15%;
+        --card-foreground: 0 0% 98%;
+        --popover: 220 18% 15%;
+        --popover-foreground: 0 0% 98%;
+        --primary: 45 96% 68%;
+        --primary-foreground: 220 25% 8%;
+        --secondary: 217 78% 50%;
+        --secondary-foreground: 0 0% 98%;
+        --muted: 220 12% 25%;
+        --muted-foreground: 220 8% 75%;
+        --accent: 0 72% 58%;
+        --accent-foreground: 0 0% 98%;
+        --destructive: 0 65% 55%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 220 12% 35%;
+        --input: 220 12% 25%;
+        --ring: 45 96% 68%;
+        --radius: 0.875rem;
+        /* Campaign-inspired tokens */
+        --campaign-gold: 45 96% 65%;
+        --campaign-blue: 212 96% 25%;
+        /* Navy Blue from logo */
+        --campaign-red: 355 78% 48%;
+        /* Bright Red from logo */
+        --campaign-purple: 212 96% 25%;
+        /* Replaced purple with Navy Blue */
+    }
+
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground font-sans antialiased;
+        background: linear-gradient(135deg, hsl(220 25% 8%) 0%, hsl(212 96% 12%) 50%, hsl(220 25% 8%) 100%);
+        min-height: 100vh;
+    }
+
+    .campaign-gradient {
+        background: linear-gradient(135deg, hsl(212 96% 25%) 0%, hsl(212 96% 15%) 50%, hsl(355 78% 48%) 100%);
+    }
+
+    .campaign-gold-gradient {
+        background: linear-gradient(135deg, hsl(45 96% 65%) 0%, hsl(35 85% 55%) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .campaign-text-glow {
+        text-shadow: 0 0 20px hsl(45 96% 65% / 0.5);
+    }
+
+    .campaign-card {
+        @apply bg-gradient-to-br from-card/60 to-card/40 backdrop-blur-2xl border border-border/30;
+        box-shadow: 0 10px 40px -8px hsl(220 25% 4% / 0.9);
+    }
+
+    .campaign-button {
+        @apply bg-gradient-to-r from-primary to-campaign-gold hover:shadow-lg hover:shadow-primary/30 font-semibold;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: 44px;
+        /* Touch-friendly minimum */
+    }
+
+    /* Mobile-optimized styles */
+    @media (max-width: 640px) {
+        .campaign-card {
+            @apply p-4 rounded-xl;
+            box-shadow: 0 8px 32px -6px hsl(220 25% 4% / 0.9);
+        }
+
+        .mobile-title {
+            font-size: clamp(1.25rem, 4vw, 1.75rem);
+            line-height: 1.2;
+        }
+
+        .mobile-text {
+            font-size: clamp(0.875rem, 3vw, 1rem);
+            line-height: 1.4;
+        }
+
+        .mobile-button {
+            min-height: 48px;
+            font-size: 1rem;
+        }
+    }
+
+    .battle-winner {
+        @apply relative;
+        background: linear-gradient(135deg, hsl(45 96% 65% / 0.1) 0%, hsl(0 72% 55% / 0.1) 100%);
+        border: 1px solid hsl(45 96% 65% / 0.3);
+        box-shadow: 0 0 30px hsl(45 96% 65% / 0.2);
+    }
+
+    .voting-card {
+        @apply campaign-card hover:scale-[1.02] active:scale-[0.98];
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .voting-card:hover {
+        box-shadow: 0 25px 50px -12px hsl(45 96% 65% / 0.2);
+    }
+
+    /* Professional minimal scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: hsl(232 20% 28%);
+        border-radius: 999px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+        transition: background 0.2s ease;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: hsl(232 20% 38%);
+        background-clip: content-box;
+    }
+
+    /* Modern animations */
+    @keyframes fade-in-up {
+        from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes glow-pulse {
+
+        0%,
+        100% {
+            text-shadow: 0 0 20px hsl(45 96% 65% / 0.5);
+        }
+
+        50% {
+            text-shadow: 0 0 30px hsl(45 96% 65% / 0.8);
+        }
+    }
+
+    @keyframes gradient-shift {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fade-in-up 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .animate-glow-pulse {
+        animation: glow-pulse 3s ease-in-out infinite;
+    }
+
+    .animate-gradient-shift {
+        background-size: 200% 200%;
+        animation: gradient-shift 8s ease infinite;
+    }
+}
+
+/* Flat accent bar */
+.fn-accent-bar {
+    height: 3px;
+    background: hsl(var(--fn-red));
+}
+
+/* Battle winner highlight */
+.battle-winner {
+    border-left: 3px solid hsl(var(--fn-red));
+}

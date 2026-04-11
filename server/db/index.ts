@@ -13,9 +13,9 @@ async function ensureDirectories() {
   try {
     await mkdir(dbDir, { recursive: true });
     await mkdir(backupDir, { recursive: true });
-    console.log(`📁 Database directories created: ${dbDir}, ${backupDir}`);
+    console.log(`[DB] Database directories created: ${dbDir}, ${backupDir}`);
   } catch (error) {
-    console.error('❌ Failed to create database directories:', error);
+    console.error('[ERROR] Failed to create database directories:', error);
   }
 }
 

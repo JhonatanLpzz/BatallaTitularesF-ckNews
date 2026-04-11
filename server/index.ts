@@ -56,8 +56,8 @@ const PORT = config.port;
 try {
   await app.listen({ port: PORT, host: config.host });
   console.log(`⚔️  Batalla de Titulares API running on http://${config.host}:${PORT}`);
-  console.log(`📊 Environment: ${config.nodeEnv}`);
-  console.log(`🔐 CORS Origin: ${config.corsOrigin}`);
+  console.log(`[INFO] Environment: ${config.nodeEnv}`);
+  console.log(`[INFO] CORS Origin: ${config.corsOrigin}`);
 } catch (err) {
   app.log.error(err);
   process.exit(1);

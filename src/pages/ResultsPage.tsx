@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
-import { Loader2, Users, Crown, ArrowLeft, Timer, Swords } from "lucide-react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { Loader2, Users, Crown, Timer, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -10,8 +10,10 @@ import { useCountdown } from "@/hooks/useCountdown";
 
 export default function ResultsPage() {
   const { code } = useParams<{ code: string }>();
+  const navigate = useNavigate();
   const [battle, setBattle] = useState<Battle | null>(null);
   const [loading, setLoading] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
 
   const fetchBattle = useCallback(async () => {
     if (!code) return;
@@ -30,6 +32,14 @@ export default function ResultsPage() {
   useEffect(() => {
     fetchBattle();
   }, [fetchBattle]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useSSE(code, {
     enabled: !!battle,
@@ -73,24 +83,46 @@ export default function ResultsPage() {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/8 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-campaign-red/5 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
-      
 
-      {/* Mobile-Optimized Navbar */}
-      <nav className="sticky top-0 z-50 campaign-card border-b border-border/30">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
-            <Link to="/">
-              <Button variant="ghost" size="icon" className="text-foreground hover:text-campaign-gold h-9 w-9 sm:h-10 sm:w-10">
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
+
+      <nav
+        className={cn(
+          "fixed top-1 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
+          scrolled
+            ? "px-2 sm:px-4 py-2"
+            : "px-0 py-0"
+        )}
+      >
+        <div
+          className={cn(
+            "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between campaign-card border-b border-border/30",
+            scrolled
+              ? "max-w-4xl h-14 rounded-full shadow-lg border px-4 sm:px-6 bg-card/60 backdrop-blur-sm"
+              : "max-w-6xl h-16 rounded-none border-x-0 border-t-0 px-6 bg-card/60 backdrop-blur-sm"
+          )}
+        >
+          <div className="flex items-center gap-3 sm:gap-5 flex-1 min-w-0">
+            <Link to="/" className="shrink-0">
+              <img
+                src="/logo_fn.png"
+                alt="F*cks News"
+                className={cn(
+                  "drop-shadow-lg transition-all duration-300 hover:scale-105",
+                  scrolled ? "h-8" : "h-10 sm:h-12"
+                )}
+              />
             </Link>
-            <img src="/logo_fn.png" alt="F*cks News" className="h-8 sm:h-10 drop-shadow-lg" />
-            <div className="min-w-0">
-              <h1 className="text-sm sm:text-lg font-bold campaign-gold-gradient truncate">RESULTADOS</h1>
-              <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">Batalla de Titulares</p>
+            <div className={cn("transition-all duration-300 min-w-0", scrolled ? "hidden sm:block" : "block")}>
+              <h1 className={cn(
+                "font-bold campaign-gold-gradient truncate transition-all duration-300",
+                scrolled ? "text-base" : "text-lg"
+              )}>RESULTADOS</h1>
+              <p className={cn(
+                "text-muted-foreground transition-all duration-300",
+                scrolled ? "text-[10px]" : "text-xs"
+              )}>Batalla de Titulares</p>
             </div>
           </div>
-          
           <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
             <Badge variant="outline" className="font-mono text-[10px] sm:text-sm border-campaign-gold/30 text-campaign-gold px-2 py-1">
               <Users className="h-3 w-3 mr-1" />
@@ -108,7 +140,7 @@ export default function ResultsPage() {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full flex-1">
         {/* Mobile-Optimized Title */}
-        <div className="text-center mb-8 sm:mb-12 animate-fade-in-up">
+        <div className="text-center mb-8 sm:mb-12 animate-fade-in-up mt-16 md:mt-13">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight mb-2 sm:mb-4 px-2">
             <span className="campaign-gold-gradient animate-glow-pulse leading-tight">{battle.title}</span>
           </h1>
@@ -135,7 +167,7 @@ export default function ResultsPage() {
               >
                 {/* Mobile Layout: Stack on mobile, side-by-side on desktop */}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-                  
+
                   {/* Header Row - Position + Name + Percentage */}
                   <div className="flex items-center justify-between sm:justify-start gap-3 sm:gap-6">
                     {/* Position Icon/Number */}
