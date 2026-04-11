@@ -243,76 +243,140 @@ export default function AdminPage() {
           </div>
         ) : battles.length === 0 ? (
           <div className="campaign-card p-12 text-center">
-            <Swords className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-lg text-muted-foreground mb-2">No hay batallas creadas</p>
-            <p className="text-sm text-muted-foreground/60">Crea tu primera batalla épica</p>
+            <Swords className="h-16 w-16 text-muted-foreground/30 mx-auto mb-6" />
+            <h3 className="text-xl font-bold text-white mb-2">Sin Batallas Activas</h3>
+            <p className="text-muted-foreground mb-6 max-w-sm mx-auto leading-relaxed">Crea tu primera batalla épica para comenzar la competencia</p>
+            <Button onClick={() => setShowCreate(true)} className="campaign-button h-12 px-8">
+              <Plus className="h-4 w-4 mr-2" />
+              Crear Primera Batalla
+            </Button>
           </div>
         ) : (
-          <div className="grid gap-6">
+          <div className="space-y-6">
             {battles.map((battle, idx) => (
-              <div key={battle.id} className="campaign-card p-6 animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-bold text-white">{battle.title}</h3>
-                      <Badge 
-                        variant={battle.status === "active" ? "success" : battle.status === "closed" ? "destructive" : "outline"}
-                        className="font-medium"
+              <div key={battle.id} className="campaign-card overflow-hidden animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+                {/* Battle Header */}
+                <div className="px-8 py-6 border-b border-border/10">
+                  <div className="flex items-start justify-between gap-6">
+                    <div className="flex-1 min-w-0">
+                      {/* Title and Status */}
+                      <div className="flex items-center gap-4 mb-4">
+                        <h2 className="text-2xl font-bold text-white truncate">{battle.title}</h2>
+                        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold tracking-wide ${
+                          battle.status === 'active' 
+                            ? 'bg-gradient-to-r from-green-500/20 to-green-400/20 text-green-300 border border-green-500/30 shadow-lg shadow-green-500/10' 
+                            : battle.status === 'closed' 
+                            ? 'bg-gradient-to-r from-red-500/20 to-red-400/20 text-red-300 border border-red-500/30'
+                            : 'bg-gradient-to-r from-gray-500/20 to-gray-400/20 text-gray-300 border border-gray-500/30'
+                        }`}>
+                          <div className={`w-2 h-2 rounded-full ${
+                            battle.status === 'active' ? 'bg-green-400 animate-pulse' :
+                            battle.status === 'closed' ? 'bg-red-400' : 'bg-gray-400'
+                          }`} />
+                          {battle.status === 'active' ? 'EN VIVO' : battle.status === 'closed' ? 'CERRADA' : 'BORRADOR'}
+                        </div>
+                      </div>
+                      
+                      {/* Description */}
+                      {battle.description && (
+                        <p className="text-muted-foreground mb-4 leading-relaxed text-base">{battle.description}</p>
+                      )}
+                      
+                      {/* Metadata */}
+                      <div className="flex items-center gap-6 text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="text-muted-foreground">Código de Batalla:</span>
+                          <code className="font-mono text-campaign-gold font-bold text-base px-3 py-1.5 bg-campaign-gold/10 border border-campaign-gold/20 rounded-md">
+                            {battle.code}
+                          </code>
+                        </div>
+                        
+                        {battle.durationMinutes && (
+                          <div className="flex items-center gap-2 text-campaign-blue font-medium">
+                            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12,20A7,7 0 0,1 5,13A7,7 0 0,1 12,6A7,7 0 0,1 19,13A7,7 0 0,1 12,20M19.03,7.39L20.45,5.97C20,5.46 19.55,5 19.04,4.56L17.62,6C16.07,4.74 14.12,4 12,4A9,9 0 0,0 3,13A9,9 0 0,0 12,22C17,22 21,17.97 21,13C21,10.88 20.26,8.93 19.03,7.39M11,14H13V8H11M15,1H9V3H15V1Z"/>
+                            </svg>
+                            Timer: {battle.durationMinutes} minutos
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center gap-2 text-muted-foreground ml-auto">
+                          <span>Creada:</span>
+                          <time>{new Date(battle.createdAt).toLocaleDateString('es-ES', { 
+                            day: 'numeric', month: 'short', year: 'numeric' 
+                          })}</time>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* Professional Action Bar */}
+                <div className="px-8 py-5 bg-card/20 border-t border-border/10">
+                  <div className="flex items-center justify-between">
+                    {/* Primary CTA */}
+                    <div className="flex items-center gap-4">
+                      <Button
+                        size="lg"
+                        variant={battle.status === "active" ? "destructive" : "default"}
+                        onClick={() =>
+                          updateStatus(
+                            battle.id,
+                            battle.status === "active" ? "closed" : "active"
+                          )
+                        }
+                        className={`h-12 px-8 font-semibold text-base ${
+                          battle.status !== "active" ? "campaign-button" : ""
+                        }`}
                       >
-                        {battle.status.toUpperCase()}
-                      </Badge>
+                        {battle.status === "active" ? (
+                          <><Square className="h-5 w-5 mr-3" />Cerrar Batalla</>
+                        ) : (
+                          <><Play className="h-5 w-5 mr-3" />Activar Batalla</>
+                        )}
+                      </Button>
                     </div>
-                    {battle.description && (
-                      <p className="text-muted-foreground mb-3">{battle.description}</p>
-                    )}
-                    <div className="flex items-center gap-4 text-sm">
-                      <span className="font-mono text-campaign-gold font-semibold">{battle.code}</span>
-                      <span className="text-muted-foreground">
-                        {new Date(battle.createdAt).toLocaleDateString()}
-                      </span>
-                      {battle.durationMinutes && (
-                        <span className="text-campaign-blue font-medium">
-                          {battle.durationMinutes} min timer
-                        </span>
-                      )}
+                    
+                    {/* Secondary Actions Group */}
+                    <div className="flex items-center gap-3">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => showQR(battle)} 
+                        className="h-10 px-6 hover:border-campaign-gold hover:text-campaign-gold font-medium"
+                      >
+                        <QrCode className="h-4 w-4 mr-2" />
+                        Mostrar QR
+                      </Button>
+                      
+                      <Button variant="outline" asChild className="h-10 px-6 hover:border-campaign-blue hover:text-campaign-blue font-medium">
+                        <Link to={`/resultados/${battle.code}`}>
+                          <BarChart3 className="h-4 w-4 mr-2" />
+                          Ver Resultados
+                        </Link>
+                      </Button>
+                      
+                      {/* Utility Actions */}
+                      <div className="flex items-center gap-1 ml-3 border-l border-border/30 pl-3">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => resetVotes(battle.id)} 
+                          className="h-9 w-9 p-0 hover:bg-amber-500/10 hover:text-amber-400 rounded-lg"
+                          title="Reiniciar votos"
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => deleteBattle(battle.id)} 
+                          className="h-9 w-9 p-0 hover:bg-red-500/10 hover:text-red-400 rounded-lg"
+                          title="Eliminar batalla"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" onClick={() => showQR(battle)} className="hover:border-campaign-gold hover:text-campaign-gold">
-                      <QrCode className="h-4 w-4 mr-1" />
-                      QR
-                    </Button>
-                    <Button size="sm" variant="outline" asChild className="hover:border-campaign-blue hover:text-campaign-blue">
-                      <Link to={`/resultados/${battle.code}`}>
-                        <BarChart3 className="h-4 w-4 mr-1" />
-                        Resultados
-                      </Link>
-                    </Button>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant={battle.status === "active" ? "destructive" : "default"}
-                      onClick={() =>
-                        updateStatus(
-                          battle.id,
-                          battle.status === "active" ? "closed" : "active"
-                        )
-                      }
-                      className={battle.status !== "active" ? "campaign-button" : ""}
-                    >
-                      {battle.status === "active" ? (
-                        <><Square className="h-4 w-4 mr-1" /> Cerrar</>
-                      ) : (
-                        <><Play className="h-4 w-4 mr-1" /> Activar</>
-                      )}
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => resetVotes(battle.id)} className="hover:border-yellow-500 hover:text-yellow-500">
-                      <RotateCcw className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="destructive" onClick={() => deleteBattle(battle.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
                   </div>
                 </div>
               </div>
