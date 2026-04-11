@@ -33,7 +33,7 @@ export default function LandingPage() {
       <div className="campaign-accent-bar w-full h-1" />
 
       {/* Mobile-Optimized Navbar */}
-      <nav className="sticky top-0 z-50 campaign-card border-b border-border/30">
+      <nav className="sticky top-0 z-50 campaign-card border-b border-border/30 transition-transform duration-300 hover:scale-[1.01] hover:shadow-gold/20 hover:border-campaign-gold/30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
           <div className="flex items-center gap-3 sm:gap-5 flex-1 min-w-0">
             <Link to="/" className="shrink-0">
@@ -41,7 +41,7 @@ export default function LandingPage() {
                 src="/logo_fn.png" 
                 alt="F*cks News" 
                 className={cn(
-                  "drop-shadow-lg transition-all duration-300 hover:scale-105",
+                  "drop-shadow-lg transition-all duration-300",
                   scrolled ? "h-8" : "h-10 sm:h-12"
                 )} 
               />
@@ -51,12 +51,6 @@ export default function LandingPage() {
               <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">Sistema de Votación Interactivo</p>
             </div>
           </div>
-          <Link to="/login">
-            <Button size="sm" className="campaign-button font-medium h-9 sm:h-10 px-3 sm:px-4">
-              <Star className="h-4 w-4 mr-1 sm:mr-2" />
-              <span className="hidden sm:inline">Panel </span>Admin
-            </Button>
-          </Link>
         </div>
       </nav>
 
@@ -78,7 +72,7 @@ export default function LandingPage() {
             se enfrentan y el público decide quién reina supremo
           </p>
 
-          <div className="flex flex-col gap-4 justify-center items-center mb-10 sm:mb-16 px-4">
+          <div className="flex flex-col gap-4 justify-center items-center px-4">
             <Link to="/login" className="w-full sm:w-auto">
               <Button size="lg" className="campaign-button text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-auto font-semibold w-full sm:w-auto">
                 <Globe className="h-5 w-5 mr-2 sm:mr-3" />
@@ -86,12 +80,6 @@ export default function LandingPage() {
                 <span className="hidden sm:inline">Acceder al Panel Admin</span>
               </Button>
             </Link>
-          </div>
-
-          {/* Live indicator */}
-          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-campaign-red/20 border border-campaign-red/30">
-            <div className="w-2 h-2 bg-campaign-red rounded-full animate-pulse" />
-            <span className="text-xs sm:text-sm font-medium text-campaign-red">Sistema Activo</span>
           </div>
         </div>
       </section>
