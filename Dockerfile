@@ -3,8 +3,11 @@ FROM oven/bun:1-alpine
 
 WORKDIR /app
 
+# Install curl for health checks
+RUN apk add --no-cache curl
+
 # Copy package files
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 
 # Install dependencies
 RUN bun install --frozen-lockfile
@@ -12,8 +15,8 @@ RUN bun install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Create data directory for SQLite
-RUN mkdir -p /app/data
+# Create storage directories (Railway volume will mount to /storage)
+RUN mkdir -p /storage/data /storage/data/backups
 
 # Build frontend
 RUN bun run build

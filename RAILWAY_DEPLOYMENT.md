@@ -58,14 +58,16 @@ ENABLE_VOTE_EXPORT=false
 
 **⚡ Tip:** `${{RAILWAY_STATIC_URL}}` y `${{PORT}}` son variables automáticas de Railway
 
-### **5. SQLite Persistence Setup**
+### **5. SQLite Persistence Setup** ✅
 
-Railway necesita volumen persistente para SQLite:
+Railway volumen persistente ya configurado:
 
-1. **"Settings"** → **"Volume"** → **"Create Volume"**
-2. **Mount Path:** `/app/data`
-3. **Size:** 1GB (suficiente)
-4. **Restart deployment** después de crear volumen
+1. **✅ Volume creado** → Mount Path: `/storage/`
+2. **✅ Variables configuradas:**
+   - `DB_PATH=/storage/data/batalla.db`
+   - `DB_BACKUP_PATH=/storage/data/backups`
+3. **Auto-creation:** App crea directorios automáticamente
+4. **Persistence:** Base de datos sobrevive redeploys
 
 ### **6. Custom Domain (Opcional)**
 ```bash

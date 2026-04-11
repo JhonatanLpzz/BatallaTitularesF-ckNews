@@ -1,14 +1,29 @@
 import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
-import { mkdirSync } from "fs";
-import { dirname } from "path";
 import * as schema from "./schema.js";
+import config from "../config.js";
+import { mkdir } from "fs/promises";
+import path from "path";
 
-const DB_PATH = "./data/batalla.db";
+// Ensure database directories exist
+async function ensureDirectories() {
+  const dbDir = path.dirname(config.dbPath);
+  const backupDir = config.dbBackupPath;
+  
+  try {
+    await mkdir(dbDir, { recursive: true });
+    await mkdir(backupDir, { recursive: true });
+    console.log(`📁 Database directories created: ${dbDir}, ${backupDir}`);
+  } catch (error) {
+    console.error('❌ Failed to create database directories:', error);
+  }
+}
 
-mkdirSync(dirname(DB_PATH), { recursive: true });
+// Create directories first
+await ensureDirectories();
 
-const sqlite = new Database(DB_PATH, { create: true });
+// Create SQLite database with persistent path
+const sqlite = new Database(config.dbPath, { create: true });
 
 sqlite.exec("PRAGMA journal_mode = WAL;");
 sqlite.exec("PRAGMA foreign_keys = ON;");

@@ -9,8 +9,9 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-in-production-immediately',
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   
-  // Database
-  dbPath: process.env.DB_PATH || './data/batalla.db',
+  // Database (Railway persistent volume)
+  dbPath: process.env.DB_PATH || '/storage/data/batalla.db',
+  dbBackupPath: process.env.DB_BACKUP_PATH || '/storage/data/backups',
   
   // Rate limiting (anti-spam)
   rateLimitVotes: parseInt(process.env.RATE_LIMIT_VOTES || '10'),
