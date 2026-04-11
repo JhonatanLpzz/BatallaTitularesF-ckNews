@@ -24,6 +24,9 @@ export default function VotePage() {
   const [voterPhone, setVoterPhone] = useState("");
   const [voterReady, setVoterReady] = useState(false);
   const [expired, setExpired] = useState(false);
+  
+  // UI State
+  const [scrolled, setScrolled] = useState(false);
 
   const fetchBattle = useCallback(async () => {
     if (!code) return;
@@ -48,6 +51,14 @@ export default function VotePage() {
   useEffect(() => {
     fetchBattle();
   }, [fetchBattle]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useSSE(code, {
     enabled: !!battle && battle.status === "active",
@@ -171,7 +182,7 @@ export default function VotePage() {
         <div className="campaign-accent-bar w-full h-1" />
         
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6">
-          <div className="w-full max-w-md campaign-card p-6 sm:p-8 animate-fade-in-up mx-4">
+          <div className="w-full max-w-md campaign-card backdrop-blur-xl bg-card/60 p-6 sm:p-8 animate-fade-in-up mx-4 shadow-2xl border border-white/5">
             <div className="text-center mb-6 sm:mb-8">
               <img src="/logo_fn.png" alt="F*cks News" className="h-16 sm:h-20 mx-auto mb-4 sm:mb-6 drop-shadow-lg" />
               <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-tight">{battle.title}</h1>
@@ -191,7 +202,7 @@ export default function VotePage() {
                   onChange={(e) => setVoterName(e.target.value)}
                   autoFocus
                   required
-                  className="h-12 sm:h-14 text-base"
+                  className="h-12 sm:h-14 text-base bg-background/50 backdrop-blur-sm border-white/10 focus:border-campaign-gold/50 transition-colors"
                 />
               </div>
               <div>
@@ -202,7 +213,7 @@ export default function VotePage() {
                   placeholder="Cédula o documento"
                   value={voterDocument}
                   onChange={(e) => setVoterDocument(e.target.value)}
-                  className="h-12 sm:h-14"
+                  className="h-12 sm:h-14 bg-background/50 backdrop-blur-sm border-white/10 focus:border-campaign-gold/50 transition-colors"
                 />
               </div>
               <div>
@@ -214,10 +225,10 @@ export default function VotePage() {
                   value={voterPhone}
                   onChange={(e) => setVoterPhone(e.target.value)}
                   type="tel"
-                  className="h-12 sm:h-14"
+                  className="h-12 sm:h-14 bg-background/50 backdrop-blur-sm border-white/10 focus:border-campaign-gold/50 transition-colors"
                 />
               </div>
-              <Button type="submit" className="w-full h-14 campaign-button text-base font-semibold">
+              <Button type="submit" className="w-full h-14 campaign-button text-base font-semibold shadow-lg hover:shadow-campaign-gold/20 transition-all hover:-translate-y-0.5">
                 <User className="h-5 w-5 mr-3" />
                 Continuar a Votar
               </Button>
@@ -232,16 +243,6 @@ export default function VotePage() {
     );
   }
 
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
     <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
       <div className="fixed inset-0 -z-10">
@@ -253,25 +254,25 @@ export default function VotePage() {
 
       {/* Header */}
       <div className={cn(
-        "fixed top-1 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
+        "fixed top-1 left-0 right-0 z-50 transition-all duration-500 ease-out",
         scrolled ? "px-2 sm:px-4 py-2" : "px-0 py-0"
       )}>
         <div className={cn(
-          "mx-auto transition-all duration-300 ease-in-out campaign-card border-b border-border/30",
+          "mx-auto transition-all duration-500 ease-out campaign-card border-b border-white/5",
           scrolled 
-            ? "max-w-3xl rounded-3xl shadow-lg border px-4 sm:px-6 py-2 bg-card/90 backdrop-blur-md flex items-center justify-between" 
-            : "w-full rounded-none border-x-0 border-t-0 px-4 sm:px-6 pt-6 sm:pt-8 pb-4 sm:pb-6 text-center bg-card/60 backdrop-blur-sm block"
+            ? "max-w-3xl rounded-3xl shadow-xl border px-4 sm:px-6 py-2 bg-card/80 backdrop-blur-xl flex items-center justify-between transform scale-95 sm:scale-100" 
+            : "w-full rounded-none border-x-0 border-t-0 px-4 sm:px-6 pt-6 sm:pt-8 pb-4 sm:pb-6 text-center bg-card/40 backdrop-blur-md block"
         )}>
           {scrolled ? (
             // Scrolled State (Compact horizontal)
             <>
               <div className="flex items-center gap-3">
-                <img src="/logo_fn.png" alt="F*cks News" className="h-8 drop-shadow-lg" />
-                <div className="text-left hidden sm:block">
+                <img src="/logo_fn.png" alt="F*cks News" className="h-8 drop-shadow-lg transition-transform duration-300" />
+                <div className="text-left hidden sm:block animate-fade-in">
                   <h1 className="text-sm font-bold text-white leading-tight">{battle.title}</h1>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 animate-fade-in">
                 <div className="text-center">
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</p>
                   <p className="text-sm font-bold text-campaign-gold">{battle.totalVotes || 0}</p>
@@ -281,38 +282,40 @@ export default function VotePage() {
             </>
           ) : (
             // Expanded State (Original vertical)
-            <>
-              <img src="/logo_fn.png" alt="F*cks News" className="h-12 sm:h-14 mx-auto mb-4 sm:mb-6 drop-shadow-lg" />
-              <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-tight px-2">{battle.title}</h1>
+            <div className="animate-fade-in-up">
+              <img src="/logo_fn.png" alt="F*cks News" className="h-12 sm:h-14 mx-auto mb-4 sm:mb-6 drop-shadow-2xl transition-transform duration-300 hover:scale-105" />
+              <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-tight px-2 drop-shadow-md">{battle.title}</h1>
               {battle.description && (
                 <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4 px-2">{battle.description}</p>
               )}
               <div className="flex items-center justify-center gap-4 sm:gap-6 mt-4">
-                <div className="text-center">
+                <div className="text-center bg-background/30 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/5">
                   <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider mb-1">Total Votos</p>
                   <p className="text-lg sm:text-xl font-bold text-campaign-gold">{battle.totalVotes || 0}</p>
                 </div>
-                <VoteTimer expiresAt={battle.expiresAt} expired={expired} onExpire={() => setExpired(true)} />
+                <div className="bg-background/30 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/5">
+                  <VoteTimer expiresAt={battle.expiresAt} expired={expired} onExpire={() => setExpired(true)} />
+                </div>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
 
       {/* Mobile-Optimized Voting area */}
       <div className={cn(
-        "max-w-2xl mx-auto px-4 sm:px-6 flex-1 w-full transition-all duration-300",
+        "max-w-2xl mx-auto px-4 sm:px-6 flex-1 w-full transition-all duration-500 ease-out",
         scrolled ? "pt-24 sm:pt-28 pb-6 sm:pb-8" : "pt-8 sm:pt-10 pb-6 sm:pb-8"
       )}>
         {hasVoted && (
-          <div className="mb-6 sm:mb-8 campaign-card p-4 sm:p-6 text-center border border-campaign-gold/30 mx-2 sm:mx-0">
-            <CheckCircle2 className="h-8 w-8 sm:h-10 sm:w-10 text-campaign-gold mx-auto mb-2 sm:mb-3" />
+          <div className="mb-6 sm:mb-8 campaign-card backdrop-blur-xl bg-card/60 p-4 sm:p-6 text-center border border-campaign-gold/30 mx-2 sm:mx-0 shadow-lg animate-in zoom-in duration-300">
+            <CheckCircle2 className="h-8 w-8 sm:h-10 sm:w-10 text-campaign-gold mx-auto mb-2 sm:mb-3 animate-bounce" />
             <p className="text-base sm:text-lg font-semibold text-white mb-1">¡Voto Registrado!</p>
             <p className="text-sm sm:text-base text-muted-foreground">Los resultados se actualizan en tiempo real</p>
           </div>
         )}
 
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-3 sm:space-y-5">
           {battle.participants?.map((participant: Participant, idx: number) => {
             const isVotedFor = votedFor === participant.id;
 
@@ -320,20 +323,20 @@ export default function VotePage() {
               <div
                 key={participant.id}
                 className={cn(
-                  "voting-card p-4 sm:p-6 relative group animate-fade-in-up mx-2 sm:mx-0",
-                  isVotedFor && "battle-winner"
+                  "voting-card backdrop-blur-md bg-card/40 p-4 sm:p-6 relative group animate-fade-in-up mx-2 sm:mx-0 border border-white/5 hover:border-white/10 transition-all duration-300 hover:shadow-xl",
+                  isVotedFor && "battle-winner bg-card/80 border-campaign-gold/30"
                 )}
                 style={{ animationDelay: `${idx * 0.1}s` }}
               >
                 <button
                   onClick={() => !hasVoted && castVote(participant.id)}
                   disabled={hasVoted || voting !== null}
-                  className="w-full text-left touch-manipulation"
+                  className="w-full text-left touch-manipulation focus:outline-none focus:ring-2 focus:ring-campaign-gold/50 rounded-lg"
                 >
                   {/* Progress bar */}
                   {hasVoted && (
                     <div
-                      className="absolute inset-y-0 left-0 opacity-20 transition-all duration-1000 rounded-l-lg"
+                      className="absolute inset-y-0 left-0 opacity-20 transition-all duration-1000 ease-out rounded-l-lg"
                       style={{
                         backgroundColor: participant.color,
                         width: `${participant.percentage}%`,
@@ -346,7 +349,7 @@ export default function VotePage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
                           <div
-                            className="w-3 h-3 sm:w-4 sm:h-4 rounded-full shrink-0 shadow-glow"
+                            className="w-3 h-3 sm:w-4 sm:h-4 rounded-full shrink-0 shadow-glow transition-transform group-hover:scale-110"
                             style={{ backgroundColor: participant.color }}
                           />
                           <span className="font-bold text-sm sm:text-base text-white">{participant.name}</span>
@@ -357,14 +360,14 @@ export default function VotePage() {
                       </div>
 
                       {hasVoted && (
-                        <div className="text-right shrink-0">
+                        <div className="text-right shrink-0 animate-in fade-in slide-in-from-right-4 duration-500">
                           <div 
-                            className="text-xl sm:text-3xl font-bold mb-1 leading-none"
+                            className="text-xl sm:text-3xl font-bold mb-1 leading-none drop-shadow-md"
                             style={{ color: participant.color }}
                           >
                             {participant.percentage}%
                           </div>
-                          <div className="text-[10px] sm:text-xs text-muted-foreground">{participant.votes} votos</div>
+                          <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">{participant.votes} votos</div>
                         </div>
                       )}
                     </div>
@@ -382,14 +385,14 @@ export default function VotePage() {
         </div>
 
         {!hasVoted && (
-          <p className="text-center text-sm sm:text-base text-muted-foreground mt-6 sm:mt-8 font-medium px-4">
+          <p className="text-center text-sm sm:text-base text-muted-foreground mt-6 sm:mt-8 font-medium px-4 animate-pulse">
             Selecciona el titular que más te guste para votar
           </p>
         )}
       </div>
 
       {/* Mobile-Optimized Footer */}
-      <div className="border-t border-border/30 campaign-card px-4 sm:px-6 py-6 sm:py-8 text-center">
+      <div className="border-t border-white/5 campaign-card backdrop-blur-lg bg-card/40 px-4 sm:px-6 py-6 sm:py-8 text-center mt-auto">
         <p className="text-xs sm:text-sm text-foreground/70 leading-relaxed max-w-2xl mx-auto mb-3 sm:mb-4 px-2">
           Gracias a <strong className="campaign-gold-gradient">F*cks News Noticreo</strong> por esa comedia ácida
           y bien pensada. Son el apoyo y la risa de mucha gente.

@@ -190,15 +190,17 @@ export default function UserManagementPage() {
               : "max-w-6xl h-16 rounded-none border-x-0 border-t-0 px-6 bg-card/60 backdrop-blur-sm"
           )}
         >
-          <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
-            <img 
-              src="/logo_fn.png" 
-              alt="F*cks News" 
-              className={cn(
-                "drop-shadow-lg transition-all duration-300",
-                scrolled ? "h-8" : "h-10"
-              )} 
-            />
+          <div className="flex items-center gap-3 sm:gap-5 flex-1 min-w-0">
+            <Link to="/" className="shrink-0">
+              <img 
+                src="/logo_fn.png" 
+                alt="F*cks News" 
+                className={cn(
+                  "drop-shadow-lg transition-all duration-300 hover:scale-105",
+                  scrolled ? "h-8" : "h-10 sm:h-12"
+                )} 
+              />
+            </Link>
             <div className={cn("transition-all duration-300 min-w-0", scrolled ? "hidden sm:block" : "block")}>
               <h1 className={cn(
                 "font-bold campaign-gold-gradient truncate transition-all duration-300",
@@ -243,8 +245,8 @@ export default function UserManagementPage() {
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 pt-24 sm:pt-28 w-full flex-1">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 pt-28 sm:pt-32 w-full flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-white mobile-title">Administradores</h1>
             <p className="text-muted-foreground mobile-text">Gestión de usuarios del sistema</p>
