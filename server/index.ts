@@ -7,14 +7,20 @@ import { voteRoutes } from "./routes/votes.js";
 import { sseRoutes } from "./routes/sse.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import config from "./config.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const app = Fastify({ logger: true });
+const app = Fastify({
+  logger: { level: config.logLevel },
+});
 
 await app.register(cors, {
-  origin: true,
+  origin: config.nodeEnv === "production" 
+    ? [config.corsOrigin]
+    : ["http://localhost:5173"],
   methods: ["GET", "POST", "PATCH", "DELETE"],
+  credentials: true,
 });
 
 // Register API routes
@@ -23,8 +29,17 @@ await app.register(battleRoutes);
 await app.register(voteRoutes);
 await app.register(sseRoutes);
 
+// Health check endpoint for Railway
+app.get("/health", async () => {
+  return { 
+    status: "healthy", 
+    timestamp: new Date().toISOString(),
+    environment: config.nodeEnv
+  };
+});
+
 // In production, serve the Vite build
-if (process.env.NODE_ENV === "production") {
+if (config.nodeEnv === "production") {
   await app.register(fastifyStatic, {
     root: path.join(__dirname, "../dist"),
     prefix: "/",
@@ -36,11 +51,13 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-const PORT = parseInt(process.env.PORT || "3001");
+const PORT = config.port;
 
 try {
-  await app.listen({ port: PORT, host: "0.0.0.0" });
-  console.log(`⚔️  Batalla de Titulares API running on http://localhost:${PORT}`);
+  await app.listen({ port: PORT, host: config.host });
+  console.log(`⚔️  Batalla de Titulares API running on http://${config.host}:${PORT}`);
+  console.log(`📊 Environment: ${config.nodeEnv}`);
+  console.log(`🔐 CORS Origin: ${config.corsOrigin}`);
 } catch (err) {
   app.log.error(err);
   process.exit(1);

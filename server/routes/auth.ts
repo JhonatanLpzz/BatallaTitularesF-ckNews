@@ -1,7 +1,12 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { db, schema } from "../db/index.js";
+import { db } from "../db/index.js";
+import * as schema from "../db/schema.js";
+import config from "../config.js";
 import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
+
+const JWT_SECRET = config.jwtSecret;
+const SESSION_DURATION = config.sessionDuration;
 
 async function hashPassword(password: string): Promise<string> {
   return await Bun.password.hash(password, { algorithm: "bcrypt", cost: 10 });
