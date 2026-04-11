@@ -185,7 +185,7 @@ export default function UserManagementPage() {
           className={cn(
             "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between campaign-card border-b border-border/30",
             scrolled 
-              ? "max-w-4xl h-14 rounded-full shadow-lg border px-4 sm:px-6 bg-card/90 backdrop-blur-md" 
+              ? "max-w-4xl h-14 rounded-full shadow-lg border px-4 sm:px-6 bg-card/60 backdrop-blur-sm" 
               : "max-w-6xl h-16 rounded-none border-x-0 border-t-0 px-6 bg-card/60 backdrop-blur-sm"
           )}
         >

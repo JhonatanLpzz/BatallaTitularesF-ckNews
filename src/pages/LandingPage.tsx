@@ -48,16 +48,30 @@ export default function LandingPage() {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-campaign-red/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
-      {/* Fixed Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-40 campaign-card border-b border-border/30 transition-transform duration-300 hover:scale-[1.01] hover:shadow-gold/20 hover:border-campaign-gold/30">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
+      {/* Header */}
+      <nav 
+        className={cn(
+          "fixed top-1 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
+          scrolled 
+            ? "px-2 sm:px-4 py-2" 
+            : "px-0 py-0"
+        )}
+      >
+        <div 
+          className={cn(
+            "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between campaign-card border-b border-border/30",
+            scrolled 
+              ? "max-w-4xl h-14 rounded-full shadow-lg border px-4 sm:px-6 bg-card/60 backdrop-blur-sm" 
+              : "max-w-6xl h-16 rounded-none border-x-0 border-t-0 px-6 bg-card/60 backdrop-blur-sm"
+          )}
+        >
           <div className="flex items-center gap-3 sm:gap-5 flex-1 min-w-0">
             <Link to="/" className="shrink-0">
               <img 
                 src="/logo_fn.png" 
                 alt="F*cks News" 
                 className={cn(
-                  "drop-shadow-lg transition-all duration-300",
+                  "drop-shadow-lg transition-all duration-300 hover:scale-105",
                   scrolled ? "h-8" : "h-10 sm:h-12"
                 )} 
               />
@@ -71,7 +85,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="flex-1 flex items-center justify-center px-4 sm:px-6 pt-20 sm:pt-24 pb-16 sm:py-24">
+      <section className="flex-1 flex items-center justify-center px-4 sm:px-6 pt-20 sm:pt-24 pb-16 sm:py-24 py-24">
         <div className="max-w-5xl mx-auto text-center animate-fade-in-up">
           <div className="mb-8 sm:mb-12">
             <h1 className="text-3xl sm:text-4xl md:text-7xl font-bold tracking-tight mb-4 sm:mb-6 leading-tight">

@@ -181,7 +181,7 @@ export default function VotePage() {
         </div>
         
         <div className="flex-1 flex items-center justify-center px-4 sm:px-6">
-          <div className="w-full max-w-md campaign-card backdrop-blur-xl bg-card/60 p-6 sm:p-8 animate-fade-in-up mx-4 shadow-2xl border border-white/5">
+          <div className="w-full max-w-md campaign-card backdrop-blur-sm bg-card/60 p-6 sm:p-8 animate-fade-in-up mx-4 shadow-2xl border border-white/5">
             <div className="text-center mb-6 sm:mb-8">
               <img src="/logo_fn.png" alt="F*cks News" className="h-16 sm:h-20 mx-auto mb-4 sm:mb-6 drop-shadow-lg" />
               <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-tight">{battle.title}</h1>
@@ -251,7 +251,7 @@ export default function VotePage() {
       
 
       {/* Header */}
-      <div className="sticky top-0 z-50 campaign-card border-b border-white/5 bg-card/80 backdrop-blur-xl px-4 sm:px-6 py-3 sm:py-4">
+      <div className="sticky top-0 z-50 campaign-card border-b border-white/5 bg-card/60 backdrop-blur-sm px-4 sm:px-6 py-3 sm:py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img src="/logo_fn.png" alt="F*cks News" className="h-8 sm:h-10 drop-shadow-lg" />
@@ -272,7 +272,7 @@ export default function VotePage() {
       {/* Voting area */}
       <div className="max-w-2xl mx-auto px-4 sm:px-6 flex-1 w-full pt-6 sm:pt-8 pb-6 sm:pb-8">
         {hasVoted && (
-          <div className="mb-6 sm:mb-8 campaign-card backdrop-blur-xl bg-card/60 p-4 sm:p-6 text-center border border-campaign-gold/30 mx-2 sm:mx-0 shadow-lg animate-in zoom-in duration-300">
+          <div className="mb-6 sm:mb-8 campaign-card backdrop-blur-sm bg-card/60 p-4 sm:p-6 text-center border border-campaign-gold/30 mx-2 sm:mx-0 shadow-lg animate-in zoom-in duration-300">
             <CheckCircle2 className="h-8 w-8 sm:h-10 sm:w-10 text-campaign-gold mx-auto mb-2 sm:mb-3 animate-bounce" />
             <p className="text-base sm:text-lg font-semibold text-white mb-1">¡Voto Registrado!</p>
             <p className="text-sm sm:text-base text-muted-foreground">Los resultados se actualizan en tiempo real</p>
@@ -287,8 +287,8 @@ export default function VotePage() {
               <div
                 key={participant.id}
                 className={cn(
-                  "voting-card backdrop-blur-md bg-card/40 p-4 sm:p-6 relative group animate-fade-in-up mx-2 sm:mx-0 border border-white/5 hover:border-white/10 transition-all duration-300 hover:shadow-xl",
-                  isVotedFor && "battle-winner bg-card/80 border-campaign-gold/30"
+                  "voting-card backdrop-blur-sm bg-card/60 p-4 sm:p-6 relative group animate-fade-in-up mx-2 sm:mx-0 border border-white/5 hover:border-white/10 transition-all duration-300 hover:shadow-xl",
+                  isVotedFor && "battle-winner bg-card/60 border-campaign-gold/30"
                 )}
                 style={{ animationDelay: `${idx * 0.1}s` }}
               >
