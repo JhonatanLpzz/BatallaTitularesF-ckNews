@@ -3,12 +3,10 @@ import { Link } from "react-router-dom";
 import { Play, Swords, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Battle } from "@/types";
-import { cn } from "@/lib/utils";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { Header } from "@/components/Header";
 
 export default function LandingPage() {
   const [activeBattles, setActiveBattles] = useState<Battle[]>([]);
-  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     fetch("/api/battles")
@@ -19,14 +17,6 @@ export default function LandingPage() {
         }
       })
       .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
@@ -47,32 +37,14 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#050505] flex flex-col relative overflow-hidden selection:bg-campaign-gold/30">
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden selection:bg-campaign-gold/30">
       {/* Animated background elements */}
       <div className="fixed inset-0 -z-10 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/10 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-campaign-red/10 rounded-full blur-[120px] animate-pulse delay-1000" />
       </div>
 
-      {/* Header */}
-      <nav 
-        className={cn(
-          "fixed top-1 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
-          scrolled ? "bg-[#080808]/60 backdrop-blur-xl border-b border-white/[0.06]" : "bg-transparent"
-        )}
-      >
-        <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
-          <img src="/logo_fn.png" alt="F*cks News" className="h-10 sm:h-12 drop-shadow-2xl hover:scale-105 transition-transform" />
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <Link to="/admin">
-              <Button variant="outline" size="sm" className="hidden sm:flex text-zinc-400 hover:text-white border-white/10 hover:bg-white/10 rounded-xl h-10 px-6">
-                Panel Admin
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Header showAdminButton={true} />
 
       <main className="flex-1 flex flex-col items-center justify-center p-6 text-center mt-20 relative z-10">
         <div className="animate-fade-in-up w-full max-w-3xl mx-auto">
@@ -84,29 +56,29 @@ export default function LandingPage() {
             Sistema de Votación Interactivo
           </div>
           
-          <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tighter text-white mb-6 leading-none">
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tighter text-foreground mb-6 leading-none">
             BATALLA DE<br />
             <span className="campaign-gold-gradient animate-glow-pulse block mt-2">TITULARES</span>
           </h1>
           
-          <p className="text-lg sm:text-xl md:text-2xl text-zinc-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-            La competencia más <span className="text-campaign-gold">épica</span> de comedia donde los titulares más <span className="text-campaign-red">absurdos</span> se enfrentan y el público decide quién reina supremo.
+          <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
+            La competencia de comedia donde los titulares más <span className="text-campaign-red">absurdos</span> se enfrentan y el público decide.
           </p>
 
           <div className="space-y-4 w-full max-w-md mx-auto">
-            <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest mb-4">Batallas Activas</p>
+            <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">Batallas Activas</p>
             {activeBattles.length > 0 ? (
               activeBattles.map(battle => (
                 <Link key={battle.id} to={`/votar/${battle.code}`} className="block group">
                   <div className="glass-card rounded-[28px] p-6 flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-300 hover:bg-white/[0.05] hover:border-campaign-gold/40 hover:shadow-[0_0_30px_rgba(212,175,55,0.15)] group-active:scale-[0.98]">
                     <div className="text-left flex-1 min-w-0">
-                      <h3 className="font-bold text-white text-xl truncate mb-1 tracking-tight">{battle.title}</h3>
+                      <h3 className="font-bold text-foreground text-xl truncate mb-1 tracking-tight">{battle.title}</h3>
                       <div className="flex items-center gap-2">
                         <span className="relative flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success"></span>
                         </span>
-                        <p className="text-sm text-emerald-400 font-medium">EN VIVO</p>
+                        <p className="text-sm text-status-success font-medium">EN VIVO</p>
                       </div>
                     </div>
                     <div className="w-12 h-12 rounded-2xl bg-campaign-gold text-black flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(212,175,55,0.4)]">
@@ -117,16 +89,16 @@ export default function LandingPage() {
               ))
             ) : (
               <div className="glass-card rounded-[32px] p-8 mx-auto border-white/5 text-center mt-8">
-                <Swords className="h-12 w-12 text-zinc-600 mx-auto mb-4 opacity-50" />
-                <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Preparando el show</h3>
-                <p className="text-zinc-400">El administrador aún no ha iniciado ninguna batalla. Mantente atento a la pantalla principal.</p>
+                <Swords className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                <h3 className="text-xl font-bold text-foreground mb-2 tracking-tight">Preparando el show</h3>
+                <p className="text-muted-foreground">El administrador aún no ha iniciado ninguna batalla. Mantente atento a la pantalla principal.</p>
               </div>
             )}
           </div>
 
           <div className="mt-16 sm:hidden">
             <Link to="/admin">
-              <Button variant="ghost" className="text-zinc-500 hover:text-white rounded-xl">
+              <Button variant="ghost" className="text-muted-foreground hover:text-foreground rounded-xl">
                 Acceso Administrador
               </Button>
             </Link>
@@ -134,35 +106,15 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Mobile-Optimized Call to Action */}
-      <section className="px-4 sm:px-6 py-12 sm:py-20 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="glass-card rounded-[32px] p-8 sm:p-12 animate-fade-in-up border-white/5">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 text-white tracking-tight">
-              ¿Listo para la <span className="campaign-gold-gradient">Batalla?</span>
-            </h2>
-            <p className="text-zinc-400 text-sm sm:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto px-2 leading-relaxed">
-              Crea batallas épicas, genera códigos QR, y deja que el público decida quién tiene los titulares más geniales.
-            </p>
-            <Link to="/login">
-              <Button size="lg" className="bg-white text-black hover:bg-zinc-200 text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 h-auto font-semibold w-full sm:w-auto rounded-2xl shadow-xl transition-all hover:-translate-y-1">
-                <Globe className="h-5 w-5 mr-2" />
-                Empezar Ahora
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* Mobile-Optimized Footer */}
-      <footer className="border-t border-white/5 glass-card rounded-none backdrop-blur-lg bg-[#080808]/80 px-4 sm:px-6 py-6 sm:py-8 mt-auto relative z-10">
+      <footer className="border-t border-white/5 glass-card rounded-none backdrop-blur-lg bg-background/80 px-4 sm:px-6 py-6 sm:py-8 mt-auto relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl mx-auto mb-3 sm:mb-4 px-2">
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-3 sm:mb-4 px-2">
             Gracias a <strong className="campaign-gold-gradient">F*cks News Noticreo</strong> por esa comedia ácida
             y bien pensada. Son el apoyo y la risa de mucha gente.
             ¡Esperamos verlos pronto en tarima — la última vez no alcanzamos a comprar boletas!
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-zinc-500 font-medium">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-muted-foreground font-medium">
             <span>Desarrollado con ❤️ por <strong className="text-campaign-gold font-bold">Jhonatan Lopez Conde</strong></span>
             <span className="hidden sm:inline">•</span>
             <span>Bogotá, Colombia</span>

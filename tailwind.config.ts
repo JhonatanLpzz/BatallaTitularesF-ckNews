@@ -47,6 +47,10 @@ const config: Config = {
         "campaign-blue": "hsl(var(--campaign-blue))",
         "campaign-red": "hsl(var(--campaign-red))",
         "campaign-purple": "hsl(var(--campaign-purple))",
+        // Status colors
+        "status-success": "hsl(var(--status-success))",
+        "status-warning": "hsl(var(--status-warning))",
+        "status-info": "hsl(var(--status-info))",
       },
       borderRadius: {
         lg: "var(--radius)",

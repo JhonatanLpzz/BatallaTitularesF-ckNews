@@ -1,14 +1,27 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { CheckCircle2, XCircle, Loader2, Clock, User, Timer, ChevronRight, AlertTriangle } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  Loader2,
+  Clock,
+  Timer,
+  ChevronRight,
+  AlertTriangle,
+  User,
+  Phone,
+  CreditCard
+} from "lucide-react";
 import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn, generateFingerprint } from "@/lib/utils";
 import type { Battle, Participant, VoteUpdate } from "@/types";
 import { useSSE } from "@/hooks/useSSE";
 import { useCountdown } from "@/hooks/useCountdown";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { Header } from "@/components/Header";
 
 export default function VotePage() {
   const { code } = useParams<{ code: string }>();
@@ -34,8 +47,9 @@ export default function VotePage() {
       setBattle(data);
       const fp = generateFingerprint();
       const voteCheck = await fetch(`/api/votes/check/${code}?fp=${fp}`);
-      const { hasVoted: voted } = await voteCheck.json();
+      const { hasVoted: voted, participantId } = await voteCheck.json();
       setHasVoted(voted);
+      setVotedFor(participantId ?? null);
       if (voted) setVoterReady(true);
     } catch {
       setError("Batalla no encontrada");
@@ -77,58 +91,71 @@ export default function VotePage() {
       if (!res.ok) throw new Error("Error al votar");
       setHasVoted(true);
       setVotedFor(participantId);
-      toast.success("Voto registrado con éxito");
+      toast.success("¡Voto registrado!");
     } catch (err) {
       toast.error("No se pudo registrar el voto");
     } finally { setVoting(null); }
   };
 
+  const changeVote = async (participantId: number) => {
+    if (!code || !hasVoted || !voterReady || votedFor === participantId) return;
+    setVoting(participantId);
+    try {
+      const fp = generateFingerprint();
+      const res = await fetch("/api/votes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          battleCode: code,
+          participantId,
+          fingerprint: fp,
+        }),
+      });
+      if (!res.ok) throw new Error("Error");
+      setVotedFor(participantId);
+      toast.success("Voto actualizado");
+    } catch {
+      toast.error("No se pudo cambiar el voto");
+    } finally { setVoting(null); }
+  };
+
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="relative flex items-center justify-center">
-        <div className="absolute h-16 w-16 border-t-2 border-campaign-gold rounded-full animate-spin opacity-20" />
-        <Loader2 className="h-6 w-6 animate-spin text-campaign-gold" />
+        <div className="absolute h-20 w-20 border-t-2 border-campaign-gold rounded-full animate-spin opacity-20" />
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     </div>
   );
 
-  if (error || !battle) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#050505] px-4">
-        <div className="glass-card rounded-[32px] p-8 text-center max-w-sm w-full">
-          <XCircle className="h-12 w-12 text-campaign-red mx-auto mb-3 opacity-80" />
-          <h2 className="text-lg font-semibold mb-2 text-white">{error || "Error"}</h2>
-          <Link to="/">
-            <Button className="bg-white/10 hover:bg-white/20 text-white rounded-xl mt-4">Volver al inicio</Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  // --- ESTADOS DE ERROR / DRAFT / CLOSED ---
+  if (error || !battle || battle.status === "draft" || battle.status === "closed" || battle.status === "tied") {
+    const isClosed = battle?.status === "closed";
+    const isTied = battle?.status === "tied";
+    const isDraft = battle?.status === "draft";
 
-  if (battle.status === "draft") {
     return (
-      <div key="draft" className="min-h-screen flex items-center justify-center bg-[#050505] px-4 animate-fade-in-up">
-        <div className="glass-card rounded-[32px] p-8 text-center max-w-sm w-full">
-          <Clock className="h-12 w-12 text-zinc-500 mx-auto mb-3 opacity-80" />
-          <h2 className="text-lg font-semibold mb-1 text-white">Aún no comienza</h2>
-          <p className="text-sm text-zinc-400">La votación se activará pronto...</p>
-        </div>
-      </div>
-    );
-  }
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-campaign-gold/5 blur-[120px] rounded-full" />
 
-  if (battle.status === "closed") {
-    return (
-      <div key="closed" className="min-h-screen flex items-center justify-center bg-[#050505] px-4 relative overflow-hidden animate-fade-in-up">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-campaign-gold/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="glass-card rounded-[32px] p-10 text-center max-w-sm w-full z-10">
-          <img src="/logo_fn.png" alt="F*cks News" className="h-14 mx-auto mb-6 drop-shadow-2xl" />
-          <h2 className="text-xl font-semibold mb-2 text-white">Batalla Cerrada</h2>
-          <p className="text-sm text-zinc-400 mb-8">La votación ha terminado</p>
-          <Link to={`/resultados/${code}`}>
-            <Button className="w-full bg-white text-black hover:bg-zinc-200 rounded-xl font-semibold">
-              Ver Resultados
+        <div className="glass-card rounded-[40px] border border-white/5 bg-white/[0.02] p-10 text-center max-w-sm w-full z-10 backdrop-blur-3xl animate-in fade-in zoom-in duration-700">
+          <img src="/logo_fn.png" alt="Logo" className="h-16 mx-auto mb-8 drop-shadow-2xl" />
+
+          {error && <XCircle className="h-14 w-14 text-error mx-auto mb-4 opacity-80" />}
+          {isDraft && <Clock className="h-14 w-14 text-zinc-500 mx-auto mb-4 opacity-80" />}
+          {(isClosed || isTied) && <div className="h-1 w-12 bg-primary mx-auto mb-6 rounded-full" />}
+
+          <h2 className="text-2xl font-black tracking-tighter text-foreground mb-2 uppercase">
+            {error ? "Error" : isDraft ? "Próximamente" : isTied ? "¡Empate!" : "Finalizada"}
+          </h2>
+
+          <p className=" text-sm mb-10 font-medium">
+            {error || (isDraft ? "La votación aún no ha comenzado." : isTied ? "La batalla terminó en tablas." : "Esta batalla ha concluido.")}
+          </p>
+
+          <Link to={isClosed || isTied ? `/resultados/${code}` : "/"}>
+            <Button className="w-full h-14 bg-primary text-primary-foreground hover:bg-primary/90 rounded-[22px] font-black text-lg shadow-xl transition-all active:scale-95">
+              {isClosed || isTied ? "VER RESULTADOS" : "VOLVER"}
             </Button>
           </Link>
         </div>
@@ -136,213 +163,193 @@ export default function VotePage() {
     );
   }
 
-  if (battle.status === "tied") {
-    return (
-      <div key="tied" className="min-h-screen flex items-center justify-center bg-[#050505] px-4 relative overflow-hidden animate-fade-in-up">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-campaign-gold/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="glass-card rounded-[32px] p-10 text-center max-w-sm w-full z-10">
-          <img src="/logo_fn.png" alt="F*cks News" className="h-14 mx-auto mb-6 drop-shadow-2xl" />
-          <h2 className="text-xl font-bold mb-2 text-campaign-gold">¡Empate!</h2>
-          <p className="text-sm text-zinc-300 mb-2">
-            La batalla terminó en empate.
-          </p>
-          <p className="text-xs text-zinc-500 mb-8">
-            El administrador puede iniciar una ronda de desempate.
-          </p>
-          <Link to={`/resultados/${code}`}>
-            <Button className="w-full bg-white/[0.05] border border-white/10 hover:bg-white/10 text-white rounded-xl font-medium">
-              Ver Resultados
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  // --- RENDER DE IDENTIFICACIÓN (ESTILO APPLE GLASS) ---
+  // --- PANTALLA DE IDENTIFICACIÓN ---
   if (!voterReady && !hasVoted) {
     return (
-      <div key="auth" className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-4 selection:bg-campaign-gold/30 animate-fade-in-up">
-        {/* Background blobs decorativos */}
-        <div className="fixed inset-0 overflow-hidden -z-10">
-          <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-campaign-red/10 blur-[120px] rounded-full animate-pulse" />
-          <div className="absolute top-[20%] -right-[10%] w-[30%] h-[50%] bg-campaign-gold/5 blur-[120px] rounded-full delay-1000" />
+      <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4 selection:bg-primary/30">
+        <div className="fixed inset-0 -z-10">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[150px] rounded-full animate-pulse" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[150px] rounded-full" />
         </div>
 
-        <div className="w-full max-w-[440px] relative">
-          <div className="glass-card absolute inset-0 rounded-[32px] -z-10" />
-          
-          <div className="p-8 sm:p-10 flex flex-col items-center">
-            <img src="/logo_fn.png" alt="Logo" className="h-16 mb-8 drop-shadow-2xl" />
-            <h1 className="text-2xl font-semibold tracking-tight text-center mb-2">{battle?.title}</h1>
-            <p className="text-zinc-400 text-center text-sm mb-8 leading-relaxed">Ingresa tus datos para participar en la votación en tiempo real.</p>
+        <div className="w-full max-w-[460px] animate-in fade-in slide-in-from-bottom-8 duration-1000">
+          <div className="glass-card rounded-[40px] border border-white/5 bg-white/[0.02] backdrop-blur-3xl p-8 sm:p-12 relative overflow-hidden">
+            <div className="absolute top-6 right-8 opacity-40 hover:opacity-100 transition-opacity">
+              <ThemeToggle />
+            </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); voterName.trim() && setVoterReady(true); }} className="w-full space-y-4">
-              <div className="space-y-1.5 font-medium">
-                <label className="text-[13px] text-zinc-400 ml-1">Nombre Completo</label>
-                <Input 
-                  value={voterName}
-                  onChange={e => setVoterName(e.target.value)}
-                  className="bg-white/[0.05] border-white/5 h-12 rounded-xl focus:ring-campaign-gold/20 focus:border-campaign-gold/40 transition-all text-white"
-                  placeholder="Ej. Juan Pérez"
-                  required
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[13px] text-zinc-400 ml-1 font-medium text-xs">Documento (Opc)</label>
-                  <Input 
-                    value={voterDocument}
-                    onChange={e => setVoterDocument(e.target.value)}
-                    className="bg-white/[0.05] border-white/5 h-12 rounded-xl text-white"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[13px] text-zinc-400 ml-1 font-medium text-xs">Celular (Opc)</label>
-                  <Input 
-                    value={voterPhone}
-                    onChange={e => setVoterPhone(e.target.value)}
-                    className="bg-white/[0.05] border-white/5 h-12 rounded-xl text-white"
-                  />
-                </div>
-              </div>
+            <div className="flex flex-col items-center text-center">
+              <img src="/logo_fn.png" alt="Logo" className="h-14 mb-10 drop-shadow-2xl" />
 
-              <Button className="w-full h-12 bg-white text-black hover:bg-zinc-200 rounded-xl font-semibold transition-all mt-4 group">
-                Empezar a votar
-                <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </form>
+              <h1 className="text-3xl font-black">{battle?.title}</h1>
+              <p className=" text-sm mb-10 font-medium">Completa tus datos para habilitar el voto.</p>
+
+              <form onSubmit={(e) => { e.preventDefault(); voterName.trim() && setVoterReady(true); }} className="w-full space-y-6 text-left">
+                <div className="space-y-2">
+                  <label>Nombre Completo</label>
+                  <div className="relative">
+                    <Input
+                      value={voterName}
+                      onChange={e => setVoterName(e.target.value)}
+                      placeholder="Ej. Jhonatan Lopez"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label>Documento</label>
+                    <div className="relative">
+                      <Input
+                        value={voterDocument}
+                        onChange={e => setVoterDocument(e.target.value)}
+                        placeholder="Opcional"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label>Celular</label>
+                    <div className="relative">
+                      <Input
+                        value={voterPhone}
+                        onChange={e => setVoterPhone(e.target.value)}
+                        placeholder="Opcional"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <Button variant="outline" className="w-full">
+                  INGRESAR A VOTAR
+                  <ChevronRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  // --- RENDER DE VOTACIÓN ---
+  // --- PANTALLA DE VOTACIÓN PRINCIPAL ---
   return (
-    <div className="min-h-screen bg-[#080808] text-zinc-100 flex flex-col font-sans selection:bg-campaign-gold/30">
-      {/* Background blobs for voting */}
-      <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute top-[30%] -right-[20%] w-[50%] h-[50%] bg-campaign-gold/5 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-campaign-blue/5 blur-[120px] rounded-full" />
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/30 overflow-x-hidden">
+      <div className="fixed inset-0 -z-10 pointer-events-none">
+        <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-primary/5 blur-[150px] rounded-full" />
+        <div className="absolute bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/5 blur-[150px] rounded-full" />
       </div>
 
-      {/* Header Estilo Apple Glass */}
-      <nav className="sticky top-0 z-50 bg-[#080808]/60 backdrop-blur-xl border-b border-white/[0.06]">
-        <div className="max-w-3xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <img src="/logo_fn.png" alt="FN" className="h-10 w-auto" />
-            <div className="h-8 w-[1px] bg-white/10 hidden sm:block" />
-            <h2 className="text-sm font-medium hidden sm:block max-w-[200px] truncate opacity-80">{battle?.title}</h2>
+      <Header
+        leftContent={
+          <div className="hidden sm:flex flex-col">
+            <h2 className="text-sm font-black tracking-tighter uppercase leading-none text-foreground">{battle?.title}</h2>
+            <span className="text-[10px]  font-bold tracking-widest mt-1">SISTEMA DE VOTACIÓN</span>
           </div>
-          
-          <div className="flex items-center gap-6">
+        }
+        rightContent={
+          <div className="flex items-center gap-8">
             <div className="text-right">
-              <span className="block text-[10px] uppercase tracking-[0.1em] text-zinc-500 font-bold">Total Votos</span>
-              <span className="text-lg font-semibold tabular-nums text-campaign-gold tracking-tight">{battle?.totalVotes || 0}</span>
+              <span className="block text-[9px] uppercase tracking-[0.2em]  font-black">Total Votos</span>
+              <span className="text-2xl font-black tabular-nums text-primary tracking-tighter leading-none">{battle?.totalVotes || 0}</span>
             </div>
             <VoteTimer expiresAt={battle?.expiresAt} expired={expired} onExpire={() => setExpired(true)} />
           </div>
-        </div>
-      </nav>
+        }
+        containerClassName="max-w-4xl"
+      />
 
-      {/* Tiebreaker Banner */}
       {battle?.status === "tiebreaker" && (
-        <div className="bg-campaign-gold/10 border-b border-campaign-gold/20 backdrop-blur-md">
-          <div className="max-w-3xl mx-auto px-6 py-3 flex items-center justify-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-campaign-gold animate-pulse" />
-            <span className="text-sm font-medium text-campaign-gold tracking-wide">RONDA DE DESEMPATE ACTIVA</span>
+        <div className="bg-primary text-primary-foreground py-2 overflow-hidden relative">
+          <div className="flex items-center justify-center gap-4 animate-pulse">
+            <AlertTriangle className="h-4 w-4" />
+            <span className="text-[11px] font-black tracking-[0.3em] uppercase text-primary-foreground">Ronda de Desempate Activa</span>
+            <AlertTriangle className="h-4 w-4" />
           </div>
         </div>
       )}
 
-      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-10">
+      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-12 pt-24">
         {hasVoted && (
-          <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-700">
-            <div className="bg-campaign-gold/5 border border-campaign-gold/20 rounded-[28px] p-6 flex flex-col items-center text-center backdrop-blur-md">
-              <div className="h-12 w-12 bg-campaign-gold rounded-full flex items-center justify-center mb-3 shadow-[0_0_20px_rgba(212,175,55,0.3)]">
-                <CheckCircle2 className="text-black h-6 w-6" />
+          <div className="animate-in fade-in slide-in-from-top-6 duration-700">
+            <div className="glass-card rounded-[32px] border border-primary/20 bg-primary/[0.03] p-6 flex items-center justify-between backdrop-blur-3xl">
+              <div className="flex items-center gap-4 text-left">
+                <CheckCircle2 className="h-16 w-16" />
+                <div>
+                  <h3 className="text-lg font-black tracking-tight leading-none">Voto Registrado</h3>
+                  <p className=" text-xs font-medium mt-1 uppercase tracking-wider">Puedes cambiar tu elección mientras el tiempo siga corriendo</p>
+                </div>
               </div>
-              <h3 className="text-lg font-semibold text-campaign-gold">¡Voto registrado!</h3>
-              <p className="text-zinc-400 text-sm">Mira cómo cambian los resultados en tiempo real.</p>
             </div>
           </div>
         )}
 
-        <div className="space-y-4">
+        <div className="space-y-4 mt-8">
           {battle?.participants?.map((participant: Participant, idx: number) => {
             const isVotedFor = votedFor === participant.id;
-            // Solo permitir votar por participantes empatados si es tiebreaker
             const isTiebreakerDisabled = battle.status === "tiebreaker" && battle.tiedParticipantIds && !battle.tiedParticipantIds.includes(participant.id);
-            const isDisabled = hasVoted || voting !== null || isTiebreakerDisabled;
-            
+            const isDisabled = voting !== null || isTiebreakerDisabled;
+
             return (
               <button
                 key={participant.id}
-                onClick={() => !isDisabled && castVote(participant.id)}
+                onClick={() => !isDisabled && (hasVoted ? changeVote(participant.id) : castVote(participant.id))}
                 disabled={isDisabled}
                 className={cn(
-                  "relative w-full text-left rounded-[28px] overflow-hidden transition-all duration-500 group",
-                  "bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.05]",
-                  isDisabled && !hasVoted ? "cursor-not-allowed opacity-50" : (hasVoted ? "cursor-default" : "cursor-pointer active:scale-[0.98]"),
-                  isVotedFor && "border-campaign-gold/40 bg-campaign-gold/[0.02]"
+                  "relative w-full text-left rounded-[32px] overflow-hidden transition-all duration-500 group border",
+                  "bg-white/[0.02] border-white/5 hover:border-white/10 hover:bg-white/[0.04]",
+                  isDisabled ? "cursor-not-allowed opacity-40" : "cursor-pointer active:scale-[0.98]",
+                  isVotedFor && "border-primary/40 bg-primary/[0.05]"
                 )}
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
-                {/* Capa de progreso "Líquida" */}
+                {/* Barra de progreso Líquida Premium */}
                 {hasVoted && (
-                  <div 
-                    className="absolute inset-y-0 left-0 transition-all duration-[1500ms] ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden"
-                    style={{ 
-                      width: `${participant.percentage}%`, 
-                    }}
+                  <div
+                    className="absolute inset-y-0 left-0 transition-all duration-[2000ms] ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden"
+                    style={{ width: `${participant.percentage}%` }}
                   >
-                    <div 
-                      className="absolute inset-0 opacity-[0.15]" 
+                    <div
+                      className="absolute inset-0 opacity-[0.12] transition-colors duration-1000"
                       style={{ backgroundColor: participant.color }}
                     />
-                    {/* Shimmer effect inside the bar */}
-                    {participant.percentage > 0 && (
-                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                    )}
-                    {/* Right edge glow */}
-                    <div 
-                      className="absolute top-0 bottom-0 right-0 w-1 opacity-50 shadow-[0_0_15px_rgba(255,255,255,0.5)]"
-                      style={{ backgroundColor: participant.color }} 
+                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_3s_infinite] bg-gradient-to-r from-transparent via-white/[0.05] to-transparent" />
+                    <div
+                      className="absolute top-0 bottom-0 right-0 w-[2px] opacity-60 shadow-[0_0_20px_white]"
+                      style={{ backgroundColor: participant.color }}
                     />
                   </div>
                 )}
 
-                <div className="relative p-6 sm:p-8 flex items-center justify-between gap-6">
-                  <div className="flex-1 min-w-0 z-10">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div 
-                        className="w-2.5 h-2.5 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.3)]"
-                        style={{ backgroundColor: participant.color }}
+                <div className="relative p-7 sm:p-9 flex items-center justify-between gap-8 z-10">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div
+                        className="w-2.5 h-2.5 rounded-full shadow-lg"
+                        style={{ backgroundColor: participant.color, boxShadow: `0 0 10px ${participant.color}80` }}
                       />
-                      <span className="text-xs font-bold tracking-widest uppercase text-zinc-400">{participant.name}</span>
+                      <span className="text-[10px] font-black tracking-[0.2em] uppercase ">{participant.name}</span>
                     </div>
-                    <p className="text-lg sm:text-xl font-medium leading-snug tracking-tight text-white/90 drop-shadow-sm">
+                    <p className="text-xl sm:text-2xl font-black leading-[1.1] tracking-tighter text-foreground group-hover:text-primary transition-colors duration-500">
                       "{participant.headline}"
                     </p>
                   </div>
 
                   {hasVoted ? (
-                    <div className="text-right shrink-0 z-10">
-                      <span className="text-3xl sm:text-4xl font-bold tracking-tighter block drop-shadow-sm" style={{ color: participant.color }}>
+                    <div className="text-right shrink-0">
+                      <span className="text-4xl sm:text-5xl font-black tracking-tighter block leading-none mb-1" style={{ color: participant.color }}>
                         {participant.percentage}%
                       </span>
-                      <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-tighter">
-                        {participant.votes.toLocaleString()} votos
+                      <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+                        {participant.votes.toLocaleString()} VOTOS
                       </span>
                     </div>
                   ) : (
                     <div className={cn(
-                      "h-10 w-10 rounded-full border flex items-center justify-center transition-all shrink-0 z-10",
-                      isTiebreakerDisabled ? "border-white/5 text-white/20" : "border-white/10 group-hover:bg-white group-hover:text-black text-white"
+                      "h-14 w-14 rounded-2xl border flex items-center justify-center transition-all duration-500 shrink-0",
+                      isTiebreakerDisabled ? "border-white/5 /10" : "border-white/10 group-hover:bg-primary group-hover:text-primary-foreground  group-hover:rotate-12"
                     )}>
-                      {voting === participant.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronRight className="h-5 w-5" />}
+                      {voting === participant.id ? <Loader2 className="h-6 w-6 animate-spin" /> : <ChevronRight className="h-6 w-6" />}
                     </div>
                   )}
                 </div>
@@ -352,22 +359,22 @@ export default function VotePage() {
         </div>
 
         {!hasVoted && (
-          <p className="text-center text-sm sm:text-base text-muted-foreground mt-6 sm:mt-8 font-medium px-4 animate-pulse">
-            Selecciona el titular que más te guste para votar
-          </p>
+          <div className="mt-12 text-center animate-pulse">
+            <p className=" text-xs font-black tracking-[0.3em] uppercase">Toca un titular para votar</p>
+          </div>
         )}
       </main>
 
-      {/* Footer minimalista Apple Style */}
-      <footer className="mt-auto border-t border-white/[0.06] py-12 px-6">
-        <div className="max-w-3xl mx-auto text-center space-y-6">
-          <p className="text-zinc-500 text-sm leading-relaxed max-w-xl mx-auto">
-            Un tributo a la comedia de <span className="text-zinc-300 font-medium">F*cks News Noticreo</span>. 
-            Gracias por el apoyo y las risas constantes.
+      {/* Footer con créditos originales */}
+      <footer className="mt-auto border-t border-white/5 py-16 px-6 bg-white/[0.01]">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className=" text-sm font-medium leading-relaxed max-w-md mx-auto mb-8">
+            Un tributo a la comedia de <span className="text-foreground font-bold">F*cks News Noticreo</span>.
+            Hecho con código y muchas risas.
           </p>
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-bold">Desarrollado por</span>
-            <span className="text-sm font-medium bg-gradient-to-r from-campaign-gold to-yellow-200 bg-clip-text text-transparent">
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[9px] uppercase tracking-[0.1em] font-black">Development by</span>
+            <span className="text-sm font-black bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent uppercase tracking-wider">
               Jhonatan Lopez Conde
             </span>
           </div>
@@ -387,12 +394,12 @@ function VoteTimer({ expiresAt, expired, onExpire }: { expiresAt?: string | null
   if (!expiresAt) return null;
 
   return (
-    <div className="pl-6 border-l border-white/10 flex flex-col items-end">
-      <span className="text-[10px] uppercase tracking-[0.1em] text-zinc-500 font-bold mb-0.5">Cierre en</span>
+    <div className="pl-8 border-l border-white/10 flex flex-col items-end">
+      <span className="text-[9px] uppercase tracking-[0.2em]  font-black mb-1">Cierra en</span>
       <div className="flex items-center gap-2">
-        <Timer className="h-3.5 w-3.5 text-campaign-red" />
-        <span className="text-lg font-mono font-bold text-campaign-red tabular-nums tracking-tighter drop-shadow-sm">
-          {countdown?.isExpired || expired ? "FINALIZADA" : countdown?.display || "00:00"}
+        <Timer className="h-4 w-4 text-destructive animate-pulse" />
+        <span className="text-2xl font-black font-mono text-destructive tabular-nums tracking-tighter leading-none">
+          {countdown?.isExpired || expired ? "FINAL" : countdown?.display || "00:00"}
         </span>
       </div>
     </div>

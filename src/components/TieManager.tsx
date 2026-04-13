@@ -38,17 +38,17 @@ export function TieManager({ battle, onVote, userVote, showLogo = true }: TieMan
       return {
         title: "🤝 ¡EMPATE DETECTADO!",
         subtitle: "Se ha detectado un empate. Preparando desempate...",
-        bgColor: "bg-yellow-100",
-        textColor: "text-yellow-800",
-        borderColor: "border-yellow-400"
+        bgColor: "bg-status-warning/20",
+        textColor: "text-status-warning",
+        borderColor: "border-status-warning/40"
       };
     } else if (battle.status === "tiebreaker") {
       return {
         title: `🔥 DESEMPATE - RONDA ${battle.tiebreakRound || 1}`,
         subtitle: getTieSummary(battle),
-        bgColor: "bg-orange-100",
-        textColor: "text-orange-800", 
-        borderColor: "border-orange-500"
+        bgColor: "bg-status-warning/20",
+        textColor: "text-status-warning", 
+        borderColor: "border-status-warning/40"
       };
     }
     return null;

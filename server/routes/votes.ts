@@ -123,6 +123,74 @@ export async function voteRoutes(app: FastifyInstance) {
     return { success: true, message: "¡Voto registrado!" };
   });
 
+  app.put<{
+    Body: {
+      battleCode: string;
+      participantId: number;
+      fingerprint: string;
+    };
+  }>("/api/votes", async (req, reply) => {
+    const { battleCode, participantId, fingerprint } = req.body;
+
+    if (!battleCode || !participantId || !fingerprint) {
+      return reply.status(400).send({ error: "Datos de voto incompletos" });
+    }
+
+    const battle = db
+      .select()
+      .from(schema.battles)
+      .where(eq(schema.battles.code, battleCode))
+      .get();
+
+    if (!battle) {
+      return reply.status(404).send({ error: "Batalla no encontrada" });
+    }
+
+    if (battle.status !== "active" && battle.status !== "tiebreaker") {
+      return reply.status(403).send({ error: "La votación no está activa" });
+    }
+
+    const existing = db
+      .select()
+      .from(schema.votes)
+      .where(
+        and(
+          eq(schema.votes.battleId, battle.id),
+          eq(schema.votes.fingerprint, fingerprint)
+        )
+      )
+      .get();
+
+    if (!existing) {
+      return reply.status(404).send({ error: "No existe un voto previo para actualizar" });
+    }
+
+    const participant = db
+      .select()
+      .from(schema.participants)
+      .where(
+        and(
+          eq(schema.participants.id, participantId),
+          eq(schema.participants.battleId, battle.id)
+        )
+      )
+      .get();
+
+    if (!participant) {
+      return reply.status(400).send({ error: "Participante no válido" });
+    }
+
+    db.update(schema.votes)
+      .set({ participantId })
+      .where(eq(schema.votes.id, existing.id))
+      .run();
+
+    const counts = getVoteCounts(battle.id);
+    broadcastToBattle(battle.id, { type: "vote_update", ...counts });
+
+    return { success: true, message: "Voto actualizado" };
+  });
+
   // Check if user already voted
   app.get<{ Params: { code: string }; Querystring: { fp: string } }>(
     "/api/votes/check/:code",
@@ -151,7 +219,10 @@ export async function voteRoutes(app: FastifyInstance) {
         )
         .get();
 
-      return { hasVoted: !!existing };
+      return {
+        hasVoted: !!existing,
+        participantId: existing?.participantId ?? null,
+      };
     }
   );
 }

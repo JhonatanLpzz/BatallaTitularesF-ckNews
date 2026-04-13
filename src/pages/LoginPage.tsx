@@ -39,7 +39,7 @@ export default function LoginPage() {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-4 selection:bg-campaign-gold/30">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 selection:bg-campaign-gold/30">
       {/* Background blobs decorativos */}
       <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/10 rounded-full blur-[120px] animate-pulse" />

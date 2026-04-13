@@ -11,30 +11,35 @@
         --card-foreground: 220 25% 8%;
         --popover: 0 0% 100%;
         --popover-foreground: 220 25% 8%;
-        --primary: 45 96% 68%;
+        --primary: 359 100% 50%;
         --primary-foreground: 220 25% 8%;
-        --secondary: 217 78% 50%;
+        --secondary: 220 100% 36%;
         --secondary-foreground: 0 0% 100%;
         --muted: 220 12% 95%;
         --muted-foreground: 220 8% 45%;
-        --accent: 0 72% 58%;
+        --accent: 359 100% 50%;
         --accent-foreground: 0 0% 100%;
         --destructive: 0 65% 55%;
         --destructive-foreground: 0 0% 100%;
         --border: 220 12% 85%;
         --input: 220 12% 90%;
-        --ring: 45 96% 68%;
+        --ring: 359 100% 50%;
         --radius: 0.875rem;
 
         /* Campaign-inspired tokens */
         --campaign-gold: 45 96% 65%;
-        --campaign-blue: 212 96% 25%;
-        --campaign-red: 355 78% 48%;
-        --campaign-purple: 212 96% 25%;
-        --fn-red: 355 78% 48%;
-        --fn-blue: 212 96% 25%;
+        --campaign-blue: 220 100% 36%;
+        --campaign-red: 359 100% 50%;
+        --campaign-purple: 220 100% 36%;
+        --fn-red: 359 100% 50%;
+        --fn-blue: 220 100% 36%;
 
-        --vote-gradient: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(212 20% 95%) 50%, hsl(0 0% 98%) 100%);
+        /* Status colors */
+        --status-success: 142 76% 36%;
+        --status-warning: 38 92% 50%;
+        --status-info: 199 89% 48%;
+
+        --vote-gradient: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(220 100% 36%) 50%, hsl(0 0% 98%) 100%);
     }
 
     .dark {
@@ -45,20 +50,20 @@
         --card-foreground: 0 0% 98%;
         --popover: 220 18% 15%;
         --popover-foreground: 0 0% 98%;
-        --primary: 45 96% 68%;
+        --primary: 359 100% 50%;
         --primary-foreground: 220 25% 8%;
-        --secondary: 217 78% 50%;
+        --secondary: 220 100% 36%;
         --secondary-foreground: 0 0% 98%;
         --muted: 220 12% 25%;
         --muted-foreground: 220 8% 75%;
-        --accent: 0 72% 58%;
+        --accent: 359 100% 50%;
         --accent-foreground: 0 0% 98%;
         --destructive: 0 65% 55%;
         --destructive-foreground: 0 0% 98%;
         --border: 220 12% 35%;
         --input: 220 12% 25%;
         
-        --vote-gradient: linear-gradient(135deg, hsl(220 25% 8%) 0%, hsl(212 96% 12%) 50%, hsl(220 25% 8%) 100%);
+        --vote-gradient: linear-gradient(135deg, hsl(220 25% 8%) 0%, hsl(220 100% 12%) 50%, hsl(220 25% 8%) 100%);
     }
 
     * {
@@ -72,14 +77,7 @@
     }
 
     .campaign-gradient {
-        background: linear-gradient(135deg, hsl(212 96% 25%) 0%, hsl(212 96% 15%) 50%, hsl(355 78% 48%) 100%);
-    }
-
-    .campaign-gold-gradient {
-        background: linear-gradient(135deg, hsl(45 96% 65%) 0%, hsl(35 85% 55%) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        background: linear-gradient(135deg, hsl(220 100% 36%) 0%, hsl(220 100% 24%) 50%, hsl(359 100% 50%) 100%);
     }
 
     .campaign-text-glow {

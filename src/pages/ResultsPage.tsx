@@ -1,24 +1,24 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { Loader2, Users, Crown, Timer, Swords } from "lucide-react";
+import { useParams, Link } from "react-router-dom";
+import { Loader2, Crown, Timer, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { Battle, Participant, VoteUpdate } from "@/types";
 import { useSSE } from "@/hooks/useSSE";
 import { useCountdown } from "@/hooks/useCountdown";
+import { Header } from "@/components/Header";
 
 export default function ResultsPage() {
   const { code } = useParams<{ code: string }>();
-  const navigate = useNavigate();
   const [battle, setBattle] = useState<Battle | null>(null);
   const [loading, setLoading] = useState(true);
-  const [scrolled, setScrolled] = useState(false);
 
   const fetchBattle = useCallback(async () => {
     if (!code) return;
     try {
       const res = await fetch(`/api/battles/${code}`);
+
       if (!res.ok) throw new Error();
       const data = await res.json();
       setBattle(data);
@@ -33,18 +33,11 @@ export default function ResultsPage() {
     fetchBattle();
   }, [fetchBattle]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   useSSE(code, {
     enabled: !!battle,
     onMessage: (data) => {
       const update = data as VoteUpdate;
+
       if (update.type === "vote_update" && battle) {
         setBattle((prev) =>
           prev ? { ...prev, participants: update.participants, totalVotes: update.totalVotes } : prev
@@ -55,10 +48,10 @@ export default function ResultsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="relative flex items-center justify-center">
           <div className="absolute h-16 w-16 border-t-2 border-campaign-gold rounded-full animate-spin opacity-20" />
-          <Loader2 className="h-6 w-6 animate-spin text-campaign-gold" />
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       </div>
     );
@@ -66,11 +59,11 @@ export default function ResultsPage() {
 
   if (!battle) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#050505] px-4">
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <div className="glass-card rounded-[32px] p-8 text-center max-w-sm w-full">
-          <p className="text-zinc-400 mb-4">Batalla no encontrada</p>
+          <p className="text-muted-foreground mb-4">Batalla no encontrada</p>
           <Link to="/">
-            <Button className="bg-white/10 hover:bg-white/20 text-white rounded-xl mt-4">Volver</Button>
+            <Button className="bg-white/10 hover:bg-white/20 text-foreground rounded-xl mt-4">Volver</Button>
           </Link>
         </div>
       </div>
@@ -81,61 +74,39 @@ export default function ResultsPage() {
   const maxVotes = sorted.length > 0 ? sorted[0].votes : 0;
 
   return (
-    <div className="min-h-screen bg-[#080808] text-zinc-100 flex flex-col font-sans selection:bg-campaign-gold/30">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-campaign-gold/30">
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
         <div className="absolute top-[30%] -right-[20%] w-[50%] h-[50%] bg-campaign-gold/5 blur-[120px] rounded-full" />
         <div className="absolute bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-campaign-blue/5 blur-[120px] rounded-full" />
       </div>
 
-      <nav
-        className={cn(
-          "sticky top-0 z-50 transition-all duration-300 ease-in-out",
-          scrolled ? "bg-[#080808]/60 backdrop-blur-xl border-b border-white/[0.06]" : "bg-transparent"
-        )}
-      >
-        <div className="max-w-4xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link to="/" className="shrink-0">
-              <img
-                src="/logo_fn.png"
-                alt="F*cks News"
-                className={cn(
-                  "drop-shadow-lg transition-all duration-300 hover:scale-105",
-                  scrolled ? "h-8" : "h-10 sm:h-12"
-                )}
-              />
-            </Link>
-            <div className={cn("transition-all duration-300 min-w-0", scrolled ? "hidden sm:block" : "block")}>
-              <h1 className={cn(
-                "font-bold campaign-gold-gradient truncate transition-all duration-300",
-                scrolled ? "text-base" : "text-lg"
-              )}>RESULTADOS</h1>
-              <p className={cn(
-                "text-zinc-400 transition-all duration-300",
-                scrolled ? "text-[10px]" : "text-xs"
-              )}>Batalla de Titulares</p>
-            </div>
+      <Header
+        leftContent={
+          <div className="hidden sm:block min-w-0">
+            <h1 className="font-bold campaign-gold-gradient truncate text-lg">RESULTADOS</h1>
+            <p className="text-muted-foreground text-xs">Batalla de Titulares</p>
           </div>
+        }
+        rightContent={
           <div className="flex items-center gap-4 flex-shrink-0">
             <div className="text-right hidden sm:block">
-              <span className="block text-[10px] uppercase tracking-[0.1em] text-zinc-500 font-bold">Total Votos</span>
-              <span className="text-lg font-semibold tabular-nums text-campaign-gold tracking-tight">{battle.totalVotes || 0}</span>
+              <span className="block text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-bold">Total Votos</span>
+              <span className="text-lg font-semibold tabular-nums text-primary tracking-tight">{battle.totalVotes || 0}</span>
             </div>
-            
             {battle.status === "active" && (
-              <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] sm:text-xs animate-pulse px-2 rounded-lg">VIVO</Badge>
+              <Badge className="bg-status-success/20 text-status-success border-status-success/30 text-[10px] sm:text-xs animate-pulse px-2 rounded-lg">VIVO</Badge>
             )}
             {battle.status === "tied" && (
-              <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[10px] sm:text-xs px-2 rounded-lg">EMPATE</Badge>
+              <Badge className="bg-status-warning/20 text-status-warning border-status-warning/30 text-[10px] sm:text-xs px-2 rounded-lg">EMPATE</Badge>
             )}
             {battle.status === "tiebreaker" && (
-              <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-[10px] sm:text-xs animate-pulse px-2 rounded-lg">DESEMPATE</Badge>
+              <Badge className="bg-status-warning/20 text-status-warning border-status-warning/30 text-[10px] sm:text-xs animate-pulse px-2 rounded-lg">DESEMPATE</Badge>
             )}
             <CountdownBadge expiresAt={battle.expiresAt} />
           </div>
-        </div>
-      </nav>
+        }
+      />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full flex-1">
         {/* Mobile-Optimized Title */}
@@ -144,7 +115,7 @@ export default function ResultsPage() {
             <span className="campaign-gold-gradient animate-glow-pulse leading-tight">{battle.title}</span>
           </h1>
           {battle.description && (
-            <p className="text-zinc-300 text-sm sm:text-lg px-4 leading-relaxed font-medium">{battle.description}</p>
+            <p className="text-muted-foreground text-sm sm:text-lg px-4 leading-relaxed font-medium">{battle.description}</p>
           )}
           <div className="w-16 sm:w-24 h-1 bg-gradient-to-r from-campaign-gold to-yellow-200 mx-auto mt-4 sm:mt-6 rounded-full opacity-50" />
         </div>
@@ -153,11 +124,11 @@ export default function ResultsPage() {
         {(battle.status === "tied" || battle.status === "tiebreaker") && (
           <div className={`glass-card rounded-[24px] p-6 mb-8 border text-center ${
             battle.status === "tied"
-              ? "border-yellow-500/40 bg-yellow-500/5"
-              : "border-orange-500/50 bg-orange-500/5"
+              ? "border-status-warning/40 bg-status-warning/5"
+              : "border-status-warning/50 bg-status-warning/5"
           }`}>
             <p className={`font-semibold text-sm ${
-              battle.status === "tied" ? "text-yellow-400" : "text-orange-400"
+              battle.status === "tied" ? "text-status-warning" : "text-status-warning"
             }`}>
               {battle.status === "tied"
                 ? "La batalla terminó en empate. El administrador puede iniciar una ronda de desempate."
@@ -183,12 +154,12 @@ export default function ResultsPage() {
               >
                 <div className="relative p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-6">
                   {/* Layer Liquid Progress Bar */}
-                  <div 
+                  <div
                     className="absolute inset-y-0 left-0 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)] z-0"
-                    style={{ 
-                      width: `${barWidth}%`, 
+                    style={{
+                      width: `${barWidth}%`,
                       backgroundColor: participant.color,
-                      opacity: 0.15
+                      opacity: 0.15,
                     }}
                   />
 
@@ -199,8 +170,8 @@ export default function ResultsPage() {
                       className={cn(
                         "w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center font-bold text-lg sm:text-xl shrink-0 backdrop-blur-md border border-white/10",
                         isWinner
-                          ? "bg-campaign-gold/20 text-campaign-gold shadow-[0_0_20px_rgba(212,175,55,0.3)]"
-                          : "bg-white/5 text-zinc-400"
+                          ? "bg-primary/20 text-primary shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                          : "bg-white/5 text-muted-foreground"
                       )}
                     >
                       {isWinner ? <Crown className="h-6 w-6 sm:h-8 sm:w-8" /> : idx + 1}
@@ -212,9 +183,9 @@ export default function ResultsPage() {
                         className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.3)] shrink-0"
                         style={{ backgroundColor: participant.color }}
                       />
-                      <span className="font-bold text-lg text-white truncate tracking-tight">{participant.name}</span>
+                      <span className="font-bold text-lg text-foreground truncate tracking-tight">{participant.name}</span>
                       {isWinner && (
-                        <span className="text-[10px] font-bold text-campaign-gold bg-campaign-gold/10 border border-campaign-gold/20 px-2 py-1 rounded-full whitespace-nowrap">
+                        <span className="text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-2 py-1 rounded-full whitespace-nowrap">
                           CAMPEÓN
                         </span>
                       )}
@@ -228,7 +199,7 @@ export default function ResultsPage() {
                       >
                         {participant.percentage}%
                       </span>
-                      <span className="text-[11px] text-zinc-500 font-bold uppercase tracking-tighter mt-1">
+                      <span className="text-[11px] text-muted-foreground font-bold uppercase tracking-tighter mt-1">
                         {participant.votes} votos
                       </span>
                     </div>
@@ -242,15 +213,15 @@ export default function ResultsPage() {
                           className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.3)]"
                           style={{ backgroundColor: participant.color }}
                         />
-                        <span className="font-bold text-xl text-white tracking-tight">{participant.name}</span>
+                        <span className="font-bold text-xl text-foreground tracking-tight">{participant.name}</span>
                         {isWinner && (
-                          <span className="text-xs font-bold text-campaign-gold bg-campaign-gold/10 border border-campaign-gold/20 px-3 py-1 rounded-full">
+                          <span className="text-xs font-bold text-primary bg-primary/10 border border-primary/20 px-3 py-1 rounded-full">
                             CAMPEÓN
                           </span>
                         )}
                       </div>
                       <div className="flex items-end gap-4">
-                        <span className="text-xs text-zinc-500 font-bold uppercase tracking-tighter pb-1">
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-tighter pb-1">
                           {participant.votes} votos
                         </span>
                         <span
@@ -261,7 +232,7 @@ export default function ResultsPage() {
                         </span>
                       </div>
                     </div>
-                    <p className="text-zinc-300 font-medium leading-snug">
+                    <p className="text-muted-foreground font-medium leading-snug">
                       "{participant.headline}"
                     </p>
                   </div>
@@ -269,7 +240,7 @@ export default function ResultsPage() {
 
                 {/* Headline - Full Width (Mobile only) */}
                 <div className="px-6 pb-6 sm:hidden relative z-10">
-                  <p className="text-sm text-zinc-300 font-medium leading-relaxed">
+                  <p className="text-sm text-muted-foreground font-medium leading-relaxed">
                     "{participant.headline}"
                   </p>
                 </div>
@@ -280,21 +251,21 @@ export default function ResultsPage() {
 
         {(!battle.participants || battle.participants.length === 0) && (
           <div className="glass-card rounded-[32px] p-12 text-center mt-8">
-            <Swords className="h-16 w-16 text-zinc-600 mx-auto mb-4 opacity-50" />
-            <p className="text-lg text-zinc-400 font-medium">No hay participantes en esta batalla</p>
+            <Swords className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+            <p className="text-lg text-muted-foreground font-medium">No hay participantes en esta batalla</p>
           </div>
         )}
       </main>
 
       {/* Footer minimalista Apple Style */}
-      <footer className="mt-auto border-t border-white/[0.06] py-12 px-6 bg-[#080808]/80 backdrop-blur-md">
+      <footer className="mt-auto border-t border-white/[0.06] py-12 px-6 bg-background/80 backdrop-blur-md">
         <div className="max-w-3xl mx-auto text-center space-y-6">
-          <p className="text-zinc-500 text-sm leading-relaxed max-w-xl mx-auto">
+          <p className="text-muted-foreground text-sm leading-relaxed max-w-xl mx-auto">
             Un tributo a la comedia de <span className="text-zinc-300 font-medium">F*cks News Noticreo</span>. 
             Gracias por el apoyo y las risas constantes.
           </p>
           <div className="flex flex-col items-center gap-2">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-bold">Desarrollado por</span>
+            <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-bold">Desarrollado por</span>
             <span className="text-sm font-medium bg-gradient-to-r from-campaign-gold to-yellow-200 bg-clip-text text-transparent">
               Jhonatan Lopez Conde
             </span>
@@ -315,7 +286,7 @@ function CountdownBadge({ expiresAt }: { expiresAt?: string | null }) {
 
   return (
     <div className="pl-4 sm:pl-6 border-l border-white/10 flex flex-col items-end">
-      <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] text-zinc-500 font-bold mb-0.5">Cierre en</span>
+      <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-bold mb-0.5">Cierre en</span>
       <div className="flex items-center gap-1 sm:gap-2">
         <Timer className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-campaign-red" />
         <span className="text-base sm:text-lg font-mono font-bold text-campaign-red tabular-nums tracking-tighter drop-shadow-sm">

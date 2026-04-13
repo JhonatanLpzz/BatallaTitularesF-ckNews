@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Plus, Edit2, Trash2, Key, User, ArrowLeft, Loader2, LogOut, Swords } from "lucide-react";
+import { Plus, Edit2, Trash2, User, Loader2, LogOut, Swords, Users, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
+import { Header } from "@/components/Header";
 
 interface AdminUser {
   id: number;
@@ -17,7 +17,7 @@ interface AdminUser {
 
 export default function UserManagementPage() {
   const navigate = useNavigate();
-  const { token, username, logout } = useAuth();
+  const { token, logout } = useAuth();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -155,160 +155,108 @@ export default function UserManagementPage() {
     navigate("/login", { replace: true });
   };
 
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
-    <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
       <div className="fixed inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-campaign-blue/5 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-[120px] animate-pulse delay-1000" />
       </div>
-      
 
-      <nav 
-        className={cn(
-          "fixed top-1 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
-          scrolled 
-            ? "px-2 sm:px-4 py-2" 
-            : "px-0 py-0"
-        )}
-      >
-        <div 
-          className={cn(
-            "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between campaign-card border-b border-border/30",
-            scrolled 
-              ? "max-w-4xl h-14 rounded-full shadow-lg border px-4 sm:px-6 bg-card/60 backdrop-blur-sm" 
-              : "max-w-6xl h-16 rounded-none border-x-0 border-t-0 px-6 bg-card/60 backdrop-blur-sm"
-          )}
-        >
-          <div className="flex items-center gap-3 sm:gap-5 flex-1 min-w-0">
-            <Link to="/" className="shrink-0">
-              <img 
-                src="/logo_fn.png" 
-                alt="F*cks News" 
-                className={cn(
-                  "drop-shadow-lg transition-all duration-300 hover:scale-105",
-                  scrolled ? "h-8" : "h-10 sm:h-12"
-                )} 
-              />
-            </Link>
-            <div className={cn("transition-all duration-300 min-w-0", scrolled ? "hidden sm:block" : "block")}>
-              <h1 className={cn(
-                "font-bold campaign-gold-gradient truncate transition-all duration-300",
-                scrolled ? "text-base" : "text-lg"
-              )}>PANEL ADMIN</h1>
-              <p className={cn(
-                "text-muted-foreground transition-all duration-300",
-                scrolled ? "text-[10px]" : "text-xs"
-              )}>Gestión de Usuarios</p>
-            </div>
+      <Header
+        leftContent={
+          <div className="hidden sm:block min-w-0">
+            <h1 className="font-bold text-foreground truncate tracking-tight text-lg">PANEL ADMIN</h1>
+            <p className="text-muted-foreground text-xs">Gestión de Usuarios</p>
           </div>
-          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-            <Button 
-              variant="ghost" 
-              size={scrolled ? "icon" : "sm"} 
-              asChild 
-              className="text-foreground hover:text-campaign-gold transition-all"
-              title="Batallas"
+        }
+        rightContent={
+          <>
+            <Button
+              variant="outline"
+              size="toggle-icon"
+              onClick={() => navigate('/admin')}
+              title="Ver Batallas"
             >
-              <Link to="/admin">
-                <Swords className={cn("transition-all", scrolled ? "h-5 w-5" : "h-4 w-4 mr-2")} />
-                {!scrolled && <span className="hidden sm:inline">Batallas</span>}
-              </Link>
+              <Swords className="h-5 w-5" />
             </Button>
-            <div className={cn(
-              "text-right transition-all duration-300",
-              scrolled ? "hidden" : "hidden sm:block"
-            )}>
-              <p className="text-xs text-campaign-gold font-medium">{username}</p>
-              <p className="text-[10px] text-muted-foreground">Administrador</p>
-            </div>
-            <Button 
-              variant="destructive" 
-              size={scrolled ? "icon" : "sm"} 
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={handleLogout}
-              className={cn("transition-all", scrolled && "h-8 w-8 rounded-full")}
-              title="Cerrar Sesión"
+              className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors h-9 px-3"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Salir</span>
             </Button>
-          </div>
-        </div>
-      </nav>
+          </>
+        }
+      />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 pt-28 sm:pt-32 w-full flex-1">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white mobile-title">Administradores</h1>
-            <p className="text-muted-foreground mobile-text">Gestión de usuarios del sistema</p>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full flex-1">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 sm:mb-12 mt-16 md:mt-13 animate-fade-in-up">
+          <div className="text-center sm:text-left">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-2">Administradores</h1>
+            <p className="text-muted-foreground">Gestión de usuarios del sistema</p>
           </div>
-          <Button 
-            onClick={() => setShowCreate(true)} 
-            className="campaign-button mobile-button w-full sm:w-auto"
-          >
-            <Plus className="h-4 w-4 mr-2" />
+          <Button onClick={() => setShowCreate(true)} variant="outline">
+            <Plus className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
             Nuevo Usuario
           </Button>
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-campaign-gold" />
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-10 w-10 animate-spin opacity-50" />
           </div>
         ) : users.length === 0 ? (
-          <div className="campaign-card p-8 sm:p-12 text-center">
-            <User className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-lg text-muted-foreground mb-2">No hay usuarios</p>
-            <p className="text-sm text-muted-foreground/60">Crea el primer administrador</p>
+          <div className="glass-card rounded-[32px] text-center py-20 px-6 animate-in fade-in zoom-in duration-500 max-w-2xl mx-auto mt-10">
+            <div className="w-24 h-24 bg-white/5 rounded-[24px] mx-auto flex items-center justify-center mb-8 border border-white/10 shadow-2xl transform -rotate-6">
+              <User className="h-12 w-12" />
+            </div>
+            <h3 className="text-2xl font-bold text-foreground mb-4 tracking-tight">No hay usuarios</h3>
+            <p className="text-muted-foreground mb-8 max-w-md mx-auto leading-relaxed text-base">Crea el primer administrador del sistema</p>
+            <Button onClick={() => setShowCreate(true)} className="h-14 px-8 rounded-2xl bg-white text-black hover:bg-zinc-200 font-semibold shadow-xl hover:-translate-y-1 transition-all">
+              <Plus className="h-5 w-5 mr-2" />
+              Crear Primer Usuario
+            </Button>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6 sm:space-y-8">
             {users.map((user, idx) => (
-              <div 
-                key={user.id} 
-                className="campaign-card p-4 sm:p-6 animate-fade-in-up"
-                style={{ animationDelay: `${idx * 0.1}s` }}
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 bg-campaign-gradient rounded-xl flex items-center justify-center shrink-0">
-                        <User className="h-5 w-5 text-campaign-gold" />
+              <div key={user.id} className="glass-card rounded-[32px] overflow-hidden animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+                <div className="px-5 sm:px-8 py-5 sm:py-8 border-b border-white/5 bg-white/[0.01]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[16px] flex items-center justify-center shrink-0 shadow-lg">
+                        <User className="h-6 w-6 sm:h-7 sm:w-7" />
                       </div>
                       <div className="min-w-0">
-                        <h3 className="font-bold text-lg text-white mobile-title truncate">{user.username}</h3>
-                        <p className="text-sm text-muted-foreground mobile-text">
-                          Creado: {new Date(user.createdAt).toLocaleDateString('es-ES')}
+                        <h3 className="font-bold text-xl sm:text-2xl text-foreground tracking-tight truncate">{user.username}</h3>
+                        <p className="text-sm sm:text-base text-muted-foreground flex items-center gap-2 mt-1">
+                          <Clock className="h-3.5 w-3.5" />
+                          Creado: {new Date(user.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </p>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => openEdit(user)}
-                      className="flex-1 sm:flex-none hover:border-campaign-gold hover:text-campaign-gold"
-                    >
-                      <Edit2 className="h-4 w-4 mr-1 sm:mr-0" />
-                      <span className="sm:hidden">Editar</span>
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => deleteUser(user)}
-                      className="shrink-0"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openEdit(user)}
+                        className="flex-1 sm:flex-none h-10 px-4 rounded-xl transition-all"
+                      >
+                        <Edit2 className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Editar</span>
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => deleteUser(user)}
+                        className="h-10 px-4 rounded-xl shrink-0"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>

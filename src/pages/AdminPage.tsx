@@ -20,12 +20,11 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import type { Battle } from "@/types";
+import { Header } from "@/components/Header";
 
 interface ParticipantInput {
   name: string;
@@ -34,8 +33,6 @@ interface ParticipantInput {
 }
 
 const DEFAULT_COLORS = ["#1a56a8", "#dc2626", "#10b981", "#f59e0b", "#7c3aed", "#0891b2"];
-
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function AdminPage() {
   const navigate = useNavigate();
@@ -131,8 +128,8 @@ export default function AdminPage() {
       setDescription("");
       setDurationMinutes("");
       setParticipants([
-        { name: "Camilo Pardo 'El mago'", headline: "[Titular sera dado en vivo]", color: DEFAULT_COLORS[0] },
-        { name: "Camilo Sanchez 'El Inquieto'", headline: "[Titular sera dado en vivo]", color: DEFAULT_COLORS[1] },
+        { name: "Camilo Pardo 'El mago'", headline: "Titulares en vivo...", color: DEFAULT_COLORS[0] },
+        { name: "Camilo Sanchez 'El Inquieto'", headline: "Titulares en vivo...", color: DEFAULT_COLORS[1] },
       ]);
       fetchBattles();
     } catch {
@@ -209,107 +206,45 @@ export default function AdminPage() {
     }
   };
 
-  const statusBadge = (status: string) => {
-    switch (status) {
-      case "draft":
-        return <Badge variant="secondary">Borrador</Badge>;
-      case "active":
-        return <Badge variant="success">En Vivo</Badge>;
-      case "tied":
-        return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">Empate</Badge>;
-      case "tiebreaker":
-        return <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">Desempate</Badge>;
-      case "closed":
-        return <Badge variant="warning">Cerrada</Badge>;
-      default:
-        return null;
-    }
-  };
-
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
-    <div className="min-h-screen bg-[#050505] flex flex-col relative overflow-hidden selection:bg-campaign-gold/30">
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/5 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-campaign-blue/5 rounded-full blur-[120px] animate-pulse delay-1000" />
-      </div>
-
-      <nav 
-        className={cn(
-          "fixed top-1 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
-          scrolled 
-            ? "px-2 sm:px-4 py-2" 
-            : "px-0 py-0"
-        )}
-      >
-        <div 
-          className={cn(
-            "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between glass-card border-b border-white/[0.06]",
-            scrolled 
-              ? "max-w-4xl h-14 rounded-full shadow-2xl px-4 sm:px-6" 
-              : "max-w-6xl h-16 rounded-none border-x-0 border-t-0 px-6"
-          )}
-        >
-          <div className="flex items-center gap-3 sm:gap-5 flex-1 min-w-0">
-            <Link to="/" className="shrink-0">
-              <img 
-                src="/logo_fn.png" 
-                alt="F*cks News" 
-                className={cn(
-                  "drop-shadow-lg transition-all duration-300 hover:scale-105",
-                  scrolled ? "h-8" : "h-10 sm:h-12"
-                )} 
-              />
-            </Link>
-            <div className={cn("transition-all duration-300 min-w-0", scrolled ? "hidden sm:block" : "block")}>
-              <h1 className={cn(
-                "font-bold text-white truncate transition-all duration-300 tracking-tight",
-                scrolled ? "text-base" : "text-lg"
-              )}>PANEL ADMIN</h1>
-              <p className={cn(
-                "text-zinc-500 transition-all duration-300",
-                scrolled ? "text-[10px]" : "text-xs"
-              )}>Gestión de Batallas</p>
-            </div>
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
+      <Header
+        leftContent={
+          <div className="hidden sm:block min-w-0">
+            <h1 className="font-bold text-foreground truncate tracking-tight text-lg">PANEL ADMIN</h1>
+            <p className="text-muted-foreground text-xs">Gestión de Batallas</p>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            <ThemeToggle />
-            <Badge variant="outline" className="font-mono text-[10px] sm:text-xs border-white/10 text-zinc-400 px-2 py-1 bg-white/5">
-              <Users className="h-3 w-3 mr-1" />
-              {username}
-            </Badge>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleLogout}
-              className={cn(
-                "hover:bg-red-500/10 hover:text-red-400 text-zinc-400 transition-colors",
-                scrolled ? "h-8 w-8 p-0" : "h-9 px-3"
-              )}
+        }
+        rightContent={
+          <>
+            <Button
+              variant="outline"
+              size="toggle-icon"
+              onClick={() => navigate(location.pathname === '/admin' ? '/admin/usuarios' : '/admin')}
+              title={location.pathname === '/admin' ? 'Ver Usuarios' : 'Ver Batallas'}
             >
-              <LogOut className={cn("h-4 w-4", !scrolled && "mr-2")} />
-              <span className={cn(scrolled && "hidden")}>Salir</span>
+              {location.pathname === '/admin' ? <Users className="h-5 w-5" /> : <Swords className="h-5 w-5" />}
             </Button>
-          </div>
-        </div>
-      </nav>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors h-9 px-3"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Salir</span>
+            </Button>
+          </>
+        }
+      />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full flex-1">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 sm:mb-12 mt-16 md:mt-13 animate-fade-in-up">
           <div className="text-center sm:text-left">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">Panel de Control</h1>
-            <p className="text-zinc-400">Gestiona las batallas en tiempo real</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-2">Panel de Control</h1>
+            <p className="text-muted-foreground">Gestiona las batallas en tiempo real</p>
           </div>
-          <Button onClick={() => setShowCreate(true)} className="w-full sm:w-auto h-12 rounded-xl bg-white text-black hover:bg-zinc-200 font-semibold shadow-xl hover:shadow-white/20 transition-all group">
+          <Button onClick={() => setShowCreate(true)} variant="outline">
             <Plus className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
             Nueva Batalla
           </Button>
@@ -317,15 +252,15 @@ export default function AdminPage() {
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-10 w-10 animate-spin text-campaign-gold opacity-50" />
+            <Loader2 className="h-10 w-10 animate-spin opacity-50" />
           </div>
         ) : battles.length === 0 ? (
           <div className="glass-card rounded-[32px] text-center py-20 px-6 animate-in fade-in zoom-in duration-500 max-w-2xl mx-auto mt-10">
             <div className="w-24 h-24 bg-white/5 rounded-[24px] mx-auto flex items-center justify-center mb-8 border border-white/10 shadow-2xl transform -rotate-6">
-              <Swords className="h-12 w-12 text-zinc-400" />
+              <Swords className="h-12 w-12 " />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-4 tracking-tight">No hay batallas activas</h3>
-            <p className="text-zinc-400 mb-8 max-w-md mx-auto leading-relaxed text-base">Crea tu primera batalla épica para comenzar la competencia</p>
+            <h3 className="text-2xl font-bold text-foreground mb-4 tracking-tight">No hay batallas activas</h3>
+            <p className="text-muted-foreground mb-8 max-w-md mx-auto leading-relaxed text-base">Crea tu primera batalla épica para comenzar la competencia</p>
             <Button onClick={() => setShowCreate(true)} className="h-14 px-8 rounded-2xl bg-white text-black hover:bg-zinc-200 font-semibold shadow-xl hover:-translate-y-1 transition-all">
               <Plus className="h-5 w-5 mr-2" />
               Crear Primera Batalla
@@ -340,57 +275,55 @@ export default function AdminPage() {
                   <div className="space-y-5">
                     {/* Title and Status - Mobile Stack */}
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                      <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">{battle.title}</h2>
-                      <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold tracking-wide self-start ${
-                        battle.status === 'active'
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
-                          : battle.status === 'closed'
-                          ? 'bg-white/5 text-zinc-300 border border-white/10'
+                      <h2 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">{battle.title}</h2>
+                      <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold tracking-wide self-start ${battle.status === 'active'
+                        ? 'bg-status-success/10 text-status-success border border-status-success/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+                        : battle.status === 'closed'
+                          ? 'bg-white/5 text-muted-foreground border border-white/10'
                           : battle.status === 'tied'
-                          ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.15)]'
-                          : battle.status === 'tiebreaker'
-                          ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.15)]'
-                          : 'bg-white/5 text-zinc-500 border border-white/10'
-                      }`}>
-                        <div className={`w-2 h-2 rounded-full ${
-                          battle.status === 'active' ? 'bg-emerald-400 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]' :
-                          battle.status === 'tiebreaker' ? 'bg-orange-400 animate-pulse shadow-[0_0_10px_rgba(249,115,22,0.5)]' :
-                          battle.status === 'tied' ? 'bg-yellow-400 shadow-[0_0_10px_rgba(234,179,8,0.5)]' :
-                          battle.status === 'closed' ? 'bg-zinc-400' : 'bg-zinc-600'
-                        }`} />
+                            ? 'bg-status-warning/10 text-status-warning border border-status-warning/20 shadow-[0_0_15px_rgba(234,179,8,0.15)]'
+                            : battle.status === 'tiebreaker'
+                              ? 'bg-status-warning/10 text-status-warning border border-status-warning/20 shadow-[0_0_15px_rgba(249,115,22,0.15)]'
+                              : 'bg-white/5 text-muted-foreground border border-white/10'
+                        }`}>
+                        <div className={`w-2 h-2 rounded-full ${battle.status === 'active' ? 'bg-status-success animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]' :
+                          battle.status === 'tiebreaker' ? 'bg-status-warning animate-pulse shadow-[0_0_10px_rgba(249,115,22,0.5)]' :
+                            battle.status === 'tied' ? 'bg-status-warning shadow-[0_0_10px_rgba(234,179,8,0.5)]' :
+                              battle.status === 'closed' ? 'bg-muted-foreground' : 'bg-muted-foreground'
+                          }`} />
                         {battle.status === 'active' ? 'EN VIVO' :
-                         battle.status === 'tied' ? 'EMPATE' :
-                         battle.status === 'tiebreaker' ? 'DESEMPATE' :
-                         battle.status === 'closed' ? 'CERRADA' : 'BORRADOR'}
+                          battle.status === 'tied' ? 'EMPATE' :
+                            battle.status === 'tiebreaker' ? 'DESEMPATE' :
+                              battle.status === 'closed' ? 'CERRADA' : 'BORRADOR'}
                       </div>
                     </div>
-                    
+
                     {/* Description */}
                     {battle.description && (
-                      <p className="text-zinc-400 leading-relaxed text-sm sm:text-base max-w-3xl">{battle.description}</p>
+                      <p className=" leading-relaxed text-sm sm:text-base max-w-3xl">{battle.description}</p>
                     )}
-                    
+
                     {/* Mobile-Friendly Metadata */}
                     <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:gap-6 text-sm pt-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-zinc-500">Código:</span>
-                        <code className="font-mono text-white font-bold text-sm sm:text-base px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg tracking-wider">
+                        <span className="text-muted-foreground">Código:</span>
+                        <code className="font-mono text-foreground font-bold text-sm sm:text-base px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg tracking-wider">
                           {battle.code}
                         </code>
                       </div>
-                      
+
                       <div className="flex items-center justify-between sm:justify-start gap-4 sm:gap-6">
                         {battle.durationMinutes && (
-                          <div className="flex items-center gap-2 text-zinc-300 font-medium text-sm sm:text-base">
-                            <Clock className="h-4 w-4 text-zinc-500" />
+                          <div className="flex items-center gap-2 text-foreground font-medium text-sm sm:text-base">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
                             {battle.durationMinutes} min
                           </div>
                         )}
-                        
-                        <div className="flex items-center gap-2 text-zinc-500 text-sm sm:text-base">
+
+                        <div className="flex items-center gap-2 text-muted-foreground text-sm sm:text-base">
                           <span className="hidden sm:inline">Creada:</span>
-                          <time>{new Date(battle.createdAt).toLocaleDateString('es-ES', { 
-                            day: 'numeric', month: 'short', year: battle.durationMinutes ? undefined : 'numeric' 
+                          <time>{new Date(battle.createdAt).toLocaleDateString('es-ES', {
+                            day: 'numeric', month: 'short', year: battle.durationMinutes ? undefined : 'numeric'
                           })}</time>
                         </div>
                       </div>
@@ -399,14 +332,14 @@ export default function AdminPage() {
                 </div>
 
                 {/* Mobile-Optimized Action Bar */}
-                <div className="px-5 sm:px-8 py-5 sm:py-6 bg-black/20">
+                <div className="px-5 sm:px-8 py-5 sm:py-6 bg-black/10 dark:bg-black/30">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
                     {/* Primary CTA */}
                     {battle.status === "tied" ? (
                       <Button
                         size="lg"
                         onClick={() => startTiebreaker(battle.id)}
-                        className="w-full sm:w-auto h-12 px-6 sm:px-8 font-semibold rounded-xl bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-500/20 border-0"
+                        className="w-full sm:w-auto h-12 px-6 sm:px-8 font-semibold rounded-xl bg-orange-500 text-foreground hover:bg-orange-600 shadow-lg shadow-orange-500/20 border-0"
                       >
                         <Play className="h-5 w-5 mr-2 sm:mr-3" />Iniciar Desempate
                       </Button>
@@ -441,21 +374,21 @@ export default function AdminPage() {
                         )}
                       </Button>
                     )}
-                    
+
                     {/* Secondary Actions - Mobile Stack */}
                     <div className="flex flex-col sm:flex-row gap-4 sm:gap-3">
                       <div className="flex gap-3">
-                        <Button 
-                          variant="outline" 
-                          onClick={() => showQR(battle)} 
-                          className="flex-1 sm:flex-none h-12 sm:h-11 px-5 sm:px-6 rounded-xl hover:bg-white/10 text-white border-white/10"
+                        <Button
+                          variant="outline"
+                          onClick={() => showQR(battle)}
+                          className="flex-1 sm:flex-none h-12 sm:h-11 px-5 sm:px-6 rounded-xl hover:bg-white/10 text-foreground border-white/10"
                         >
                           <QrCode className="h-5 w-5 sm:h-4 sm:w-4 mr-2" />
                           <span className="sm:hidden">QR</span>
                           <span className="hidden sm:inline">Mostrar QR</span>
                         </Button>
-                        
-                        <Button variant="outline" asChild className="flex-1 sm:flex-none h-12 sm:h-11 px-5 sm:px-6 rounded-xl hover:bg-white/10 text-white border-white/10">
+
+                        <Button variant="outline" asChild className="flex-1 sm:flex-none h-12 sm:h-11 px-5 sm:px-6 rounded-xl hover:bg-white/10 text-foreground border-white/10">
                           <Link to={`/resultados/${battle.code}`}>
                             <BarChart3 className="h-5 w-5 sm:h-4 sm:w-4 mr-2" />
                             <span className="sm:hidden">Resultados</span>
@@ -463,24 +396,24 @@ export default function AdminPage() {
                           </Link>
                         </Button>
                       </div>
-                      
+
                       {/* Utility Actions - Mobile Friendly */}
                       <div className="flex items-center justify-center gap-3 mt-2 sm:mt-0 sm:justify-start sm:ml-4 sm:border-l sm:border-white/10 sm:pl-4">
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="sm"
-                          onClick={() => resetVotes(battle.id)} 
-                          className="h-12 sm:h-11 w-12 sm:w-11 p-0 hover:bg-amber-500/10 hover:text-amber-400 text-zinc-400 rounded-xl"
+                          onClick={() => resetVotes(battle.id)}
+                          className="h-12 sm:h-11 w-12 sm:w-11 p-0 hover:bg-amber-500/10 hover:text-amber-400  rounded-xl"
                           title="Reiniciar votos"
                         >
                           <RotateCcw className="h-5 w-5 sm:h-4 sm:w-4" />
                         </Button>
-                        
-                        <Button 
+
+                        <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => deleteBattle(battle.id)} 
-                          className="h-12 sm:h-11 w-12 sm:w-11 p-0 hover:bg-red-500/10 hover:text-red-400 text-zinc-400 rounded-xl"
+                          onClick={() => deleteBattle(battle.id)}
+                          className="h-12 sm:h-11 w-12 sm:w-11 p-0 hover:bg-destructive/10 hover:text-destructive text-muted-foreground rounded-xl"
                           title="Eliminar batalla"
                         >
                           <Trash2 className="h-5 w-5 sm:h-4 sm:w-4" />
@@ -499,13 +432,13 @@ export default function AdminPage() {
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
         <DialogContent onClose={() => setShowCreate(false)} className="glass-card border-white/10 max-w-2xl rounded-[32px] p-8">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-white mb-2 tracking-tight">Nueva Batalla</DialogTitle>
-            <p className="text-zinc-400 text-sm">Configura los detalles de la competencia</p>
+            <DialogTitle className="text-2xl font-bold text-foreground mb-2 tracking-tight">Nueva Batalla</DialogTitle>
+            <p className=" text-sm">Configura los detalles de la competencia</p>
           </DialogHeader>
 
           <div className="space-y-5 mt-6">
             <div>
-              <label className="text-[13px] text-zinc-400 ml-1 font-medium mb-1.5 block">Título</label>
+              <label className="text-[13px]  ml-1 font-medium mb-1.5 block">Título</label>
               <Input
                 placeholder="Ej: Ronda 1 - Noticias Absurdas"
                 value={title}
@@ -514,18 +447,17 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <label className="text-[13px] text-zinc-400 ml-1 font-medium mb-1.5 block">Descripción (opcional)</label>
+              <label className="text-[13px]  ml-1 font-medium mb-1.5 block">Descripción (opcional)</label>
               <Textarea
                 placeholder="Descripción breve..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
-                className="bg-white/[0.05] border-white/5 rounded-xl text-white placeholder:text-zinc-500 focus-visible:ring-campaign-gold/20 focus-visible:border-campaign-gold/40"
               />
             </div>
 
             <div>
-              <label className="text-[13px] text-zinc-400 ml-1 font-medium mb-1.5 block">Duración (opcional)</label>
+              <label className="text-[13px]  ml-1 font-medium mb-1.5 block">Duración (opcional)</label>
               <div className="flex items-center gap-3">
                 <Input
                   type="number"
@@ -535,14 +467,14 @@ export default function AdminPage() {
                   onChange={(e) => setDurationMinutes(e.target.value)}
                   className="w-32"
                 />
-                <span className="text-sm text-zinc-500 font-medium">minutos</span>
+                <span className="text-sm text-muted-foreground font-medium">minutos</span>
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-[13px] text-zinc-400 ml-1 font-medium">Participantes</label>
-                <Button variant="outline" size="sm" onClick={addParticipant} className="h-8 rounded-lg text-xs border-white/10">
+                <label className="text-[13px]  ml-1 font-medium">Participantes</label>
+                <Button variant="outline" size="sm" onClick={addParticipant}>
                   <Plus className="h-3 w-3 mr-1.5" /> Agregar
                 </Button>
               </div>
@@ -564,10 +496,10 @@ export default function AdminPage() {
                         className="h-11"
                       />
                     </div>
-                    
+
                     <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
                       <div className="flex items-center gap-2 flex-1 sm:flex-none">
-                        <label className="text-xs text-zinc-500 sm:hidden">Color:</label>
+                        <label className="text-xs text-muted-foreground sm:hidden">Color:</label>
                         <input
                           type="color"
                           value={p.color}
@@ -580,7 +512,7 @@ export default function AdminPage() {
                         size="icon"
                         onClick={() => removeParticipant(idx)}
                         disabled={participants.length <= 2}
-                        className="h-11 w-11 rounded-xl text-zinc-500 hover:text-red-400 hover:bg-red-500/10"
+                        className="h-11 w-11 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -590,13 +522,13 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <Button 
-              onClick={createBattle} 
-              disabled={creating} 
-              className="w-full h-14 mt-6 rounded-xl bg-white text-black hover:bg-zinc-200 font-semibold shadow-xl"
+            <Button
+              onClick={createBattle}
+              disabled={creating}
+              variant="outline"
             >
               {creating ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Plus className="h-5 w-5 mr-2" />}
-              {creating ? "Creando..." : "Crear Batalla Épica"}
+              {creating ? "Creando..." : "Crear Batalla"}
             </Button>
           </div>
         </DialogContent>
@@ -604,24 +536,24 @@ export default function AdminPage() {
 
       {/* QR Dialog */}
       <Dialog open={!!qrData} onOpenChange={() => setQrData(null)}>
-        <DialogContent onClose={() => setQrData(null)} className="glass-card border-white/10 sm:max-w-md rounded-[32px] p-8 text-center">
+        <DialogContent onClose={() => setQrData(null)} className="glass-card border-white/10 sm:max-w-md rounded-[32px] p-8 pb-2 text-center">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-white mb-2 tracking-tight">QR de Votación</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-foreground mb-2 tracking-tight">QR de Votación</DialogTitle>
           </DialogHeader>
           <div className="py-6 flex flex-col items-center">
             <div className="bg-white p-6 rounded-[32px] shadow-2xl mb-6">
               <img src={qrData?.qr} alt="QR Code" className="w-56 h-56 md:w-64 md:h-64" />
             </div>
-            
+
             <div className="w-full space-y-4">
-              <p className="text-zinc-400 text-sm">Los asistentes pueden escanear este QR o visitar:</p>
-              
-              <div className="flex items-center gap-2 bg-white/5 border border-white/10 p-2 rounded-xl">
-                <code className="text-xs md:text-sm text-campaign-gold font-mono flex-1 truncate px-2">
+              <p className=" text-sm">Los asistentes pueden escanear este QR o visitar:</p>
+
+              <div className="flex items-center gap-2 bg-black/10 dark:bg-black/30 border border-white/10 p-2 rounded-xl">
+                <code className="text-xs md:text-sm font-mono flex-1 truncate px-2">
                   {qrData?.url}
                 </code>
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   variant="secondary"
                   className="shrink-0 h-9 rounded-lg px-4 bg-white text-black hover:bg-zinc-200"
                   onClick={() => {
@@ -635,7 +567,7 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
-          <Button onClick={() => setQrData(null)} className="w-full h-12 bg-white/10 hover:bg-white/20 text-white rounded-xl border border-white/5">
+          <Button onClick={() => setQrData(null)} variant="outline">
             Cerrar
           </Button>
         </DialogContent>

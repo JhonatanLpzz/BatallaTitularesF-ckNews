@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
@@ -8,23 +9,10 @@ import AdminPage from "./pages/AdminPage";
 import UserManagementPage from "./pages/UserManagementPage";
 import VotePage from "./pages/VotePage";
 import ResultsPage from "./pages/ResultsPage";
-import { useEffect, useState } from "react";
-
-function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-
-  useEffect(() => {
-    // Check system preference or local storage here if needed
-    // Defaulting to dark theme for the Liquid Glass aesthetic
-    document.documentElement.classList.add("dark");
-  }, []);
-
-  return <>{children}</>;
-}
 
 export default function App() {
   return (
-    <ThemeProvider>
+    <ThemeProvider defaultTheme="dark" storageKey="fcknews-theme">
       <AuthProvider>
         <Toaster theme="dark" position="top-center" richColors />
         <Routes>
