@@ -1,4 +1,13 @@
-// Production configuration with environment variables
+/**
+ * @fileoverview Configuración centralizada del servidor con variables de entorno.
+ *
+ * Valores por defecto razonables para desarrollo local. En producción se espera
+ * que las variables críticas (`JWT_SECRET`) estén definidas en el entorno.
+ * Incluye validación automática para producción.
+ *
+ * @module server/config
+ */
+
 export const config = {
   // Server
   port: parseInt(process.env.PORT || '3001') || 3001,

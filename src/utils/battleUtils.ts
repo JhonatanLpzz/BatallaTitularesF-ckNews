@@ -143,27 +143,27 @@ export function getBattleStatusColors(battle: Battle) {
       };
     case "active":
       return {
-        bg: "bg-green-100",
-        text: "text-green-700",
-        border: "border-green-500"
+        bg: "bg-status-success/20",
+        text: "text-status-success",
+        border: "border-status-success/30"
       };
     case "tied":
       return {
-        bg: "bg-yellow-100",
-        text: "text-yellow-700",
-        border: "border-yellow-500"
+        bg: "bg-status-warning/20",
+        text: "text-status-warning",
+        border: "border-status-warning/30"
       };
     case "tiebreaker":
       return {
-        bg: "bg-orange-100",
-        text: "text-orange-700",
-        border: "border-orange-500"
+        bg: "bg-status-warning/20",
+        text: "text-status-warning",
+        border: "border-status-warning/30"
       };
     case "closed":
       return {
-        bg: "bg-red-100",
-        text: "text-red-700",
-        border: "border-red-500"
+        bg: "bg-destructive/20",
+        text: "text-destructive",
+        border: "border-destructive/30"
       };
     default:
       return {

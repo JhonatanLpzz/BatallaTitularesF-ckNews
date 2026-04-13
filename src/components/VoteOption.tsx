@@ -57,7 +57,7 @@ export function VoteOption({
     }
 
     if (isSelected && hasVoted) {
-      return `${baseClass} bg-green-100 border-2 border-green-500 text-green-700`;
+      return `${baseClass} bg-status-success/20 border-2 border-status-success/30 text-status-success`;
     }
 
     if (battleStatus === "tiebreaker" && isInTie) {
@@ -79,11 +79,11 @@ export function VoteOption({
     let baseClass = "fn-card p-6 transition-all duration-300";
     
     if (isInTie && battleStatus === "tied") {
-      baseClass += " border-2 border-yellow-400 bg-yellow-50";
+      baseClass += " border-2 border-status-warning/40 bg-status-warning/5";
     } else if (isInTie && battleStatus === "tiebreaker") {
-      baseClass += " border-2 border-orange-500 bg-orange-50 shadow-lg";
+      baseClass += " border-2 border-status-warning/50 bg-status-warning/5 shadow-lg";
     } else if (isSelected && hasVoted) {
-      baseClass += " border-2 border-green-500 bg-green-50";
+      baseClass += " border-2 border-status-success/30 bg-status-success/5";
     } else if (showResults && participant.votes === maxVotes && maxVotes > 0) {
       baseClass += " border-2 border-accent bg-accent/10 shadow-lg";
     }
@@ -110,13 +110,13 @@ export function VoteOption({
             {participant.name}
           </h3>
           {isInTie && battleStatus === "tied" && (
-            <div className="flex items-center gap-1 text-yellow-600 text-sm font-medium">
+            <div className="flex items-center gap-1 text-status-warning text-sm font-medium">
               <Zap className="w-4 h-4" />
               <span>¡EMPATE!</span>
             </div>
           )}
           {isInTie && battleStatus === "tiebreaker" && (
-            <div className="flex items-center gap-1 text-orange-600 text-sm font-medium">
+            <div className="flex items-center gap-1 text-status-warning text-sm font-medium">
               <Zap className="w-4 h-4" />
               <span>Desempate Ronda {tiebreakRound || 1}</span>
             </div>
@@ -171,8 +171,8 @@ export function VoteOption({
 
       {/* Tie Status Message */}
       {battleStatus === "tied" && isInTie && (
-        <div className="mt-4 p-3 bg-yellow-100 border border-yellow-300 rounded-lg">
-          <p className="text-yellow-800 text-sm font-medium text-center">
+        <div className="mt-4 p-3 bg-status-warning/20 border border-status-warning/40 rounded-lg">
+          <p className="text-status-warning text-sm font-medium text-center">
             🤝 ¡Empate detectado! Esperando desempate...
           </p>
         </div>

@@ -1,10 +1,23 @@
+/**
+ * @fileoverview Entry point del servidor Fastify para Batalla de Titulares.
+ *
+ * Responsabilidades:
+ * - Configura CORS según el entorno (dev/prod).
+ * - Registra los plugins de rutas: auth, battles, votes, SSE.
+ * - Sirve el build estático de Vite en producción con SPA fallback.
+ * - Expone un endpoint `/health` para health checks (Railway, etc.).
+ *
+ * @module server/index
+ */
+
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
 import { authRoutes } from "./routes/auth.js";
 import { battleRoutes } from "./routes/battles.js";
 import { voteRoutes } from "./routes/votes.js";
-import { sseRoutes } from "./routes/sse.js";
+import { rankingRoutes } from "./routes/rankings.js";
+import { initWebSocketServer } from "./realtime/websocket.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import config from "./config.js";
@@ -27,7 +40,8 @@ await app.register(cors, {
 await app.register(authRoutes);
 await app.register(battleRoutes);
 await app.register(voteRoutes);
-await app.register(sseRoutes);
+await app.register(rankingRoutes);
+initWebSocketServer(app);
 
 // Health check endpoint for Railway
 app.get("/health", async () => {
