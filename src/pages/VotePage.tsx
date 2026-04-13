@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { CheckCircle2, XCircle, Loader2, Clock, User, Timer } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, Clock, User, Timer, ChevronRight, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { cn, generateFingerprint } from "@/lib/utils";
 import type { Battle, Participant, VoteUpdate } from "@/types";
 import { useSSE } from "@/hooks/useSSE";
 import { useCountdown } from "@/hooks/useCountdown";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function VotePage() {
   const { code } = useParams<{ code: string }>();
@@ -18,15 +19,11 @@ export default function VotePage() {
   const [votedFor, setVotedFor] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Voter info
   const [voterName, setVoterName] = useState("");
   const [voterDocument, setVoterDocument] = useState("");
   const [voterPhone, setVoterPhone] = useState("");
   const [voterReady, setVoterReady] = useState(false);
   const [expired, setExpired] = useState(false);
-  
-  // UI State
-  const [scrolled, setScrolled] = useState(false);
 
   const fetchBattle = useCallback(async () => {
     if (!code) return;
@@ -35,7 +32,6 @@ export default function VotePage() {
       if (!res.ok) throw new Error("No encontrada");
       const data = await res.json();
       setBattle(data);
-
       const fp = generateFingerprint();
       const voteCheck = await fetch(`/api/votes/check/${code}?fp=${fp}`);
       const { hasVoted: voted } = await voteCheck.json();
@@ -48,45 +44,21 @@ export default function VotePage() {
     }
   }, [code]);
 
-  useEffect(() => {
-    fetchBattle();
-  }, [fetchBattle]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  useEffect(() => { fetchBattle(); }, [fetchBattle]);
 
   useSSE(code, {
-    enabled: !!battle && battle.status === "active",
+    enabled: !!battle && (battle.status === "active" || battle.status === "tiebreaker"),
     onMessage: (data) => {
       const update = data as VoteUpdate;
       if (update.type === "vote_update" && battle) {
-        setBattle((prev) =>
-          prev
-            ? { ...prev, participants: update.participants, totalVotes: update.totalVotes }
-            : prev
-        );
+        setBattle((prev) => prev ? { ...prev, participants: update.participants, totalVotes: update.totalVotes } : prev);
       }
     },
   });
 
-  const handleVoterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!voterName.trim()) {
-      toast.error("Tu nombre es obligatorio");
-      return;
-    }
-    setVoterReady(true);
-  };
-
   const castVote = async (participantId: number) => {
     if (!code || hasVoted || !voterReady) return;
     setVoting(participantId);
-
     try {
       const fp = generateFingerprint();
       const res = await fetch("/api/votes", {
@@ -101,44 +73,33 @@ export default function VotePage() {
           voterPhone: voterPhone.trim() || undefined,
         }),
       });
-
-      if (res.status === 409) {
-        setHasVoted(true);
-        toast.info("Ya votaste en esta batalla");
-        return;
-      }
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error);
-      }
-
+      if (res.status === 409) { setHasVoted(true); return; }
+      if (!res.ok) throw new Error("Error al votar");
       setHasVoted(true);
       setVotedFor(participantId);
-      toast.success("Voto registrado!");
+      toast.success("Voto registrado con éxito");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error al votar");
-    } finally {
-      setVoting(null);
-    }
+      toast.error("No se pudo registrar el voto");
+    } finally { setVoting(null); }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+      <div className="relative flex items-center justify-center">
+        <div className="absolute h-16 w-16 border-t-2 border-campaign-gold rounded-full animate-spin opacity-20" />
+        <Loader2 className="h-6 w-6 animate-spin text-campaign-gold" />
       </div>
-    );
-  }
+    </div>
+  );
 
   if (error || !battle) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <div className="text-center">
-          <XCircle className="h-12 w-12 text-fn-red mx-auto mb-3" />
-          <h2 className="text-lg font-semibold mb-2">{error || "Error"}</h2>
+      <div className="min-h-screen flex items-center justify-center bg-[#050505] px-4">
+        <div className="glass-card rounded-[32px] p-8 text-center max-w-sm w-full">
+          <XCircle className="h-12 w-12 text-campaign-red mx-auto mb-3 opacity-80" />
+          <h2 className="text-lg font-semibold mb-2 text-white">{error || "Error"}</h2>
           <Link to="/">
-            <Button variant="outline" size="sm">Volver al inicio</Button>
+            <Button className="bg-white/10 hover:bg-white/20 text-white rounded-xl mt-4">Volver al inicio</Button>
           </Link>
         </div>
       </div>
@@ -147,11 +108,11 @@ export default function VotePage() {
 
   if (battle.status === "draft") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <div className="text-center">
-          <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-          <h2 className="text-lg font-semibold mb-1">Aun no comienza</h2>
-          <p className="text-sm text-muted-foreground">La votacion se activara pronto...</p>
+      <div key="draft" className="min-h-screen flex items-center justify-center bg-[#050505] px-4 animate-fade-in-up">
+        <div className="glass-card rounded-[32px] p-8 text-center max-w-sm w-full">
+          <Clock className="h-12 w-12 text-zinc-500 mx-auto mb-3 opacity-80" />
+          <h2 className="text-lg font-semibold mb-1 text-white">Aún no comienza</h2>
+          <p className="text-sm text-zinc-400">La votación se activará pronto...</p>
         </div>
       </div>
     );
@@ -159,191 +120,233 @@ export default function VotePage() {
 
   if (battle.status === "closed") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <div className="text-center">
-          <img src="/logo_fn.png" alt="F*cks News" className="h-14 mx-auto mb-4" />
-          <h2 className="text-lg font-semibold mb-1">Batalla Cerrada</h2>
-          <p className="text-sm text-muted-foreground mb-4">La votacion ha terminado</p>
+      <div key="closed" className="min-h-screen flex items-center justify-center bg-[#050505] px-4 relative overflow-hidden animate-fade-in-up">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-campaign-gold/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="glass-card rounded-[32px] p-10 text-center max-w-sm w-full z-10">
+          <img src="/logo_fn.png" alt="F*cks News" className="h-14 mx-auto mb-6 drop-shadow-2xl" />
+          <h2 className="text-xl font-semibold mb-2 text-white">Batalla Cerrada</h2>
+          <p className="text-sm text-zinc-400 mb-8">La votación ha terminado</p>
           <Link to={`/resultados/${code}`}>
-            <Button size="sm">Ver Resultados</Button>
+            <Button className="w-full bg-white text-black hover:bg-zinc-200 rounded-xl font-semibold">
+              Ver Resultados
+            </Button>
           </Link>
         </div>
       </div>
     );
   }
 
-  // Voter identification form
+  if (battle.status === "tied") {
+    return (
+      <div key="tied" className="min-h-screen flex items-center justify-center bg-[#050505] px-4 relative overflow-hidden animate-fade-in-up">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-campaign-gold/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="glass-card rounded-[32px] p-10 text-center max-w-sm w-full z-10">
+          <img src="/logo_fn.png" alt="F*cks News" className="h-14 mx-auto mb-6 drop-shadow-2xl" />
+          <h2 className="text-xl font-bold mb-2 text-campaign-gold">¡Empate!</h2>
+          <p className="text-sm text-zinc-300 mb-2">
+            La batalla terminó en empate.
+          </p>
+          <p className="text-xs text-zinc-500 mb-8">
+            El administrador puede iniciar una ronda de desempate.
+          </p>
+          <Link to={`/resultados/${code}`}>
+            <Button className="w-full bg-white/[0.05] border border-white/10 hover:bg-white/10 text-white rounded-xl font-medium">
+              Ver Resultados
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // --- RENDER DE IDENTIFICACIÓN (ESTILO APPLE GLASS) ---
   if (!voterReady && !hasVoted) {
     return (
-      <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
-        <div className="fixed inset-0 -z-10">
-          <div className="absolute top-1/3 left-1/3 w-64 h-64 bg-campaign-gold/5 rounded-full blur-3xl animate-pulse" />
+      <div key="auth" className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-4 selection:bg-campaign-gold/30 animate-fade-in-up">
+        {/* Background blobs decorativos */}
+        <div className="fixed inset-0 overflow-hidden -z-10">
+          <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-campaign-red/10 blur-[120px] rounded-full animate-pulse" />
+          <div className="absolute top-[20%] -right-[10%] w-[30%] h-[50%] bg-campaign-gold/5 blur-[120px] rounded-full delay-1000" />
         </div>
-        
-        <div className="flex-1 flex items-center justify-center px-4 sm:px-6">
-          <div className="w-full max-w-md campaign-card backdrop-blur-sm bg-card/60 p-6 sm:p-8 animate-fade-in-up mx-4 shadow-2xl border border-white/5">
-            <div className="text-center mb-6 sm:mb-8">
-              <img src="/logo_fn.png" alt="F*cks News" className="h-16 sm:h-20 mx-auto mb-4 sm:mb-6 drop-shadow-lg" />
-              <h1 className="text-xl sm:text-2xl font-bold text-white mb-2 leading-tight">{battle.title}</h1>
-              {battle.description && (
-                <p className="text-sm sm:text-base text-muted-foreground px-2">{battle.description}</p>
-              )}
-            </div>
 
-            <form onSubmit={handleVoterSubmit} className="space-y-5 sm:space-y-6">
-              <div>
-                <label className="text-sm font-semibold block mb-2 text-foreground">
-                  Tu nombre <span className="text-campaign-red">*</span>
-                </label>
-                <Input
-                  placeholder="Nombre completo"
+        <div className="w-full max-w-[440px] relative">
+          <div className="glass-card absolute inset-0 rounded-[32px] -z-10" />
+          
+          <div className="p-8 sm:p-10 flex flex-col items-center">
+            <img src="/logo_fn.png" alt="Logo" className="h-16 mb-8 drop-shadow-2xl" />
+            <h1 className="text-2xl font-semibold tracking-tight text-center mb-2">{battle?.title}</h1>
+            <p className="text-zinc-400 text-center text-sm mb-8 leading-relaxed">Ingresa tus datos para participar en la votación en tiempo real.</p>
+
+            <form onSubmit={(e) => { e.preventDefault(); voterName.trim() && setVoterReady(true); }} className="w-full space-y-4">
+              <div className="space-y-1.5 font-medium">
+                <label className="text-[13px] text-zinc-400 ml-1">Nombre Completo</label>
+                <Input 
                   value={voterName}
-                  onChange={(e) => setVoterName(e.target.value)}
-                  autoFocus
+                  onChange={e => setVoterName(e.target.value)}
+                  className="bg-white/[0.05] border-white/5 h-12 rounded-xl focus:ring-campaign-gold/20 focus:border-campaign-gold/40 transition-all text-white"
+                  placeholder="Ej. Juan Pérez"
                   required
-                  className="h-12 sm:h-14 text-base bg-background/50 backdrop-blur-sm border-white/10 focus:border-campaign-gold/50 transition-colors"
                 />
               </div>
-              <div>
-                <label className="text-sm font-medium block mb-2 text-foreground/80">
-                  Documento <span className="text-muted-foreground font-normal">(opcional)</span>
-                </label>
-                <Input
-                  placeholder="Cédula o documento"
-                  value={voterDocument}
-                  onChange={(e) => setVoterDocument(e.target.value)}
-                  className="h-12 sm:h-14 bg-background/50 backdrop-blur-sm border-white/10 focus:border-campaign-gold/50 transition-colors"
-                />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[13px] text-zinc-400 ml-1 font-medium text-xs">Documento (Opc)</label>
+                  <Input 
+                    value={voterDocument}
+                    onChange={e => setVoterDocument(e.target.value)}
+                    className="bg-white/[0.05] border-white/5 h-12 rounded-xl text-white"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[13px] text-zinc-400 ml-1 font-medium text-xs">Celular (Opc)</label>
+                  <Input 
+                    value={voterPhone}
+                    onChange={e => setVoterPhone(e.target.value)}
+                    className="bg-white/[0.05] border-white/5 h-12 rounded-xl text-white"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="text-sm font-medium block mb-2 text-foreground/80">
-                  Celular <span className="text-muted-foreground font-normal">(opcional)</span>
-                </label>
-                <Input
-                  placeholder="Número de celular"
-                  value={voterPhone}
-                  onChange={(e) => setVoterPhone(e.target.value)}
-                  type="tel"
-                  className="h-12 sm:h-14 bg-background/50 backdrop-blur-sm border-white/10 focus:border-campaign-gold/50 transition-colors"
-                />
-              </div>
-              <Button type="submit" className="w-full h-14 campaign-button text-base font-semibold shadow-lg hover:shadow-campaign-gold/20 transition-all hover:-translate-y-0.5">
-                <User className="h-5 w-5 mr-3" />
-                Continuar a Votar
+
+              <Button className="w-full h-12 bg-white text-black hover:bg-zinc-200 rounded-xl font-semibold transition-all mt-4 group">
+                Empezar a votar
+                <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </form>
-
-            <p className="text-center text-xs sm:text-sm text-muted-foreground mt-4 sm:mt-6 px-2">
-              Solo tu nombre es obligatorio para participar
-            </p>
           </div>
         </div>
       </div>
     );
   }
 
+  // --- RENDER DE VOTACIÓN ---
   return (
-    <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-campaign-gold/8 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/3 left-1/3 w-64 h-64 bg-campaign-red/5 rounded-full blur-3xl animate-pulse delay-700" />
+    <div className="min-h-screen bg-[#080808] text-zinc-100 flex flex-col font-sans selection:bg-campaign-gold/30">
+      {/* Background blobs for voting */}
+      <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
+        <div className="absolute top-[30%] -right-[20%] w-[50%] h-[50%] bg-campaign-gold/5 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-campaign-blue/5 blur-[120px] rounded-full" />
       </div>
-      
 
-      {/* Header */}
-      <div className="sticky top-0 z-50 campaign-card border-b border-white/5 bg-card/60 backdrop-blur-sm px-4 sm:px-6 py-3 sm:py-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <img src="/logo_fn.png" alt="F*cks News" className="h-8 sm:h-10 drop-shadow-lg" />
-            <div className="hidden sm:block">
-              <h1 className="text-sm sm:text-base font-bold text-white leading-tight">{battle.title}</h1>
-            </div>
+      {/* Header Estilo Apple Glass */}
+      <nav className="sticky top-0 z-50 bg-[#080808]/60 backdrop-blur-xl border-b border-white/[0.06]">
+        <div className="max-w-3xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <img src="/logo_fn.png" alt="FN" className="h-10 w-auto" />
+            <div className="h-8 w-[1px] bg-white/10 hidden sm:block" />
+            <h2 className="text-sm font-medium hidden sm:block max-w-[200px] truncate opacity-80">{battle?.title}</h2>
           </div>
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="text-center">
-              <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider">Votos</p>
-              <p className="text-sm sm:text-base font-bold text-campaign-gold">{battle.totalVotes || 0}</p>
+          
+          <div className="flex items-center gap-6">
+            <div className="text-right">
+              <span className="block text-[10px] uppercase tracking-[0.1em] text-zinc-500 font-bold">Total Votos</span>
+              <span className="text-lg font-semibold tabular-nums text-campaign-gold tracking-tight">{battle?.totalVotes || 0}</span>
             </div>
-            <VoteTimer expiresAt={battle.expiresAt} expired={expired} onExpire={() => setExpired(true)} compact />
+            <VoteTimer expiresAt={battle?.expiresAt} expired={expired} onExpire={() => setExpired(true)} />
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Voting area */}
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 flex-1 w-full pt-6 sm:pt-8 pb-6 sm:pb-8">
+      {/* Tiebreaker Banner */}
+      {battle?.status === "tiebreaker" && (
+        <div className="bg-campaign-gold/10 border-b border-campaign-gold/20 backdrop-blur-md">
+          <div className="max-w-3xl mx-auto px-6 py-3 flex items-center justify-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-campaign-gold animate-pulse" />
+            <span className="text-sm font-medium text-campaign-gold tracking-wide">RONDA DE DESEMPATE ACTIVA</span>
+          </div>
+        </div>
+      )}
+
+      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-10">
         {hasVoted && (
-          <div className="mb-6 sm:mb-8 campaign-card backdrop-blur-sm bg-card/60 p-4 sm:p-6 text-center border border-campaign-gold/30 mx-2 sm:mx-0 shadow-lg animate-in zoom-in duration-300">
-            <CheckCircle2 className="h-8 w-8 sm:h-10 sm:w-10 text-campaign-gold mx-auto mb-2 sm:mb-3 animate-bounce" />
-            <p className="text-base sm:text-lg font-semibold text-white mb-1">¡Voto Registrado!</p>
-            <p className="text-sm sm:text-base text-muted-foreground">Los resultados se actualizan en tiempo real</p>
+          <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-700">
+            <div className="bg-campaign-gold/5 border border-campaign-gold/20 rounded-[28px] p-6 flex flex-col items-center text-center backdrop-blur-md">
+              <div className="h-12 w-12 bg-campaign-gold rounded-full flex items-center justify-center mb-3 shadow-[0_0_20px_rgba(212,175,55,0.3)]">
+                <CheckCircle2 className="text-black h-6 w-6" />
+              </div>
+              <h3 className="text-lg font-semibold text-campaign-gold">¡Voto registrado!</h3>
+              <p className="text-zinc-400 text-sm">Mira cómo cambian los resultados en tiempo real.</p>
+            </div>
           </div>
         )}
 
-        <div className="space-y-3 sm:space-y-5">
-          {battle.participants?.map((participant: Participant, idx: number) => {
+        <div className="space-y-4">
+          {battle?.participants?.map((participant: Participant, idx: number) => {
             const isVotedFor = votedFor === participant.id;
-
+            // Solo permitir votar por participantes empatados si es tiebreaker
+            const isTiebreakerDisabled = battle.status === "tiebreaker" && battle.tiedParticipantIds && !battle.tiedParticipantIds.includes(participant.id);
+            const isDisabled = hasVoted || voting !== null || isTiebreakerDisabled;
+            
             return (
-              <div
+              <button
                 key={participant.id}
+                onClick={() => !isDisabled && castVote(participant.id)}
+                disabled={isDisabled}
                 className={cn(
-                  "voting-card backdrop-blur-sm bg-card/60 p-4 sm:p-6 relative group animate-fade-in-up mx-2 sm:mx-0 border border-white/5 hover:border-white/10 transition-all duration-300 hover:shadow-xl",
-                  isVotedFor && "battle-winner bg-card/60 border-campaign-gold/30"
+                  "relative w-full text-left rounded-[28px] overflow-hidden transition-all duration-500 group",
+                  "bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.05]",
+                  isDisabled && !hasVoted ? "cursor-not-allowed opacity-50" : (hasVoted ? "cursor-default" : "cursor-pointer active:scale-[0.98]"),
+                  isVotedFor && "border-campaign-gold/40 bg-campaign-gold/[0.02]"
                 )}
-                style={{ animationDelay: `${idx * 0.1}s` }}
+                style={{ animationDelay: `${idx * 100}ms` }}
               >
-                <button
-                  onClick={() => !hasVoted && castVote(participant.id)}
-                  disabled={hasVoted || voting !== null}
-                  className="w-full text-left touch-manipulation focus:outline-none focus:ring-2 focus:ring-campaign-gold/50 rounded-lg"
-                >
-                  {/* Progress bar */}
-                  {hasVoted && (
-                    <div
-                      className="absolute inset-y-0 left-0 opacity-20 transition-all duration-1000 ease-out rounded-l-lg"
-                      style={{
-                        backgroundColor: participant.color,
-                        width: `${participant.percentage}%`,
-                      }}
+                {/* Capa de progreso "Líquida" */}
+                {hasVoted && (
+                  <div 
+                    className="absolute inset-y-0 left-0 transition-all duration-[1500ms] ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden"
+                    style={{ 
+                      width: `${participant.percentage}%`, 
+                    }}
+                  >
+                    <div 
+                      className="absolute inset-0 opacity-[0.15]" 
+                      style={{ backgroundColor: participant.color }}
                     />
-                  )}
-
-                  <div className="relative z-10">
-                    <div className="flex items-start justify-between gap-3 sm:gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-                          <div
-                            className="w-3 h-3 sm:w-4 sm:h-4 rounded-full shrink-0 shadow-glow transition-transform group-hover:scale-110"
-                            style={{ backgroundColor: participant.color }}
-                          />
-                          <span className="font-bold text-sm sm:text-base text-white">{participant.name}</span>
-                        </div>
-                        <p className="text-sm sm:text-base md:text-lg text-foreground/90 leading-relaxed font-medium pr-2">
-                          "{participant.headline}"
-                        </p>
-                      </div>
-
-                      {hasVoted && (
-                        <div className="text-right shrink-0 animate-in fade-in slide-in-from-right-4 duration-500">
-                          <div 
-                            className="text-xl sm:text-3xl font-bold mb-1 leading-none drop-shadow-md"
-                            style={{ color: participant.color }}
-                          >
-                            {participant.percentage}%
-                          </div>
-                          <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">{participant.votes} votos</div>
-                        </div>
-                      )}
-                    </div>
-
-                    {voting === participant.id && (
-                      <div className="flex items-center justify-center mt-3 sm:mt-4">
-                        <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin text-campaign-gold" />
-                      </div>
+                    {/* Shimmer effect inside the bar */}
+                    {participant.percentage > 0 && (
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                     )}
+                    {/* Right edge glow */}
+                    <div 
+                      className="absolute top-0 bottom-0 right-0 w-1 opacity-50 shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+                      style={{ backgroundColor: participant.color }} 
+                    />
                   </div>
-                </button>
-              </div>
+                )}
+
+                <div className="relative p-6 sm:p-8 flex items-center justify-between gap-6">
+                  <div className="flex-1 min-w-0 z-10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div 
+                        className="w-2.5 h-2.5 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.3)]"
+                        style={{ backgroundColor: participant.color }}
+                      />
+                      <span className="text-xs font-bold tracking-widest uppercase text-zinc-400">{participant.name}</span>
+                    </div>
+                    <p className="text-lg sm:text-xl font-medium leading-snug tracking-tight text-white/90 drop-shadow-sm">
+                      "{participant.headline}"
+                    </p>
+                  </div>
+
+                  {hasVoted ? (
+                    <div className="text-right shrink-0 z-10">
+                      <span className="text-3xl sm:text-4xl font-bold tracking-tighter block drop-shadow-sm" style={{ color: participant.color }}>
+                        {participant.percentage}%
+                      </span>
+                      <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-tighter">
+                        {participant.votes.toLocaleString()} votos
+                      </span>
+                    </div>
+                  ) : (
+                    <div className={cn(
+                      "h-10 w-10 rounded-full border flex items-center justify-center transition-all shrink-0 z-10",
+                      isTiebreakerDisabled ? "border-white/5 text-white/20" : "border-white/10 group-hover:bg-white group-hover:text-black text-white"
+                    )}>
+                      {voting === participant.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronRight className="h-5 w-5" />}
+                    </div>
+                  )}
+                </div>
+              </button>
             );
           })}
         </div>
@@ -353,50 +356,43 @@ export default function VotePage() {
             Selecciona el titular que más te guste para votar
           </p>
         )}
-      </div>
+      </main>
 
-      {/* Mobile-Optimized Footer */}
-      <div className="border-t border-white/5 campaign-card backdrop-blur-lg bg-card/40 px-4 sm:px-6 py-6 sm:py-8 text-center mt-auto">
-        <p className="text-xs sm:text-sm text-foreground/70 leading-relaxed max-w-2xl mx-auto mb-3 sm:mb-4 px-2">
-          Gracias a <strong className="campaign-gold-gradient">F*cks News Noticreo</strong> por esa comedia ácida
-          y bien pensada. Son el apoyo y la risa de mucha gente.
-          ¡Esperamos verlos pronto en tarima — la última vez no alcanzamos a comprar boletas!
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-muted-foreground">
-          <span>Desarrollado con ❤️ por <strong className="text-campaign-gold">Jhonatan Lopez Conde</strong></span>
-          <span className="hidden sm:inline">•</span>
-          <span>Bogotá, Colombia</span>
+      {/* Footer minimalista Apple Style */}
+      <footer className="mt-auto border-t border-white/[0.06] py-12 px-6">
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <p className="text-zinc-500 text-sm leading-relaxed max-w-xl mx-auto">
+            Un tributo a la comedia de <span className="text-zinc-300 font-medium">F*cks News Noticreo</span>. 
+            Gracias por el apoyo y las risas constantes.
+          </p>
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 font-bold">Desarrollado por</span>
+            <span className="text-sm font-medium bg-gradient-to-r from-campaign-gold to-yellow-200 bg-clip-text text-transparent">
+              Jhonatan Lopez Conde
+            </span>
+          </div>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }
 
-function VoteTimer({ expiresAt, expired, onExpire, compact = false }: { expiresAt?: string | null; expired: boolean; onExpire: () => void; compact?: boolean }) {
-  const countdown = useCountdown(expiresAt);
+function VoteTimer({ expiresAt, expired, onExpire }: { expiresAt?: string | null; expired: boolean; onExpire: () => void }) {
+  const countdown = useCountdown(expiresAt || "");
 
-  if (countdown?.isExpired && !expired) {
-    onExpire();
-  }
+  useEffect(() => {
+    if (countdown?.isExpired && !expired) onExpire();
+  }, [countdown, expired, onExpire]);
 
-  if (countdown?.isExpired || expired) {
-    return (
-      <div className="text-center">
-        <p className={cn("text-muted-foreground uppercase tracking-wider mb-1", compact ? "text-[10px]" : "text-xs sm:text-sm")}>Estado</p>
-        <span className={cn("font-bold text-campaign-red", compact ? "text-sm" : "text-base sm:text-lg")}>FINALIZADA</span>
-      </div>
-    );
-  }
-
-  if (!countdown) return null;
+  if (!expiresAt) return null;
 
   return (
-    <div className="text-center">
-      <p className={cn("text-muted-foreground uppercase tracking-wider mb-1", compact ? "text-[10px]" : "text-xs sm:text-sm")}>Tiempo</p>
-      <div className="inline-flex items-center gap-1 sm:gap-2">
-        <Timer className={cn("text-campaign-red", compact ? "h-3 w-3" : "h-3 w-3 sm:h-4 sm:w-4")} />
-        <span className={cn("font-bold font-mono text-campaign-red", compact ? "text-sm" : "text-lg sm:text-xl")}>
-          {countdown.display}
+    <div className="pl-6 border-l border-white/10 flex flex-col items-end">
+      <span className="text-[10px] uppercase tracking-[0.1em] text-zinc-500 font-bold mb-0.5">Cierre en</span>
+      <div className="flex items-center gap-2">
+        <Timer className="h-3.5 w-3.5 text-campaign-red" />
+        <span className="text-lg font-mono font-bold text-campaign-red tabular-nums tracking-tighter drop-shadow-sm">
+          {countdown?.isExpired || expired ? "FINALIZADA" : countdown?.display || "00:00"}
         </span>
       </div>
     </div>

@@ -23,11 +23,14 @@ export const battles = sqliteTable("battles", {
   code: text("code").notNull().unique(),
   title: text("title").notNull(),
   description: text("description"),
-  status: text("status", { enum: ["draft", "active", "closed"] })
+  status: text("status", { enum: ["draft", "active", "closed", "tied", "tiebreaker"] })
     .notNull()
     .default("draft"),
   durationMinutes: integer("duration_minutes"),
   activatedAt: text("activated_at"),
+  tiedParticipantIds: text("tied_participant_ids"),
+  tiebreakRound: integer("tiebreak_round").default(0),
+  winnerId: integer("winner_id"),
   createdAt: text("created_at")
     .notNull()
     .$defaultFn(() => new Date().toISOString()),

@@ -14,6 +14,7 @@ import {
   Users,
   Swords,
   Clipboard,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,8 @@ interface ParticipantInput {
 }
 
 const DEFAULT_COLORS = ["#1a56a8", "#dc2626", "#10b981", "#f59e0b", "#7c3aed", "#0891b2"];
+
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function AdminPage() {
   const navigate = useNavigate();
@@ -191,12 +194,31 @@ export default function AdminPage() {
     navigate("/login", { replace: true });
   };
 
+  const startTiebreaker = async (id: number) => {
+    try {
+      const res = await fetch(`/api/battles/${id}/tiebreaker`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders },
+        body: JSON.stringify({ durationMinutes: 5 }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Ronda de desempate iniciada");
+      fetchBattles();
+    } catch {
+      toast.error("Error al iniciar desempate");
+    }
+  };
+
   const statusBadge = (status: string) => {
     switch (status) {
       case "draft":
         return <Badge variant="secondary">Borrador</Badge>;
       case "active":
         return <Badge variant="success">En Vivo</Badge>;
+      case "tied":
+        return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">Empate</Badge>;
+      case "tiebreaker":
+        return <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">Desempate</Badge>;
       case "closed":
         return <Badge variant="warning">Cerrada</Badge>;
       default:
@@ -215,10 +237,10 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#050505] flex flex-col relative overflow-hidden selection:bg-campaign-gold/30">
       <div className="fixed inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-campaign-blue/5 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/5 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-campaign-blue/5 rounded-full blur-[120px] animate-pulse delay-1000" />
       </div>
 
       <nav 
@@ -231,10 +253,10 @@ export default function AdminPage() {
       >
         <div 
           className={cn(
-            "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between campaign-card border-b border-border/30",
+            "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between glass-card border-b border-white/[0.06]",
             scrolled 
-              ? "max-w-4xl h-14 rounded-full shadow-lg border px-4 sm:px-6 bg-card/60 backdrop-blur-sm" 
-              : "max-w-6xl h-16 rounded-none border-x-0 border-t-0 px-6 bg-card/60 backdrop-blur-sm"
+              ? "max-w-4xl h-14 rounded-full shadow-2xl px-4 sm:px-6" 
+              : "max-w-6xl h-16 rounded-none border-x-0 border-t-0 px-6"
           )}
         >
           <div className="flex items-center gap-3 sm:gap-5 flex-1 min-w-0">
@@ -250,124 +272,122 @@ export default function AdminPage() {
             </Link>
             <div className={cn("transition-all duration-300 min-w-0", scrolled ? "hidden sm:block" : "block")}>
               <h1 className={cn(
-                "font-bold campaign-gold-gradient truncate transition-all duration-300",
+                "font-bold text-white truncate transition-all duration-300 tracking-tight",
                 scrolled ? "text-base" : "text-lg"
               )}>PANEL ADMIN</h1>
               <p className={cn(
-                "text-muted-foreground transition-all duration-300",
+                "text-zinc-500 transition-all duration-300",
                 scrolled ? "text-[10px]" : "text-xs"
               )}>Gestión de Batallas</p>
             </div>
           </div>
-          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <ThemeToggle />
+            <Badge variant="outline" className="font-mono text-[10px] sm:text-xs border-white/10 text-zinc-400 px-2 py-1 bg-white/5">
+              <Users className="h-3 w-3 mr-1" />
+              {username}
+            </Badge>
             <Button 
               variant="ghost" 
-              size={scrolled ? "icon" : "sm"} 
-              onClick={() => navigate("/admin/usuarios")} 
-              className="text-foreground hover:text-campaign-gold transition-all"
-              title="Usuarios"
-            >
-              <Users className={cn("transition-all", scrolled ? "h-5 w-5" : "h-4 w-4 mr-2")} />
-              {!scrolled && <span className="hidden sm:inline">Usuarios</span>}
-            </Button>
-            <div className={cn(
-              "text-right transition-all duration-300",
-              scrolled ? "hidden" : "hidden sm:block"
-            )}>
-              <p className="text-xs text-campaign-gold font-medium">{username}</p>
-              <p className="text-[10px] text-muted-foreground">Administrador</p>
-            </div>
-            <Button 
-              variant="destructive" 
-              size={scrolled ? "icon" : "sm"} 
+              size="sm" 
               onClick={handleLogout}
-              className={cn("transition-all", scrolled && "h-8 w-8 rounded-full")}
-              title="Cerrar Sesión"
+              className={cn(
+                "hover:bg-red-500/10 hover:text-red-400 text-zinc-400 transition-colors",
+                scrolled ? "h-8 w-8 p-0" : "h-9 px-3"
+              )}
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className={cn("h-4 w-4", !scrolled && "mr-2")} />
+              <span className={cn(scrolled && "hidden")}>Salir</span>
             </Button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 pt-24 sm:pt-28 w-full flex-1">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Gestión de Batallas</h1>
-            <p className="text-muted-foreground text-sm sm:text-base">Crea y administra competencias en tiempo real</p>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full flex-1">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 sm:mb-12 mt-16 md:mt-13 animate-fade-in-up">
+          <div className="text-center sm:text-left">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">Panel de Control</h1>
+            <p className="text-zinc-400">Gestiona las batallas en tiempo real</p>
           </div>
-          <Button onClick={() => setShowCreate(true)} className="campaign-button font-semibold h-12 px-6 w-full sm:w-auto shadow-lg hover:shadow-campaign-gold/20 transition-all">
-            <Plus className="h-5 w-5 mr-2" />
+          <Button onClick={() => setShowCreate(true)} className="w-full sm:w-auto h-12 rounded-xl bg-white text-black hover:bg-zinc-200 font-semibold shadow-xl hover:shadow-white/20 transition-all group">
+            <Plus className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
             Nueva Batalla
           </Button>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-10 w-10 animate-spin text-campaign-gold" />
+            <Loader2 className="h-10 w-10 animate-spin text-campaign-gold opacity-50" />
           </div>
         ) : battles.length === 0 ? (
-          <div className="campaign-card text-center py-20 px-6 animate-in fade-in zoom-in duration-500 max-w-2xl mx-auto mt-10">
-            <div className="w-24 h-24 bg-campaign-gradient rounded-3xl mx-auto flex items-center justify-center mb-8 shadow-glow transform -rotate-6">
-              <Swords className="h-12 w-12 text-campaign-gold" />
+          <div className="glass-card rounded-[32px] text-center py-20 px-6 animate-in fade-in zoom-in duration-500 max-w-2xl mx-auto mt-10">
+            <div className="w-24 h-24 bg-white/5 rounded-[24px] mx-auto flex items-center justify-center mb-8 border border-white/10 shadow-2xl transform -rotate-6">
+              <Swords className="h-12 w-12 text-zinc-400" />
             </div>
-            <h3 className="text-2xl font-bold text-white mb-4">No hay batallas activas</h3>
-            <p className="text-muted-foreground mb-8 max-w-md mx-auto leading-relaxed text-base">Crea tu primera batalla épica para comenzar la competencia</p>
-            <Button onClick={() => setShowCreate(true)} className="campaign-button h-14 px-8 shadow-xl hover:shadow-campaign-gold/30 hover:-translate-y-1 transition-all">
+            <h3 className="text-2xl font-bold text-white mb-4 tracking-tight">No hay batallas activas</h3>
+            <p className="text-zinc-400 mb-8 max-w-md mx-auto leading-relaxed text-base">Crea tu primera batalla épica para comenzar la competencia</p>
+            <Button onClick={() => setShowCreate(true)} className="h-14 px-8 rounded-2xl bg-white text-black hover:bg-zinc-200 font-semibold shadow-xl hover:-translate-y-1 transition-all">
               <Plus className="h-5 w-5 mr-2" />
               Crear Primera Batalla
             </Button>
           </div>
         ) : (
-          <div className="space-y-8 sm:space-y-10">
+          <div className="space-y-6 sm:space-y-8">
             {battles.map((battle, idx) => (
-              <div key={battle.id} className="campaign-card overflow-hidden animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+              <div key={battle.id} className="glass-card rounded-[32px] overflow-hidden animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
                 {/* Mobile-Optimized Header */}
-                <div className="px-5 sm:px-10 py-5 sm:py-8 border-b border-border/10">
+                <div className="px-5 sm:px-8 py-5 sm:py-8 border-b border-white/5 bg-white/[0.01]">
                   <div className="space-y-5">
                     {/* Title and Status - Mobile Stack */}
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                      <h2 className="text-2xl sm:text-3xl font-bold text-white">{battle.title}</h2>
+                      <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">{battle.title}</h2>
                       <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold tracking-wide self-start ${
-                        battle.status === 'active' 
-                          ? 'bg-gradient-to-r from-green-500/20 to-green-400/20 text-green-300 border border-green-500/30 shadow-lg shadow-green-500/10' 
-                          : battle.status === 'closed' 
-                          ? 'bg-gradient-to-r from-red-500/20 to-red-400/20 text-red-300 border border-red-500/30'
-                          : 'bg-gradient-to-r from-gray-500/20 to-gray-400/20 text-gray-300 border border-gray-500/30'
+                        battle.status === 'active'
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+                          : battle.status === 'closed'
+                          ? 'bg-white/5 text-zinc-300 border border-white/10'
+                          : battle.status === 'tied'
+                          ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.15)]'
+                          : battle.status === 'tiebreaker'
+                          ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.15)]'
+                          : 'bg-white/5 text-zinc-500 border border-white/10'
                       }`}>
                         <div className={`w-2 h-2 rounded-full ${
-                          battle.status === 'active' ? 'bg-green-400 animate-pulse' :
-                          battle.status === 'closed' ? 'bg-red-400' : 'bg-gray-400'
+                          battle.status === 'active' ? 'bg-emerald-400 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]' :
+                          battle.status === 'tiebreaker' ? 'bg-orange-400 animate-pulse shadow-[0_0_10px_rgba(249,115,22,0.5)]' :
+                          battle.status === 'tied' ? 'bg-yellow-400 shadow-[0_0_10px_rgba(234,179,8,0.5)]' :
+                          battle.status === 'closed' ? 'bg-zinc-400' : 'bg-zinc-600'
                         }`} />
-                        {battle.status === 'active' ? 'EN VIVO' : battle.status === 'closed' ? 'CERRADA' : 'BORRADOR'}
+                        {battle.status === 'active' ? 'EN VIVO' :
+                         battle.status === 'tied' ? 'EMPATE' :
+                         battle.status === 'tiebreaker' ? 'DESEMPATE' :
+                         battle.status === 'closed' ? 'CERRADA' : 'BORRADOR'}
                       </div>
                     </div>
                     
                     {/* Description */}
                     {battle.description && (
-                      <p className="text-muted-foreground leading-relaxed text-sm sm:text-base max-w-3xl">{battle.description}</p>
+                      <p className="text-zinc-400 leading-relaxed text-sm sm:text-base max-w-3xl">{battle.description}</p>
                     )}
                     
                     {/* Mobile-Friendly Metadata */}
                     <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:gap-6 text-sm pt-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">Código:</span>
-                        <code className="font-mono text-campaign-gold font-bold text-sm sm:text-base px-3 py-1.5 bg-campaign-gold/10 border border-campaign-gold/20 rounded-md">
+                        <span className="text-zinc-500">Código:</span>
+                        <code className="font-mono text-white font-bold text-sm sm:text-base px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg tracking-wider">
                           {battle.code}
                         </code>
                       </div>
                       
                       <div className="flex items-center justify-between sm:justify-start gap-4 sm:gap-6">
                         {battle.durationMinutes && (
-                          <div className="flex items-center gap-2 text-campaign-blue font-medium text-sm sm:text-base">
-                            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M12,20A7,7 0 0,1 5,13A7,7 0 0,1 12,6A7,7 0 0,1 19,13A7,7 0 0,1 12,20M19.03,7.39L20.45,5.97C20,5.46 19.55,5 19.04,4.56L17.62,6C16.07,4.74 14.12,4 12,4A9,9 0 0,0 3,13A9,9 0 0,0 12,22C17,22 21,17.97 21,13C21,10.88 20.26,8.93 19.03,7.39M11,14H13V8H11M15,1H9V3H15V1Z"/>
-                            </svg>
+                          <div className="flex items-center gap-2 text-zinc-300 font-medium text-sm sm:text-base">
+                            <Clock className="h-4 w-4 text-zinc-500" />
                             {battle.durationMinutes} min
                           </div>
                         )}
                         
-                        <div className="flex items-center gap-2 text-muted-foreground text-sm sm:text-base">
+                        <div className="flex items-center gap-2 text-zinc-500 text-sm sm:text-base">
                           <span className="hidden sm:inline">Creada:</span>
                           <time>{new Date(battle.createdAt).toLocaleDateString('es-ES', { 
                             day: 'numeric', month: 'short', year: battle.durationMinutes ? undefined : 'numeric' 
@@ -379,28 +399,48 @@ export default function AdminPage() {
                 </div>
 
                 {/* Mobile-Optimized Action Bar */}
-                <div className="px-5 sm:px-10 py-5 sm:py-6 bg-card/40 border-t border-border/10">
+                <div className="px-5 sm:px-8 py-5 sm:py-6 bg-black/20">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
                     {/* Primary CTA */}
-                    <Button
-                      size="lg"
-                      variant={battle.status === "active" ? "destructive" : "default"}
-                      onClick={() =>
-                        updateStatus(
-                          battle.id,
-                          battle.status === "active" ? "closed" : "active"
-                        )
-                      }
-                      className={`w-full sm:w-auto h-12 px-6 sm:px-8 font-semibold text-base shadow-sm ${
-                        battle.status !== "active" ? "campaign-button hover:shadow-campaign-gold/20" : "hover:shadow-red-500/20"
-                      }`}
-                    >
-                      {battle.status === "active" ? (
-                        <><Square className="h-5 w-5 mr-2 sm:mr-3" />Cerrar Batalla</>
-                      ) : (
-                        <><Play className="h-5 w-5 mr-2 sm:mr-3" />Activar Batalla</>
-                      )}
-                    </Button>
+                    {battle.status === "tied" ? (
+                      <Button
+                        size="lg"
+                        onClick={() => startTiebreaker(battle.id)}
+                        className="w-full sm:w-auto h-12 px-6 sm:px-8 font-semibold rounded-xl bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-500/20 border-0"
+                      >
+                        <Play className="h-5 w-5 mr-2 sm:mr-3" />Iniciar Desempate
+                      </Button>
+                    ) : battle.status === "tiebreaker" ? (
+                      <Button
+                        size="lg"
+                        variant="destructive"
+                        onClick={() => updateStatus(battle.id, "closed")}
+                        className="w-full sm:w-auto h-12 px-6 sm:px-8 font-semibold rounded-xl border-0"
+                      >
+                        <Square className="h-5 w-5 mr-2 sm:mr-3" />Cerrar Desempate
+                      </Button>
+                    ) : (
+                      <Button
+                        size="lg"
+                        variant={battle.status === "active" ? "destructive" : "default"}
+                        onClick={() =>
+                          updateStatus(
+                            battle.id,
+                            battle.status === "active" ? "closed" : "active"
+                          )
+                        }
+                        className={cn(
+                          "w-full sm:w-auto h-12 px-6 sm:px-8 font-semibold rounded-xl border-0 transition-all",
+                          battle.status !== "active" ? "bg-white text-black hover:bg-zinc-200" : ""
+                        )}
+                      >
+                        {battle.status === "active" ? (
+                          <><Square className="h-5 w-5 mr-2 sm:mr-3" />Cerrar Batalla</>
+                        ) : (
+                          <><Play className="h-5 w-5 mr-2 sm:mr-3" />Activar Batalla</>
+                        )}
+                      </Button>
+                    )}
                     
                     {/* Secondary Actions - Mobile Stack */}
                     <div className="flex flex-col sm:flex-row gap-4 sm:gap-3">
@@ -408,14 +448,14 @@ export default function AdminPage() {
                         <Button 
                           variant="outline" 
                           onClick={() => showQR(battle)} 
-                          className="flex-1 sm:flex-none h-12 sm:h-11 px-5 sm:px-6 hover:border-campaign-gold hover:text-campaign-gold font-medium shadow-sm hover:shadow-campaign-gold/20"
+                          className="flex-1 sm:flex-none h-12 sm:h-11 px-5 sm:px-6 rounded-xl hover:bg-white/10 text-white border-white/10"
                         >
                           <QrCode className="h-5 w-5 sm:h-4 sm:w-4 mr-2" />
                           <span className="sm:hidden">QR</span>
                           <span className="hidden sm:inline">Mostrar QR</span>
                         </Button>
                         
-                        <Button variant="outline" asChild className="flex-1 sm:flex-none h-12 sm:h-11 px-5 sm:px-6 hover:border-campaign-blue hover:text-campaign-blue font-medium shadow-sm hover:shadow-campaign-blue/20">
+                        <Button variant="outline" asChild className="flex-1 sm:flex-none h-12 sm:h-11 px-5 sm:px-6 rounded-xl hover:bg-white/10 text-white border-white/10">
                           <Link to={`/resultados/${battle.code}`}>
                             <BarChart3 className="h-5 w-5 sm:h-4 sm:w-4 mr-2" />
                             <span className="sm:hidden">Resultados</span>
@@ -425,22 +465,22 @@ export default function AdminPage() {
                       </div>
                       
                       {/* Utility Actions - Mobile Friendly */}
-                      <div className="flex items-center justify-center gap-3 mt-2 sm:mt-0 sm:justify-start sm:ml-4 sm:border-l sm:border-border/30 sm:pl-4">
+                      <div className="flex items-center justify-center gap-3 mt-2 sm:mt-0 sm:justify-start sm:ml-4 sm:border-l sm:border-white/10 sm:pl-4">
                         <Button 
-                          variant="outline" 
+                          variant="ghost" 
                           size="sm"
                           onClick={() => resetVotes(battle.id)} 
-                          className="h-12 sm:h-11 w-12 sm:w-11 p-0 hover:bg-amber-500/10 hover:text-amber-400 rounded-xl"
+                          className="h-12 sm:h-11 w-12 sm:w-11 p-0 hover:bg-amber-500/10 hover:text-amber-400 text-zinc-400 rounded-xl"
                           title="Reiniciar votos"
                         >
                           <RotateCcw className="h-5 w-5 sm:h-4 sm:w-4" />
                         </Button>
                         
                         <Button 
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
                           onClick={() => deleteBattle(battle.id)} 
-                          className="h-12 sm:h-11 w-12 sm:w-11 p-0 hover:bg-red-500/10 hover:text-red-400 rounded-xl"
+                          className="h-12 sm:h-11 w-12 sm:w-11 p-0 hover:bg-red-500/10 hover:text-red-400 text-zinc-400 rounded-xl"
                           title="Eliminar batalla"
                         >
                           <Trash2 className="h-5 w-5 sm:h-4 sm:w-4" />
@@ -457,15 +497,15 @@ export default function AdminPage() {
 
       {/* Create Dialog */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent onClose={() => setShowCreate(false)} className="campaign-card border-border/50 max-w-2xl">
+        <DialogContent onClose={() => setShowCreate(false)} className="glass-card border-white/10 max-w-2xl rounded-[32px] p-8">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-white mb-2">Nueva Batalla Épica</DialogTitle>
-            <p className="text-muted-foreground">Configura los detalles de la competencia</p>
+            <DialogTitle className="text-2xl font-bold text-white mb-2 tracking-tight">Nueva Batalla</DialogTitle>
+            <p className="text-zinc-400 text-sm">Configura los detalles de la competencia</p>
           </DialogHeader>
 
-          <div className="space-y-4 mt-4">
+          <div className="space-y-5 mt-6">
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Titulo</label>
+              <label className="text-[13px] text-zinc-400 ml-1 font-medium mb-1.5 block">Título</label>
               <Input
                 placeholder="Ej: Ronda 1 - Noticias Absurdas"
                 value={title}
@@ -474,122 +514,130 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Descripcion (opcional)</label>
+              <label className="text-[13px] text-zinc-400 ml-1 font-medium mb-1.5 block">Descripción (opcional)</label>
               <Textarea
-                placeholder="Descripcion breve..."
+                placeholder="Descripción breve..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
+                className="bg-white/[0.05] border-white/5 rounded-xl text-white placeholder:text-zinc-500 focus-visible:ring-campaign-gold/20 focus-visible:border-campaign-gold/40"
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Duracion (opcional)</label>
-              <div className="flex items-center gap-2">
+              <label className="text-[13px] text-zinc-400 ml-1 font-medium mb-1.5 block">Duración (opcional)</label>
+              <div className="flex items-center gap-3">
                 <Input
                   type="number"
                   min="1"
-                  placeholder="Sin limite"
+                  placeholder="Sin límite"
                   value={durationMinutes}
                   onChange={(e) => setDurationMinutes(e.target.value)}
                   className="w-32"
                 />
-                <span className="text-sm text-muted-foreground">minutos</span>
+                <span className="text-sm text-zinc-500 font-medium">minutos</span>
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-sm font-medium">Participantes</label>
-                {participants.length < 6 && (
-                  <Button variant="ghost" size="sm" onClick={addParticipant}>
-                    <Plus className="h-3.5 w-3.5 mr-1" />
-                    Agregar
-                  </Button>
-                )}
+                <label className="text-[13px] text-zinc-400 ml-1 font-medium">Participantes</label>
+                <Button variant="outline" size="sm" onClick={addParticipant} className="h-8 rounded-lg text-xs border-white/10">
+                  <Plus className="h-3 w-3 mr-1.5" /> Agregar
+                </Button>
               </div>
 
               <div className="space-y-3">
                 {participants.map((p, idx) => (
-                  <div key={idx} className="flex gap-2 items-start">
-                    <input
-                      type="color"
-                      value={p.color}
-                      onChange={(e) => updateParticipant(idx, "color", e.target.value)}
-                      className="w-10 h-10 rounded border border-input cursor-pointer shrink-0"
-                    />
-                    <div className="flex-1 space-y-1.5">
+                  <div key={idx} className="flex flex-col sm:flex-row gap-3 items-start bg-white/[0.02] p-4 rounded-2xl border border-white/5 relative group transition-colors hover:bg-white/[0.04]">
+                    <div className="flex-1 w-full space-y-3">
                       <Input
-                        placeholder="Nombre del comediante"
+                        placeholder={`Participante ${idx + 1}`}
                         value={p.name}
                         onChange={(e) => updateParticipant(idx, "name", e.target.value)}
+                        className="h-11"
                       />
                       <Input
-                        placeholder="Su titular absurdo..."
+                        placeholder="Titular/Noticia..."
                         value={p.headline}
                         onChange={(e) => updateParticipant(idx, "headline", e.target.value)}
+                        className="h-11"
                       />
                     </div>
-                    {participants.length > 2 && (
+                    
+                    <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
+                      <div className="flex items-center gap-2 flex-1 sm:flex-none">
+                        <label className="text-xs text-zinc-500 sm:hidden">Color:</label>
+                        <input
+                          type="color"
+                          value={p.color}
+                          onChange={(e) => updateParticipant(idx, "color", e.target.value)}
+                          className="h-11 w-11 rounded-xl cursor-pointer bg-transparent border-0 p-1 hover:scale-105 transition-transform shrink-0"
+                        />
+                      </div>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="shrink-0 mt-0.5"
                         onClick={() => removeParticipant(idx)}
+                        disabled={participants.length <= 2}
+                        className="h-11 w-11 rounded-xl text-zinc-500 hover:text-red-400 hover:bg-red-500/10"
                       >
                         <X className="h-4 w-4" />
                       </Button>
-                    )}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <Button className="w-full" onClick={createBattle} disabled={creating}>
-              {creating && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
-              Crear Batalla
+            <Button 
+              onClick={createBattle} 
+              disabled={creating} 
+              className="w-full h-14 mt-6 rounded-xl bg-white text-black hover:bg-zinc-200 font-semibold shadow-xl"
+            >
+              {creating ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Plus className="h-5 w-5 mr-2" />}
+              {creating ? "Creando..." : "Crear Batalla Épica"}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* QR Dialog - Mobile Optimized */}
-      <Dialog open={!!qrData} onOpenChange={() => { setQrData(null); setQrBattle(null); }}>
-        <DialogContent onClose={() => { setQrData(null); setQrBattle(null); }} className="campaign-card max-w-sm mx-4 max-h-[90vh] overflow-y-auto p-6">
-          <DialogHeader className="space-y-2">
-            <DialogTitle className="text-xl text-center text-white">{qrBattle?.title}</DialogTitle>
-            <p className="text-sm text-muted-foreground text-center">Escanea para votar</p>
+      {/* QR Dialog */}
+      <Dialog open={!!qrData} onOpenChange={() => setQrData(null)}>
+        <DialogContent onClose={() => setQrData(null)} className="glass-card border-white/10 sm:max-w-md rounded-[32px] p-8 text-center">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-white mb-2 tracking-tight">QR de Votación</DialogTitle>
           </DialogHeader>
-          
-          {qrData && (
-            <div className="space-y-6 mt-6">
-              <div className="bg-white rounded-xl p-4 mx-auto max-w-fit">
-                <img 
-                  src={qrData.qr} 
-                  alt="QR Code" 
-                  className="w-48 h-48 sm:w-56 sm:h-56 mx-auto block" 
-                />
-              </div>
+          <div className="py-6 flex flex-col items-center">
+            <div className="bg-white p-6 rounded-[32px] shadow-2xl mb-6">
+              <img src={qrData?.qr} alt="QR Code" className="w-56 h-56 md:w-64 md:h-64" />
+            </div>
+            
+            <div className="w-full space-y-4">
+              <p className="text-zinc-400 text-sm">Los asistentes pueden escanear este QR o visitar:</p>
               
-              <div className="text-center space-y-4">
-                <p className="text-xs text-muted-foreground break-all font-mono px-2 py-2 bg-muted/20 rounded-lg">
-                  {qrData.url}
-                </p>
-                
-                <Button
-                  variant="outline"
-                  className="w-full h-12 font-medium"
+              <div className="flex items-center gap-2 bg-white/5 border border-white/10 p-2 rounded-xl">
+                <code className="text-xs md:text-sm text-campaign-gold font-mono flex-1 truncate px-2">
+                  {qrData?.url}
+                </code>
+                <Button 
+                  size="sm" 
+                  variant="secondary"
+                  className="shrink-0 h-9 rounded-lg px-4 bg-white text-black hover:bg-zinc-200"
                   onClick={() => {
-                    navigator.clipboard.writeText(qrData.url);
-                    toast.success("URL copiada al portapapeles");
+                    navigator.clipboard.writeText(qrData?.url || "");
+                    toast.success("Enlace copiado al portapapeles");
                   }}
                 >
-                  <Clipboard className="w-4 h-4 mr-2" />
-                  Copiar URL
+                  <Clipboard className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline font-medium">Copiar</span>
                 </Button>
               </div>
             </div>
-          )}
+          </div>
+          <Button onClick={() => setQrData(null)} className="w-full h-12 bg-white/10 hover:bg-white/20 text-white rounded-xl border border-white/5">
+            Cerrar
+          </Button>
         </DialogContent>
       </Dialog>
     </div>

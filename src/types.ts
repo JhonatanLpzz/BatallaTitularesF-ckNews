@@ -15,13 +15,16 @@ export interface Battle {
   code: string;
   title: string;
   description: string | null;
-  status: "draft" | "active" | "closed";
+  status: "draft" | "active" | "closed" | "tied" | "tiebreaker";
   durationMinutes: number | null;
   activatedAt: string | null;
   expiresAt?: string | null;
   createdAt: string;
   participants?: Participant[];
   totalVotes?: number;
+  tiedParticipantIds?: number[];
+  tiebreakRound?: number;
+  winnerId?: number;
 }
 
 export interface VoteUpdate {

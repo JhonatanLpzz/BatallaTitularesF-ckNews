@@ -6,18 +6,40 @@ import QRCode from "qrcode";
 import { requireAuth } from "./auth.js";
 
 function isBattleExpired(battle: { status: string; durationMinutes: number | null; activatedAt: string | null }): boolean {
-  if (battle.status !== "active" || !battle.durationMinutes || !battle.activatedAt) return false;
+  if (!["active", "tiebreaker"].includes(battle.status) || !battle.durationMinutes || !battle.activatedAt) return false;
   const activatedMs = new Date(battle.activatedAt).getTime();
   const expiresMs = activatedMs + battle.durationMinutes * 60 * 1000;
   return Date.now() >= expiresMs;
 }
 
-function autoCloseIfExpired(battle: { id: number; status: string; durationMinutes: number | null; activatedAt: string | null }) {
-  if (isBattleExpired(battle)) {
-    db.update(schema.battles).set({ status: "closed" }).where(eq(schema.battles.id, battle.id)).run();
-    return true;
+function detectTieWinners(battleId: number): number[] {
+  const participants = db.select().from(schema.participants).where(eq(schema.participants.battleId, battleId)).all();
+  if (participants.length === 0) return [];
+  const counts: Record<number, number> = {};
+  for (const p of participants) {
+    counts[p.id] = db.select().from(schema.votes).where(eq(schema.votes.participantId, p.id)).all().length;
   }
-  return false;
+  const max = Math.max(...Object.values(counts));
+  if (max === 0) return [];
+  return participants.filter(p => counts[p.id] === max).map(p => p.id);
+}
+
+function autoCloseIfExpired(battle: { id: number; status: string; durationMinutes: number | null; activatedAt: string | null }) {
+  if (!isBattleExpired(battle)) return false;
+  const tiedIds = detectTieWinners(battle.id);
+  if (tiedIds.length > 1) {
+    db.update(schema.battles)
+      .set({ status: "tied", tiedParticipantIds: JSON.stringify(tiedIds) })
+      .where(eq(schema.battles.id, battle.id))
+      .run();
+  } else {
+    const winnerId = tiedIds[0] ?? null;
+    db.update(schema.battles)
+      .set({ status: "closed", winnerId })
+      .where(eq(schema.battles.id, battle.id))
+      .run();
+  }
+  return true;
 }
 
 export async function battleRoutes(app: FastifyInstance) {
@@ -60,9 +82,11 @@ export async function battleRoutes(app: FastifyInstance) {
 
     const totalVotes = Object.values(voteCounts).reduce((a, b) => a + b, 0);
 
-    // Auto-close if timer expired
-    const closed = autoCloseIfExpired(battle);
-    const currentStatus = closed ? "closed" : battle.status;
+    // Auto-close if timer expired, then re-read actual status (may be "tied" or "closed")
+    const expired = autoCloseIfExpired(battle);
+    const currentStatus = expired
+      ? (db.select().from(schema.battles).where(eq(schema.battles.id, battle.id)).get()?.status ?? "closed")
+      : battle.status;
 
     // Calculate time remaining
     let expiresAt: string | null = null;
@@ -71,10 +95,21 @@ export async function battleRoutes(app: FastifyInstance) {
       expiresAt = exp.toISOString();
     }
 
+    // Safely parse tied participant IDs
+    let tiedIds: number[] | undefined;
+    if (battle.tiedParticipantIds) {
+      try {
+        tiedIds = JSON.parse(battle.tiedParticipantIds);
+      } catch (e) {
+        tiedIds = undefined;
+      }
+    }
+
     return {
       ...battle,
       status: currentStatus,
       expiresAt,
+      tiedParticipantIds: tiedIds,
       participants: battleParticipants.map((p) => ({
         ...p,
         votes: voteCounts[p.id] || 0,
@@ -129,22 +164,51 @@ export async function battleRoutes(app: FastifyInstance) {
   });
 
   // Update battle status (admin only)
-  app.patch<{ Params: { id: string }; Body: { status: "draft" | "active" | "closed" } }>(
+  app.patch<{ Params: { id: string }; Body: { status: "draft" | "active" | "closed" | "tied" | "tiebreaker" } }>(
     "/api/battles/:id/status",
     { preHandler: requireAuth },
     async (req, reply) => {
       const id = parseInt(req.params.id);
       const { status } = req.body;
 
-      if (!["draft", "active", "closed"].includes(status)) {
+      if (!["draft", "active", "closed", "tied", "tiebreaker"].includes(status)) {
         return reply.status(400).send({ error: "Estado inválido" });
       }
 
       const updates: Record<string, unknown> = { status };
-      if (status === "active") {
+      if (status === "active" || status === "tiebreaker") {
         updates.activatedAt = new Date().toISOString();
       }
       db.update(schema.battles).set(updates).where(eq(schema.battles.id, id)).run();
+      return { success: true };
+    }
+  );
+
+  // Start tiebreaker round (admin only) — resets votes for tied participants, activates tiebreaker
+  app.post<{ Params: { id: string }; Body: { durationMinutes?: number } }>(
+    "/api/battles/:id/tiebreaker",
+    { preHandler: requireAuth },
+    async (req, reply) => {
+      const id = parseInt(req.params.id);
+      const battle = db.select().from(schema.battles).where(eq(schema.battles.id, id)).get();
+      if (!battle) return reply.status(404).send({ error: "Batalla no encontrada" });
+      if (battle.status !== "tied") return reply.status(400).send({ error: "La batalla debe estar en estado de empate" });
+
+      const tiedIds: number[] = battle.tiedParticipantIds ? JSON.parse(battle.tiedParticipantIds) : [];
+      for (const participantId of tiedIds) {
+        db.delete(schema.votes).where(eq(schema.votes.participantId, participantId)).run();
+      }
+
+      db.update(schema.battles)
+        .set({
+          status: "tiebreaker",
+          activatedAt: new Date().toISOString(),
+          durationMinutes: req.body.durationMinutes ?? 5,
+          tiebreakRound: (battle.tiebreakRound ?? 0) + 1,
+        })
+        .where(eq(schema.battles.id, id))
+        .run();
+
       return { success: true };
     }
   );

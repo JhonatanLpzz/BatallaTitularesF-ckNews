@@ -89,5 +89,15 @@ sqlite.exec(`
     ON votes(battle_id, fingerprint);
 `);
 
+// Migrate: add tie-related columns if they don't exist yet
+const tieColumns = [
+  "ALTER TABLE battles ADD COLUMN tied_participant_ids TEXT",
+  "ALTER TABLE battles ADD COLUMN tiebreak_round INTEGER DEFAULT 0",
+  "ALTER TABLE battles ADD COLUMN winner_id INTEGER",
+];
+for (const sql of tieColumns) {
+  try { sqlite.exec(sql); } catch { /* column already exists */ }
+}
+
 export const db = drizzle(sqlite, { schema });
 export { schema };

@@ -1,18 +1,25 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Swords, Users, BarChart3, Zap, Star, Globe, Timer } from "lucide-react";
+import { Play, Swords, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { Battle } from "@/types";
 import { cn } from "@/lib/utils";
-
-const FEATURES = [
-  { icon: Swords, title: "Batallas en Vivo", desc: "Competencias épicas de titulares con timer automático" },
-  { icon: Users, title: "Votación Masiva", desc: "Miles de fans votan simultáneamente desde sus celulares" },
-  { icon: BarChart3, title: "Resultados Dramáticos", desc: "Porcentajes en tiempo real con efectos visuales" },
-  { icon: Timer, title: "Control Total", desc: "Timer configurable y auto-cierre de batallas" },
-];
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function LandingPage() {
+  const [activeBattles, setActiveBattles] = useState<Battle[]>([]);
   const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/battles")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setActiveBattles(data.filter(b => b.status === "active" || b.status === "tiebreaker"));
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,7 +29,6 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Prevent body scroll when any modal is open
   useEffect(() => {
     const checkModals = () => {
       const hasOpenModal = !!document.querySelector('[role="dialog"]');
@@ -41,122 +47,106 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-vote-gradient flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#050505] flex flex-col relative overflow-hidden selection:bg-campaign-gold/30">
       {/* Animated background elements */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-campaign-red/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      <div className="fixed inset-0 -z-10 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/10 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-campaign-red/10 rounded-full blur-[120px] animate-pulse delay-1000" />
       </div>
 
       {/* Header */}
       <nav 
         className={cn(
           "fixed top-1 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
-          scrolled 
-            ? "px-2 sm:px-4 py-2" 
-            : "px-0 py-0"
+          scrolled ? "bg-[#080808]/60 backdrop-blur-xl border-b border-white/[0.06]" : "bg-transparent"
         )}
       >
-        <div 
-          className={cn(
-            "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between campaign-card border-b border-border/30",
-            scrolled 
-              ? "max-w-4xl h-14 rounded-full shadow-lg border px-4 sm:px-6 bg-card/60 backdrop-blur-sm" 
-              : "max-w-6xl h-16 rounded-none border-x-0 border-t-0 px-6 bg-card/60 backdrop-blur-sm"
-          )}
-        >
-          <div className="flex items-center gap-3 sm:gap-5 flex-1 min-w-0">
-            <Link to="/" className="shrink-0">
-              <img 
-                src="/logo_fn.png" 
-                alt="F*cks News" 
-                className={cn(
-                  "drop-shadow-lg transition-all duration-300 hover:scale-105",
-                  scrolled ? "h-8" : "h-10 sm:h-12"
-                )} 
-              />
-            </Link>
-            <div className="min-w-0">
-              <h1 className="text-sm sm:text-lg font-bold campaign-gold-gradient truncate">BATALLA DE TITULARES</h1>
-              <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">Sistema de Votación Interactivo</p>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="flex-1 flex items-center justify-center px-4 sm:px-6 pt-20 sm:pt-24 pb-16 sm:py-24 py-24">
-        <div className="max-w-5xl mx-auto text-center animate-fade-in-up">
-          <div className="mb-8 sm:mb-12">
-            <h1 className="text-3xl sm:text-4xl md:text-7xl font-bold tracking-tight mb-4 sm:mb-6 leading-tight">
-              <span className="campaign-gold-gradient animate-glow-pulse block sm:inline">BATALLA DE</span>
-              <br className="hidden sm:block" />
-              <span className="text-white text-4xl sm:text-5xl md:text-8xl block sm:inline">TITULARES</span>
-            </h1>
-            <div className="w-16 sm:w-24 h-1 bg-gold-gradient mx-auto mb-6 sm:mb-8 rounded-full" />
-          </div>
-          
-          <p className="text-foreground/80 text-lg sm:text-xl md:text-3xl mb-12 sm:mb-16 leading-relaxed font-light max-w-4xl mx-auto px-4">
-            La competencia más <strong className="campaign-gold-gradient">épica</strong> de comedia 
-            donde los titulares más <strong className="text-campaign-red">absurdos </strong> 
-            se enfrentan y el público decide quién reina supremo
-          </p>
-
-          <div className="flex flex-col gap-4 justify-center items-center px-4">
-            <Link to="/login" className="w-full sm:w-auto">
-              <Button size="lg" className="campaign-button text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 h-auto font-semibold w-full sm:w-auto">
-                <Globe className="h-5 w-5 mr-2 sm:mr-3" />
-                <span className="sm:hidden">Panel Admin</span>
-                <span className="hidden sm:inline">Acceder al Panel Admin</span>
+        <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+          <img src="/logo_fn.png" alt="F*cks News" className="h-10 sm:h-12 drop-shadow-2xl hover:scale-105 transition-transform" />
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <Link to="/admin">
+              <Button variant="outline" size="sm" className="hidden sm:flex text-zinc-400 hover:text-white border-white/10 hover:bg-white/10 rounded-xl h-10 px-6">
+                Panel Admin
               </Button>
             </Link>
           </div>
         </div>
-      </section>
+      </nav>
 
-      {/* Mobile-Optimized Features */}
-      <section className="px-4 sm:px-8 py-16 sm:py-24 relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12 sm:mb-20">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
-              <span className="campaign-gold-gradient">Tecnología</span> de Vanguardia
-            </h2>
-            <p className="text-foreground/70 text-sm sm:text-lg max-w-2xl mx-auto px-2">
-              Sistema completo de votación interactiva diseñado para shows en vivo
-            </p>
+      <main className="flex-1 flex flex-col items-center justify-center p-6 text-center mt-20 relative z-10">
+        <div className="animate-fade-in-up w-full max-w-3xl mx-auto">
+          <div className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-campaign-gold/20 bg-campaign-gold/5 text-campaign-gold font-medium text-sm sm:text-base mb-8 shadow-[0_0_20px_rgba(212,175,55,0.1)]">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-campaign-gold opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-campaign-gold"></span>
+            </span>
+            Sistema de Votación Interactivo
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-10">
-            {FEATURES.map((feature, idx) => (
-              <div
-                key={feature.title}
-                className="campaign-card p-8 sm:p-10 text-center group hover:shadow-gold transition-all duration-300 animate-fade-in-up"
-                style={{ animationDelay: `${idx * 0.1}s` }}
-              >
-                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 bg-campaign-gradient rounded-xl sm:rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <feature.icon className="h-6 w-6 sm:h-8 sm:w-8 text-campaign-gold" />
-                </div>
-                <h3 className="font-bold text-base sm:text-lg mb-2 sm:mb-3 text-white">{feature.title}</h3>
-                <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">{feature.desc}</p>
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tighter text-white mb-6 leading-none">
+            BATALLA DE<br />
+            <span className="campaign-gold-gradient animate-glow-pulse block mt-2">TITULARES</span>
+          </h1>
+          
+          <p className="text-lg sm:text-xl md:text-2xl text-zinc-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+            La competencia más <span className="text-campaign-gold">épica</span> de comedia donde los titulares más <span className="text-campaign-red">absurdos</span> se enfrentan y el público decide quién reina supremo.
+          </p>
+
+          <div className="space-y-4 w-full max-w-md mx-auto">
+            <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest mb-4">Batallas Activas</p>
+            {activeBattles.length > 0 ? (
+              activeBattles.map(battle => (
+                <Link key={battle.id} to={`/votar/${battle.code}`} className="block group">
+                  <div className="glass-card rounded-[28px] p-6 flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-300 hover:bg-white/[0.05] hover:border-campaign-gold/40 hover:shadow-[0_0_30px_rgba(212,175,55,0.15)] group-active:scale-[0.98]">
+                    <div className="text-left flex-1 min-w-0">
+                      <h3 className="font-bold text-white text-xl truncate mb-1 tracking-tight">{battle.title}</h3>
+                      <div className="flex items-center gap-2">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <p className="text-sm text-emerald-400 font-medium">EN VIVO</p>
+                      </div>
+                    </div>
+                    <div className="w-12 h-12 rounded-2xl bg-campaign-gold text-black flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+                      <Play className="h-6 w-6 ml-1" />
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="glass-card rounded-[32px] p-8 mx-auto border-white/5 text-center mt-8">
+                <Swords className="h-12 w-12 text-zinc-600 mx-auto mb-4 opacity-50" />
+                <h3 className="text-xl font-bold text-white mb-2 tracking-tight">Preparando el show</h3>
+                <p className="text-zinc-400">El administrador aún no ha iniciado ninguna batalla. Mantente atento a la pantalla principal.</p>
               </div>
-            ))}
+            )}
+          </div>
+
+          <div className="mt-16 sm:hidden">
+            <Link to="/admin">
+              <Button variant="ghost" className="text-zinc-500 hover:text-white rounded-xl">
+                Acceso Administrador
+              </Button>
+            </Link>
           </div>
         </div>
-      </section>
+      </main>
 
       {/* Mobile-Optimized Call to Action */}
-      <section className="px-4 sm:px-6 py-12 sm:py-20">
+      <section className="px-4 sm:px-6 py-12 sm:py-20 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="campaign-card p-8 sm:p-12 animate-fade-in-up">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 text-white">
+          <div className="glass-card rounded-[32px] p-8 sm:p-12 animate-fade-in-up border-white/5">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 text-white tracking-tight">
               ¿Listo para la <span className="campaign-gold-gradient">Batalla?</span>
             </h2>
-            <p className="text-foreground/80 text-sm sm:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto px-2 leading-relaxed">
-              Crea batallas épicas, genera códigos QR, y deja que el público decida 
-              quién tiene los titulares más geniales
+            <p className="text-zinc-400 text-sm sm:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto px-2 leading-relaxed">
+              Crea batallas épicas, genera códigos QR, y deja que el público decida quién tiene los titulares más geniales.
             </p>
             <Link to="/login">
-              <Button size="lg" className="campaign-button text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 h-auto font-semibold w-full sm:w-auto">
+              <Button size="lg" className="bg-white text-black hover:bg-zinc-200 text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 h-auto font-semibold w-full sm:w-auto rounded-2xl shadow-xl transition-all hover:-translate-y-1">
+                <Globe className="h-5 w-5 mr-2" />
                 Empezar Ahora
               </Button>
             </Link>
@@ -165,15 +155,15 @@ export default function LandingPage() {
       </section>
 
       {/* Mobile-Optimized Footer */}
-      <footer className="border-t border-border/30 campaign-card px-4 sm:px-6 py-6 sm:py-8">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-xs sm:text-sm text-foreground/70 leading-relaxed max-w-2xl mx-auto mb-3 sm:mb-4 px-2">
+      <footer className="border-t border-white/5 glass-card rounded-none backdrop-blur-lg bg-[#080808]/80 px-4 sm:px-6 py-6 sm:py-8 mt-auto relative z-10">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-2xl mx-auto mb-3 sm:mb-4 px-2">
             Gracias a <strong className="campaign-gold-gradient">F*cks News Noticreo</strong> por esa comedia ácida
             y bien pensada. Son el apoyo y la risa de mucha gente.
             ¡Esperamos verlos pronto en tarima — la última vez no alcanzamos a comprar boletas!
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-muted-foreground">
-            <span>Desarrollado con ❤️ por <strong className="text-campaign-gold">Jhonatan Lopez Conde</strong></span>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-zinc-500 font-medium">
+            <span>Desarrollado con ❤️ por <strong className="text-campaign-gold font-bold">Jhonatan Lopez Conde</strong></span>
             <span className="hidden sm:inline">•</span>
             <span>Bogotá, Colombia</span>
           </div>
