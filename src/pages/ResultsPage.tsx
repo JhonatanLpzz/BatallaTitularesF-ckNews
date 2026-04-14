@@ -50,7 +50,7 @@ export default function ResultsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="relative flex items-center justify-center">
-          <div className="absolute h-16 w-16 border-t-2 border-campaign-gold rounded-full animate-spin opacity-20" />
+          <div className="absolute h-16 w-16 border-t-2 rounded-full animate-spin opacity-20" />
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       </div>
@@ -74,17 +74,17 @@ export default function ResultsPage() {
   const maxVotes = sorted.length > 0 ? sorted[0].votes : 0;
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-campaign-gold/30">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute top-[30%] -right-[20%] w-[50%] h-[50%] bg-campaign-gold/5 blur-[120px] rounded-full" />
+        <div className="absolute top-[30%] -right-[20%] w-[50%] h-[50%] blur-[120px] rounded-full" />
         <div className="absolute bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-campaign-blue/5 blur-[120px] rounded-full" />
       </div>
 
       <Header
         leftContent={
           <div className="hidden sm:block min-w-0">
-            <h1 className="font-bold campaign-gold-gradient truncate text-lg">RESULTADOS</h1>
+            <h1 className="font-bold truncate text-lg">RESULTADOS</h1>
             <p className="text-muted-foreground text-xs">Batalla de Titulares</p>
           </div>
         }
@@ -112,24 +112,22 @@ export default function ResultsPage() {
         {/* Mobile-Optimized Title */}
         <div className="text-center mb-8 sm:mb-12 animate-fade-in-up mt-8 md:mt-12">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight mb-2 sm:mb-4 px-2">
-            <span className="campaign-gold-gradient animate-glow-pulse leading-tight">{battle.title}</span>
+            <span className="animate-glow-pulse leading-tight">{battle.title}</span>
           </h1>
           {battle.description && (
             <p className="text-muted-foreground text-sm sm:text-lg px-4 leading-relaxed font-medium">{battle.description}</p>
           )}
-          <div className="w-16 sm:w-24 h-1 bg-gradient-to-r from-campaign-gold to-yellow-200 mx-auto mt-4 sm:mt-6 rounded-full opacity-50" />
+          <div className="w-16 sm:w-24 h-1 bg-gradient-to-r mx-auto mt-4 sm:mt-6 rounded-full opacity-50" />
         </div>
 
         {/* Tie / Tiebreaker Banner */}
         {(battle.status === "tied" || battle.status === "tiebreaker") && (
-          <div className={`glass-card rounded-[24px] p-6 mb-8 border text-center ${
-            battle.status === "tied"
+          <div className={`glass-card rounded-[24px] p-6 mb-8 border text-center ${battle.status === "tied"
               ? "border-status-warning/40 bg-status-warning/5"
               : "border-status-warning/50 bg-status-warning/5"
-          }`}>
-            <p className={`font-semibold text-sm ${
-              battle.status === "tied" ? "text-status-warning" : "text-status-warning"
             }`}>
+            <p className={`font-semibold text-sm ${battle.status === "tied" ? "text-status-warning" : "text-status-warning"
+              }`}>
               {battle.status === "tied"
                 ? "La batalla terminó en empate. El administrador puede iniciar una ronda de desempate."
                 : `Ronda de desempate${battle.tiebreakRound ? ` #${battle.tiebreakRound}` : ""} en curso.`}
@@ -261,12 +259,12 @@ export default function ResultsPage() {
       <footer className="mt-auto border-t border-white/[0.06] py-12 px-6 bg-background/80 backdrop-blur-md">
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <p className="text-muted-foreground text-sm leading-relaxed max-w-xl mx-auto">
-            Un tributo a la comedia de <span className="text-zinc-300 font-medium">F*cks News Noticreo</span>. 
+            Un tributo a la comedia de <span className="text-zinc-300 font-medium">F*cks News Noticreo</span>.
             Gracias por el apoyo y las risas constantes.
           </p>
           <div className="flex flex-col items-center gap-2">
             <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-bold">Desarrollado por</span>
-            <span className="text-sm font-medium bg-gradient-to-r from-campaign-gold to-yellow-200 bg-clip-text text-transparent">
+            <span className="text-sm font-medium bg-gradient-to-r to-yellow-200 bg-clip-text text-transparent">
               Jhonatan Lopez Conde
             </span>
           </div>

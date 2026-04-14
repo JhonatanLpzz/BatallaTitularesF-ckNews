@@ -7,10 +7,7 @@ import {
   Clock,
   Timer,
   ChevronRight,
-  AlertTriangle,
-  User,
-  Phone,
-  CreditCard
+  AlertTriangle
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -122,7 +119,7 @@ export default function VotePage() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="relative flex items-center justify-center">
-        <div className="absolute h-20 w-20 border-t-2 border-campaign-gold rounded-full animate-spin opacity-20" />
+        <div className="absolute h-20 w-20 border-t-2 rounded-full animate-spin opacity-20" />
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     </div>
@@ -136,7 +133,7 @@ export default function VotePage() {
 
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-campaign-gold/5 blur-[120px] rounded-full" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] blur-[120px] rounded-full" />
 
         <div className="glass-card rounded-[40px] border border-white/5 bg-white/[0.02] p-10 text-center max-w-sm w-full z-10 backdrop-blur-3xl animate-in fade-in zoom-in duration-700">
           <img src="/logo_fn.png" alt="Logo" className="h-16 mx-auto mb-8 drop-shadow-2xl" />
@@ -234,7 +231,7 @@ export default function VotePage() {
 
   // --- PANTALLA DE VOTACIÓN PRINCIPAL ---
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/30 overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/30 overflow-x-hidden pt-6">
       <div className="fixed inset-0 -z-10 pointer-events-none">
         <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-primary/5 blur-[150px] rounded-full" />
         <div className="absolute bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/5 blur-[150px] rounded-full" />

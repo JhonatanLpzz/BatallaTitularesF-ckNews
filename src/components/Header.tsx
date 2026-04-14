@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "./ui/button";
+import { Settings } from "lucide-react";
 
 interface HeaderProps {
   leftContent?: React.ReactNode;
@@ -65,6 +66,9 @@ export function Header({
           {rightContent}
           {showAdminButton && (
             <Link to="/admin">
+              <Button variant="outline" size="sm" className="sm:hidden">
+                <Settings className="h-4 w-4" />
+              </Button>
               <Button variant="outline" size="sm" className="hidden sm:flex">
                 Panel Admin
               </Button>

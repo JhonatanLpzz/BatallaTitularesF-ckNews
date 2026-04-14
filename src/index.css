@@ -94,7 +94,6 @@
     }
 
     .campaign-button {
-        @apply bg-gradient-to-r from-primary to-campaign-gold hover:shadow-lg hover:shadow-primary/30 font-semibold;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         min-height: 44px;
         /* Touch-friendly minimum */
