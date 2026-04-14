@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Loader2, Crown, Timer, Swords } from "lucide-react";
+import { Loader2, Timer, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -123,8 +123,8 @@ export default function ResultsPage() {
         {/* Tie / Tiebreaker Banner */}
         {(battle.status === "tied" || battle.status === "tiebreaker") && (
           <div className={`glass-card rounded-[24px] p-6 mb-8 border text-center ${battle.status === "tied"
-              ? "border-status-warning/40 bg-status-warning/5"
-              : "border-status-warning/50 bg-status-warning/5"
+            ? "border-status-warning/40 bg-status-warning/5"
+            : "border-status-warning/50 bg-status-warning/5"
             }`}>
             <p className={`font-semibold text-sm ${battle.status === "tied" ? "text-status-warning" : "text-status-warning"
               }`}>
@@ -153,7 +153,7 @@ export default function ResultsPage() {
                 <div className="relative p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-6">
                   {/* Layer Liquid Progress Bar */}
                   <div
-                    className="absolute inset-y-0 left-0 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)] z-0"
+                    className="absolute inset-y-0 left-0 transition-all duration-1000 ease-&lsqb;cubic-bezier(0.23,1,0.32,1)&rsqb; z-0"
                     style={{
                       width: `${barWidth}%`,
                       backgroundColor: participant.color,
@@ -163,17 +163,6 @@ export default function ResultsPage() {
 
                   {/* Header Row - Position + Name + Percentage */}
                   <div className="flex items-center justify-between sm:justify-start gap-4 sm:gap-6 z-10 w-full sm:w-auto">
-                    {/* Position Icon/Number */}
-                    <div
-                      className={cn(
-                        "w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center font-bold text-lg sm:text-xl shrink-0 backdrop-blur-md border border-white/10",
-                        isWinner
-                          ? "bg-primary/20 text-primary shadow-[0_0_20px_rgba(212,175,55,0.3)]"
-                          : "bg-white/5 text-muted-foreground"
-                      )}
-                    >
-                      {isWinner ? <Crown className="h-6 w-6 sm:h-8 sm:w-8" /> : idx + 1}
-                    </div>
 
                     {/* Name + Champion Badge (Mobile) */}
                     <div className="flex items-center gap-3 flex-1 min-w-0 sm:hidden">
@@ -181,12 +170,8 @@ export default function ResultsPage() {
                         className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.3)] shrink-0"
                         style={{ backgroundColor: participant.color }}
                       />
-                      <span className="font-bold text-lg text-foreground truncate tracking-tight">{participant.name}</span>
-                      {isWinner && (
-                        <span className="text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-2 py-1 rounded-full whitespace-nowrap">
-                          GANADOR
-                        </span>
-                      )}
+                      <span className="font-bold text-lg text-foreground tracking-tight overflow-auto text-nowrap no-scrollbar">{participant.name}</span>
+
                     </div>
 
                     {/* Percentage (Mobile) */}
@@ -211,12 +196,8 @@ export default function ResultsPage() {
                           className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.3)]"
                           style={{ backgroundColor: participant.color }}
                         />
-                        <span className="font-bold text-xl text-foreground tracking-tight">{participant.name}</span>
-                        {isWinner && (
-                          <span className="text-xs font-bold text-primary bg-primary/10 border border-primary/20 px-3 py-1 rounded-full">
-                            GANADOR
-                          </span>
-                        )}
+                        <span className="font-bold text-xl text-foreground overflow-auto ">{participant.name}</span>
+
                       </div>
                       <div className="flex items-end gap-4">
                         <span className="text-xs text-muted-foreground font-bold uppercase tracking-tighter pb-1">
@@ -230,17 +211,32 @@ export default function ResultsPage() {
                         </span>
                       </div>
                     </div>
-                    <p className="text-muted-foreground font-medium leading-snug">
-                      "{participant.headline}"
-                    </p>
+                    <div className="overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                      <p className="text-muted-foreground font-medium leading-snug inline-block pe-2">
+                        {participant.headline}
+                      </p>
+                      {isWinner && (
+                        <span className="text-xs font-bold mt-2 px-2 rounded-full w-fit" style={{ color: participant.color, backgroundColor: `${participant.color}20`, border: `1px solid ${participant.color}40` }}>
+                          GANADOR
+                        </span>
+                      )}
+                    </div>
+
                   </div>
                 </div>
 
                 {/* Headline - Full Width (Mobile only) */}
                 <div className="px-6 pb-6 sm:hidden relative z-10">
-                  <p className="text-sm text-muted-foreground font-medium leading-relaxed">
-                    "{participant.headline}"
-                  </p>
+                  <div className="overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                    <p className="text-sm text-muted-foreground font-medium leading-relaxed inline-block">
+                      {participant.headline}
+                    </p>
+                  </div>
+                  {isWinner && (
+                    <span className="text-xs font-bold mt-2 px-2 rounded-full" style={{ color: participant.color, backgroundColor: `${participant.color}20`, border: `1px solid ${participant.color}40` }}>
+                      GANADOR
+                    </span>
+                  )}
                 </div>
               </div>
             );
@@ -259,12 +255,12 @@ export default function ResultsPage() {
       <footer className="mt-auto border-t border-white/[0.06] py-12 px-6 bg-background/80 backdrop-blur-md">
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <p className="text-muted-foreground text-sm leading-relaxed max-w-xl mx-auto">
-            Un tributo a la comedia de <span className="text-zinc-300 font-medium">F*cks News Noticreo</span>.
+            Un tributo a la comedia de <span className="font-medium">F*cks News Noticreo</span>.
             Gracias por el apoyo y las risas constantes.
           </p>
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-bold">Desarrollado por</span>
-            <span className="text-sm font-medium bg-gradient-to-r to-yellow-200 bg-clip-text text-transparent">
+          <div className="flex flex-col items-center gap-2 text-muted-foreground ">
+            <span className="text-[10px] uppercase tracking-[0.1em]font-bold">Desarrollado por</span>
+            <span className="text-sm font-medium">
               Jhonatan Lopez Conde
             </span>
           </div>

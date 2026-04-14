@@ -304,7 +304,7 @@ export default function VotePage() {
                 {/* Barra de progreso Líquida Premium */}
                 {hasVoted && (
                   <div
-                    className="absolute inset-y-0 left-0 transition-all duration-[2000ms] ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden"
+                    className="absolute inset-y-0 left-0 transition-all duration-&lsqb;2000ms&rsqb; ease-&lsqb;cubic-bezier(0.16,1,0.3,1)&rsqb; overflow-hidden"
                     style={{ width: `${participant.percentage}%` }}
                   >
                     <div
