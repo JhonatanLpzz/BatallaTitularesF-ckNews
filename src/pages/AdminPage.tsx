@@ -15,6 +15,7 @@ import {
   Swords,
   Clipboard,
   Clock,
+  Timer,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import type { Battle } from "@/types";
 import { Header } from "@/components/Header";
+import { useCountdown } from "@/hooks/useCountdown";
 
 interface ParticipantInput {
   name: string;
@@ -169,8 +171,23 @@ export default function AdminPage() {
     try {
       await fetch(`/api/battles/${id}/votes`, { method: "DELETE", headers: authHeaders });
       toast.success("Votos reiniciados");
+      fetchBattles();
     } catch {
       toast.error("Error al reiniciar votos");
+    }
+  };
+
+  const handleBattleStatusUpdate = (battleId: number, newStatus: "draft" | "active" | "closed" | "tied" | "tiebreaker") => {
+    // Actualizar la batalla en la lista local
+    setBattles(prev => prev.map(battle => 
+      battle.id === battleId ? { ...battle, status: newStatus } : battle
+    ));
+    
+    // Mostrar notificación del cambio
+    if (newStatus === "closed") {
+      toast.success("Batalla finalizada automáticamente");
+    } else if (newStatus === "tied") {
+      toast.warning("Batalla empatada automáticamente");
     }
   };
 
@@ -268,7 +285,9 @@ export default function AdminPage() {
           </div>
         ) : (
           <div className="space-y-6 sm:space-y-8">
-            {battles.map((battle, idx) => (
+            {battles
+  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  .map((battle, idx) => (
               <div key={battle.id} className="glass-card rounded-[32px] overflow-hidden animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
                 {/* Mobile-Optimized Header */}
                 <div className="px-5 sm:px-8 py-5 sm:py-8 border-b border-white/5 bg-white/[0.01]">
@@ -317,6 +336,19 @@ export default function AdminPage() {
                           <div className="flex items-center gap-2 text-foreground font-medium text-sm sm:text-base">
                             <Clock className="h-4 w-4 text-muted-foreground" />
                             {battle.durationMinutes} min
+                          </div>
+                        )}
+
+                        {/* Timer para batallas activas */}
+                        {["active", "tiebreaker"].includes(battle.status) && battle.expiresAt && (
+                          <div className="flex items-center gap-2 text-foreground font-medium text-sm sm:text-base">
+                            <Timer className="h-4 w-4 text-destructive animate-pulse" />
+                            <AdminTimer 
+                              expiresAt={battle.expiresAt} 
+                              battleId={battle.id}
+                              battles={battles}
+                              onStatusUpdate={handleBattleStatusUpdate}
+                            />
                           </div>
                         )}
 
@@ -573,5 +605,48 @@ export default function AdminPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function AdminTimer({ expiresAt, battleId, battles, onStatusUpdate }: { 
+  expiresAt: string | null | undefined; 
+  battleId: number;
+  battles: Battle[];
+  onStatusUpdate: (battleId: number, newStatus: "draft" | "active" | "closed" | "tied" | "tiebreaker") => void;
+}) {
+  const countdown = useCountdown(expiresAt || "");
+  const [hasTriggered, setHasTriggered] = useState(false);
+
+  useEffect(() => {
+    // Cuando el timer expira y no se ha disparado antes
+    if (countdown?.isExpired && !hasTriggered) {
+      setHasTriggered(true);
+      
+      // Llamar a la API para actualizar el estado
+      const updateBattleStatus = async () => {
+        try {
+          // Obtener la batalla actualizada usando el código
+          const battle = battles.find(b => b.id === battleId);
+          if (!battle) return;
+          
+          const response = await fetch(`/api/battles/${battle.code}`);
+          
+          if (response.ok) {
+            const updatedBattle = await response.json();
+            onStatusUpdate(battleId, updatedBattle.status);
+          }
+        } catch (error) {
+          console.error('Error al actualizar estado de batalla:', error);
+        }
+      };
+
+      updateBattleStatus();
+    }
+  }, [countdown?.isExpired, hasTriggered, battleId, onStatusUpdate]);
+
+  return (
+    <span className="font-mono text-destructive tabular-nums tracking-tighter leading-none">
+      {countdown?.isExpired ? "FINAL" : countdown?.display || "00:00"}
+    </span>
   );
 }

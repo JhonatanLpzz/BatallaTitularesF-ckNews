@@ -48,7 +48,7 @@ export default function LoginPage() {
 
       <div className="w-full max-w-[440px] relative animate-fade-in-up">
         <div className="glass-card absolute inset-0 rounded-[32px] -z-10" />
-        
+
         <div className="p-8 sm:p-10 flex flex-col items-center">
           <img src="/logo_fn.png" alt="F*cks News" className="h-16 sm:h-20 mb-8 drop-shadow-2xl hover:scale-105 transition-transform" />
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-center text-white mb-2">Panel Admin</h1>
@@ -62,7 +62,7 @@ export default function LoginPage() {
                 <Input
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="bg-white/[0.05] border-white/5 h-14 rounded-xl focus:ring-campaign-gold/20 focus:border-campaign-gold/40 transition-all text-white pl-12 text-base"
+                  className="pl-12"
                   placeholder="Tu usuario"
                   required
                 />
@@ -77,16 +77,17 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-white/[0.05] border-white/5 h-14 rounded-xl focus:ring-campaign-gold/20 focus:border-campaign-gold/40 transition-all text-white pl-12 text-base"
+                  className="pl-12"
                   placeholder="••••••••"
                   required
                 />
               </div>
             </div>
 
-            <Button 
-              disabled={loading} 
-              className="w-full h-14 bg-white text-black hover:bg-zinc-200 rounded-xl font-semibold transition-all mt-6 shadow-xl group text-base"
+            <Button
+              disabled={loading}
+              className="w-full"
+              variant="outline"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin mr-2" />
@@ -102,10 +103,10 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-          
+
           {!needsSetup && (
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               className="mt-8 text-zinc-500 hover:text-white text-sm h-10 px-4 rounded-xl"
               onClick={() => navigate("/")}
             >

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   CheckCircle2,
   XCircle,
@@ -151,7 +151,7 @@ export default function VotePage() {
           </p>
 
           <Link to={isClosed || isTied ? `/resultados/${code}` : "/"}>
-            <Button className="w-full h-14 bg-primary text-primary-foreground hover:bg-primary/90 rounded-[22px] font-black text-lg shadow-xl transition-all active:scale-95">
+            <Button variant="outline" className="w-full">
               {isClosed || isTied ? "VER RESULTADOS" : "VOLVER"}
             </Button>
           </Link>
@@ -241,14 +241,15 @@ export default function VotePage() {
         leftContent={
           <div className="hidden sm:flex flex-col">
             <h2 className="text-sm font-black tracking-tighter uppercase leading-none text-foreground">{battle?.title}</h2>
-            <span className="text-[10px]  font-bold tracking-widest mt-1">SISTEMA DE VOTACIÓN</span>
+            <span className="text-[10px] tracking-widest mt-1">SISTEMA DE VOTACIÓN</span>
           </div>
         }
         rightContent={
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4">
             <div className="text-right">
-              <span className="block text-[9px] uppercase tracking-[0.2em]  font-black">Total Votos</span>
-              <span className="text-2xl font-black tabular-nums text-primary tracking-tighter leading-none">{battle?.totalVotes || 0}</span>
+              <span className="block text-[9px] uppercase">Total Votos</span>
+              <span className="text-2xl font-black font-mono text-destructive tabular-nums tracking-tighter leading-none">
+                {battle?.totalVotes || 0}</span>
             </div>
             <VoteTimer expiresAt={battle?.expiresAt} expired={expired} onExpire={() => setExpired(true)} />
           </div>
@@ -269,7 +270,7 @@ export default function VotePage() {
       <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-12 pt-24">
         {hasVoted && (
           <div className="animate-in fade-in slide-in-from-top-6 duration-700">
-            <div className="glass-card rounded-[32px] border border-primary/20 bg-primary/[0.03] p-6 flex items-center justify-between backdrop-blur-3xl">
+            <div className="glass-card rounded-[32px] border border-green-300 dark:border-green-600 bg-green-500 bg-opacity-15 p-6 flex items-center justify-between backdrop-blur-3xl">
               <div className="flex items-center gap-4 text-left">
                 <CheckCircle2 className="h-16 w-16" />
                 <div>
@@ -383,16 +384,24 @@ export default function VotePage() {
 
 function VoteTimer({ expiresAt, expired, onExpire }: { expiresAt?: string | null; expired: boolean; onExpire: () => void }) {
   const countdown = useCountdown(expiresAt || "");
+  const { code } = useParams<{ code: string }>();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (countdown?.isExpired && !expired) onExpire();
-  }, [countdown, expired, onExpire]);
+    if (countdown?.isExpired && !expired) {
+      onExpire();
+      // Redirigir a resultados cuando el tiempo se acaba
+      setTimeout(() => {
+        navigate(`/resultados/${code}`);
+      }, 1000); // Pequeña espera para mostrar "FINAL"
+    }
+  }, [countdown, expired, onExpire, code, navigate]);
 
   if (!expiresAt) return null;
 
   return (
-    <div className="pl-8 border-l border-white/10 flex flex-col items-end">
-      <span className="text-[9px] uppercase tracking-[0.2em]  font-black mb-1">Cierra en</span>
+    <div className="pl-4 border-l border-white/10 flex flex-col items-end">
+      <span className="text-[9px] uppercase tracking-[0.2em]">Cierra en</span>
       <div className="flex items-center gap-2">
         <Timer className="h-4 w-4 text-destructive animate-pulse" />
         <span className="text-2xl font-black font-mono text-destructive tabular-nums tracking-tighter leading-none">

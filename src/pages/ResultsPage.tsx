@@ -74,7 +74,7 @@ export default function ResultsPage() {
   const maxVotes = sorted.length > 0 ? sorted[0].votes : 0;
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans pt-8">
       {/* Background blobs */}
       <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
         <div className="absolute top-[30%] -right-[20%] w-[50%] h-[50%] blur-[120px] rounded-full" />
@@ -184,7 +184,7 @@ export default function ResultsPage() {
                       <span className="font-bold text-lg text-foreground truncate tracking-tight">{participant.name}</span>
                       {isWinner && (
                         <span className="text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-2 py-1 rounded-full whitespace-nowrap">
-                          CAMPEÓN
+                          GANADOR
                         </span>
                       )}
                     </div>
@@ -214,7 +214,7 @@ export default function ResultsPage() {
                         <span className="font-bold text-xl text-foreground tracking-tight">{participant.name}</span>
                         {isWinner && (
                           <span className="text-xs font-bold text-primary bg-primary/10 border border-primary/20 px-3 py-1 rounded-full">
-                            CAMPEÓN
+                            GANADOR
                           </span>
                         )}
                       </div>

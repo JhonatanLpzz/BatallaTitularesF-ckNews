@@ -45,8 +45,21 @@ function autoCloseIfExpired(battle: { id: number; status: string; durationMinute
 export async function battleRoutes(app: FastifyInstance) {
   // List all battles (admin only)
   app.get("/api/battles", { preHandler: requireAuth }, async () => {
-    const allBattles = db.select().from(schema.battles).orderBy(schema.battles.id).all();
-    return allBattles;
+    const allBattles = db.select().from(schema.battles).orderBy(schema.battles.createdAt).all();
+    
+    // Calculate expiresAt for each battle like the public route does
+    return allBattles.map(battle => {
+      let expiresAt: string | null = null;
+      if (battle.durationMinutes && battle.activatedAt) {
+        const exp = new Date(new Date(battle.activatedAt).getTime() + battle.durationMinutes * 60 * 1000);
+        expiresAt = exp.toISOString();
+      }
+      
+      return {
+        ...battle,
+        expiresAt
+      };
+    });
   });
 
   // Get single battle with participants and vote counts (public)
