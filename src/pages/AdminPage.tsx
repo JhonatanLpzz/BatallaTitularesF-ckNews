@@ -462,13 +462,13 @@ export default function AdminPage() {
 
       {/* Create Dialog */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent onClose={() => setShowCreate(false)} className="glass-card border-white/10 max-w-2xl rounded-[32px] p-8">
+        <DialogContent onClose={() => setShowCreate(false)} className="glass-card border-white/10 max-w-2xl rounded-[32px] p-0">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-foreground mb-2 tracking-tight">Nueva Batalla</DialogTitle>
             <p className=" text-sm">Configura los detalles de la competencia</p>
           </DialogHeader>
 
-          <div className="space-y-5 mt-6">
+          <div className="space-y-5 mt-4">
             <div>
               <label className="text-[13px]  ml-1 font-medium mb-1.5 block">Título</label>
               <Input

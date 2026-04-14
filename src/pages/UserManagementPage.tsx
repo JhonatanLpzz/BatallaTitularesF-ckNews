@@ -267,14 +267,15 @@ export default function UserManagementPage() {
 
       {/* Create User Dialog */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent onClose={() => setShowCreate(false)}>
+        <DialogContent onClose={() => setShowCreate(false)} className="glass-card border-white/10 max-w-2xl rounded-[32px] p-0">
           <DialogHeader>
-            <DialogTitle>Crear Nuevo Usuario</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-foreground mb-2 tracking-tight">Nuevo Usuario</DialogTitle>
+            <p className="text-sm">Crea un nuevo administrador del sistema</p>
           </DialogHeader>
 
-          <div className="space-y-4 mt-4">
+          <div className="space-y-5 mt-4">
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Usuario</label>
+              <label className="text-[13px] ml-1 font-medium mb-1.5 block">Usuario</label>
               <Input
                 placeholder="Nombre de usuario"
                 value={newUsername}
@@ -284,38 +285,38 @@ export default function UserManagementPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Contraseña</label>
+              <label className="text-[13px] ml-1 font-medium mb-1.5 block">Contraseña</label>
               <Input
                 type="password"
-                placeholder="Minimo 4 caracteres"
+                placeholder="Mínimo 4 caracteres"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
               />
             </div>
 
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setShowCreate(false)} className="flex-1">
-                Cancelar
-              </Button>
-              <Button onClick={createUser} disabled={creating} className="flex-1">
-                {creating && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
-                Crear Usuario
-              </Button>
-            </div>
+            <Button
+              onClick={createUser}
+              disabled={creating}
+              variant="outline"
+            >
+              {creating ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Plus className="h-5 w-5 mr-2" />}
+              {creating ? "Creando..." : "Crear Usuario"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Edit User Dialog */}
       <Dialog open={!!editUser} onOpenChange={() => setEditUser(null)}>
-        <DialogContent onClose={() => setEditUser(null)}>
+        <DialogContent onClose={() => setEditUser(null)} className="glass-card border-white/10 max-w-2xl rounded-[32px] p-0">
           <DialogHeader>
-            <DialogTitle>Editar Usuario</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-foreground mb-2 tracking-tight">Editar Usuario</DialogTitle>
+            <p className="text-sm">Modifica los datos del administrador</p>
           </DialogHeader>
 
-          <div className="space-y-4 mt-4">
+          <div className="space-y-5 mt-4">
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Usuario</label>
+              <label className="text-[13px] ml-1 font-medium mb-1.5 block">Usuario</label>
               <Input
                 placeholder="Nombre de usuario"
                 value={editUsername}
@@ -324,12 +325,12 @@ export default function UserManagementPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-1.5 block">
+              <label className="text-[13px] ml-1 font-medium mb-1.5 block">
                 Nueva Contraseña <span className="text-muted-foreground font-normal">(opcional)</span>
               </label>
               <Input
                 type="password"
-                placeholder="Dejar vacio para no cambiar"
+                placeholder="Dejar vacío para no cambiar"
                 value={editPassword}
                 onChange={(e) => setEditPassword(e.target.value)}
               />
@@ -340,13 +341,18 @@ export default function UserManagementPage() {
               )}
             </div>
 
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setEditUser(null)} className="flex-1">
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setEditUser(null)}
+                disabled={updating}
+                className="flex-1"
+              >
                 Cancelar
               </Button>
               <Button onClick={updateUser} disabled={updating} className="flex-1">
-                {updating && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
-                Guardar Cambios
+                {updating ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Edit2 className="h-5 w-5 mr-2" />}
+                {updating ? "Actualizando..." : "Guardar Cambios"}
               </Button>
             </div>
           </div>
