@@ -56,9 +56,9 @@ function MouseGlowEffect() {
 const PageTransition = ({ children }: { children: React.ReactNode }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, filter: "blur(4px)", scale: 0.98, y: 5 }}
+      initial={{ opacity: 0, filter: "blur(2px)", scale: 1, y: 3 }}
       animate={{ opacity: 1, filter: "blur(0px)", scale: 1, y: 0 }}
-      exit={{ opacity: 0, filter: "blur(4px)", scale: 0.98, y: -5 }}
+      exit={{ opacity: 0, filter: "blur(2px)", scale: 1, y: -3 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
       className="flex flex-col flex-1 w-full min-h-screen"
     >
@@ -76,6 +76,11 @@ export default function App() {
       <AuthProvider>
         {/* Fondo oscuro profundo base para enmarcar las transiciones */}
         <div className="fixed inset-0 -z-50 bg-black" />
+        
+        {/* Contrastes Avanzados: Luces directas y sombras Vignette */}
+        <div className="fixed inset-0 -z-40 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_10%,rgba(0,0,0,0.85)_100%)] mix-blend-multiply" />
+        <div className="fixed top-0 inset-x-0 h-[60vh] -z-40 pointer-events-none bg-gradient-to-b from-white/[0.04] to-transparent mix-blend-screen" />
+        
         <MouseGlowEffect />
         <AccessibilityMenu />
         <Toaster theme="dark" position="top-center" richColors />
