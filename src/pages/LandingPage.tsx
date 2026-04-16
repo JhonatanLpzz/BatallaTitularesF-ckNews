@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Play, Swords, Globe } from "lucide-react";
+import { Play, Swords, Globe, Github, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Battle } from "@/types";
 import { Header } from "@/components/Header";
@@ -96,10 +96,18 @@ export default function LandingPage() {
             )}
           </div>
 
-          <div className="mt-16 sm:hidden">
-            <Link to="/admin">
-              <Button variant="ghost" className="text-muted-foreground hover:text-foreground rounded-xl">
-                Acceso Administrador
+          {/* Quick Access */}
+          <div className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a href="https://github.com/JhonatanLpzz/BatallaTitularesF-ckNews" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" className="rounded-xl gap-2 border-white/10 hover:bg-white/5">
+                <Github className="h-4 w-4" />
+                Ver Repositorio
+              </Button>
+            </a>
+            <Link to="/login">
+              <Button variant="ghost" className="rounded-xl gap-2 text-muted-foreground hover:text-foreground">
+                <LogIn className="h-4 w-4" />
+                Demo: <code className="text-xs bg-white/10 px-1.5 py-0.5 rounded">demo</code> / <code className="text-xs bg-white/10 px-1.5 py-0.5 rounded">demo123</code>
               </Button>
             </Link>
           </div>
@@ -118,6 +126,10 @@ export default function LandingPage() {
             <span>Desarrollado con ❤️ por <strong className="text-campaign-gold font-bold">Jhonatan Lopez Conde</strong></span>
             <span className="hidden sm:inline">•</span>
             <span>Bogotá, Colombia</span>
+            <span className="hidden sm:inline">•</span>
+            <a href="https://github.com/JhonatanLpzz/BatallaTitularesF-ckNews" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-foreground transition-colors">
+              <Github className="h-3 w-3" /> GitHub
+            </a>
           </div>
         </div>
       </footer>
