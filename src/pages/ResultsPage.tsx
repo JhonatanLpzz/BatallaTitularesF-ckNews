@@ -8,6 +8,7 @@ import type { Battle, Participant, VoteUpdate } from "@/types";
 import { useSSE } from "@/hooks/useSSE";
 import { useCountdown } from "@/hooks/useCountdown";
 import { Header } from "@/components/Header";
+import { battleService } from "@/services/api";
 
 export default function ResultsPage() {
   const { code } = useParams<{ code: string }>();
@@ -17,10 +18,7 @@ export default function ResultsPage() {
   const fetchBattle = useCallback(async () => {
     if (!code) return;
     try {
-      const res = await fetch(`/api/battles/${code}`);
-
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const data = await battleService.getByCode(code);
       setBattle(data);
     } catch {
       // error

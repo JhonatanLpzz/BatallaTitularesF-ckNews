@@ -1,277 +1,259 @@
-# Batalla de Titulares — F*cks News Noticreo
+# Batalla de Titulares — Documentacion Tecnica
 
-## Resumen
+> Documento de contexto tecnico para desarrolladores. Para una vista general del proyecto, ver [`README.md`](./README.md).
+> Para requisitos de producto, ver [`PRD.md`](./PRD.md).
 
-Aplicativo web de votacion en vivo para la **Batalla de Titulares** de **F*cks News Noticreo**, comediantes colombianos. Permite crear batallas donde los participantes compiten con titulares absurdos y el publico vota en tiempo real escaneando un QR desde su celular.
-
-**Desarrollado por:** Jhonatan Lopez Conde — Bogota, Colombia
+**Proyecto:** Batalla de Titulares — F\*cks News Noticreo  
+**Desarrollado por:** Jhonatan Lopez Conde — Bogota, Colombia  
+**Ultima actualizacion:** Abril 2026
 
 ---
 
 ## Stack Tecnologico
 
-| Capa | Tecnologia |
-|------|-----------|
-| **Runtime** | Bun |
-| **Frontend** | React 18 + TypeScript + Vite |
-| **Estilos** | TailwindCSS 3 + shadcn/ui (custom) |
-| **Backend** | Fastify 5 |
-| **Base de datos** | SQLite (bun:sqlite) + Drizzle ORM |
-| **QR** | qrcode (generacion server-side) |
-| **Real-time** | Server-Sent Events (SSE) |
-| **Autenticacion** | Bcrypt (Bun.password) + tokens de sesion |
+| Capa | Tecnologia | Version |
+|------|-----------|---------|
+| **Runtime** | Bun | >= 1.0 |
+| **Frontend** | React + TypeScript + Vite | 18 / 5.7 / 6.0 |
+| **Estilos** | TailwindCSS + shadcn/ui | 3.4 / custom |
+| **Backend** | Fastify | 5.2 |
+| **ORM** | Drizzle ORM | 0.38 |
+| **Base de datos** | SQLite (bun:sqlite) | embedded |
+| **Real-time** | Server-Sent Events (SSE) | nativo |
+| **QR** | qrcode | 1.5 (server-side) |
+| **Auth** | Bcrypt (Bun.password) + nanoid sessions | — |
 
 ---
 
-## Arquitectura
+## Arquitectura del Proyecto
 
 ```
-windsurf-project-3/
-├── server/                  # Backend Fastify
-│   ├── index.ts             # Entry point del servidor
-│   ├── sse.ts               # Utilidad SSE (broadcast)
+batalla-titulares-fcknews/
+├── server/                          # === BACKEND (Fastify) ===
+│   ├── index.ts                     # Entry point, CORS, static serve, health check
+│   ├── config.ts                    # Configuracion env vars centralizada
+│   ├── sse.ts                       # Utilidad SSE: addClient, removeClient, broadcast
 │   ├── db/
-│   │   ├── schema.ts        # Esquema Drizzle (admin_users, sessions, battles, participants, votes)
-│   │   └── index.ts         # Conexion SQLite + creacion de tablas
+│   │   ├── schema.ts               # Esquema Drizzle ORM (5 tablas con JSDoc)
+│   │   └── index.ts                # Conexion SQLite + migraciones inline
 │   └── routes/
-│       ├── auth.ts          # Login, logout, setup, CRUD usuarios
-│       ├── battles.ts       # CRUD batallas + timer + auto-cierre
-│       ├── votes.ts         # Votar (con info votante) + validar timer
-│       └── sse.ts           # Endpoint SSE por batalla
-├── src/                     # Frontend React
-│   ├── main.tsx             # Entry point React
-│   ├── App.tsx              # Router + AuthProvider
-│   ├── index.css            # Paleta F*cks News (azul/rojo/blanco) flat
-│   ├── types.ts             # Interfaces TypeScript
+│       ├── auth.ts                  # Auth: login, logout, setup, CRUD usuarios
+│       ├── battles.ts              # CRUD batallas + timer + auto-cierre + QR
+│       ├── votes.ts                # Registro/cambio votos + SSE broadcast
+│       └── sse.ts                  # Endpoint SSE por batalla
+│
+├── src/                             # === FRONTEND (React 18) ===
+│   ├── App.tsx                      # Router principal + ThemeProvider + AuthProvider
+│   ├── main.tsx                     # Entry point React
+│   ├── types.ts                     # Interfaces compartidas (con JSDoc completo)
+│   ├── index.css                    # CSS custom: tema dark F*cks News
+│   │
+│   ├── constants/
+│   │   └── index.ts                # Endpoints API, rutas, defaults, storage keys
+│   │
+│   ├── services/
+│   │   └── api.ts                  # Capa de servicios: authService, battleService,
+│   │                                #   voteService, userService (tipado fuerte)
 │   ├── context/
-│   │   └── AuthContext.tsx   # Estado de autenticacion global
-│   ├── components/
-│   │   ├── ProtectedRoute.tsx
-│   │   └── ui/              # Button, Card, Input, Badge, Dialog, Textarea
+│   │   ├── AuthContext.tsx          # Estado de autenticacion global
+│   │   └── ThemeContext.tsx         # Tema claro/oscuro
+│   │
 │   ├── hooks/
-│   │   ├── useSSE.ts        # Hook para actualizaciones en tiempo real
-│   │   └── useCountdown.ts   # Hook para countdown timer
+│   │   ├── useSSE.ts               # SSE con reconexion automatica
+│   │   ├── useCountdown.ts         # Countdown reactivo MM:SS
+│   │   └── useBattleStatusMonitor.ts # Polling de estado para batallas activas
+│   │
 │   ├── lib/
-│   │   └── utils.ts         # cn(), generateFingerprint(), formatNumber()
+│   │   └── utils.ts                # cn(), generateFingerprint(), formatNumber()
+│   │
+│   ├── components/
+│   │   ├── AdminTimer.tsx           # Countdown panel admin + auto-update estado
+│   │   ├── BattleStatusScreen.tsx   # Pantalla error/draft/closed/tied
+│   │   ├── CreateBattleDialog.tsx   # Modal crear batalla
+│   │   ├── QRDialog.tsx             # Modal mostrar QR
+│   │   ├── VoteTimer.tsx            # Countdown publico + redirect al expirar
+│   │   ├── VoterIdentificationForm.tsx # Formulario identificacion votante
+│   │   ├── Header.tsx               # Header reutilizable
+│   │   ├── ProtectedRoute.tsx       # Guard de rutas admin
+│   │   ├── ResultsChart.tsx         # Grafico de resultados
+│   │   ├── BattleCard.tsx           # Card de batalla
+│   │   ├── CountdownTimer.tsx       # Timer visual
+│   │   ├── VoteOption.tsx           # Opcion de voto
+│   │   ├── ThemeToggle.tsx          # Toggle tema claro/oscuro
+│   │   ├── TieManager.tsx           # Gestion de empates
+│   │   ├── AdminTieControls.tsx     # Controles de empate admin
+│   │   └── ui/                      # Componentes shadcn/ui base
+│   │
 │   └── pages/
-│       ├── LandingPage.tsx   # Pagina publica de bienvenida
-│       ├── LoginPage.tsx     # Login admin + setup inicial
-│       ├── AdminPage.tsx     # Panel admin (crear, activar, QR, timer)
-│       ├── UserManagementPage.tsx # Gestión de usuarios admin
-│       ├── VotePage.tsx      # Formulario votante + countdown + seleccion
-│       └── ResultsPage.tsx   # Resultados en vivo + countdown
+│       ├── LandingPage.tsx          # Landing publica de bienvenida
+│       ├── LoginPage.tsx            # Login admin + setup inicial
+│       ├── AdminPage.tsx            # Panel admin (usa CreateBattleDialog, QRDialog, AdminTimer)
+│       ├── UserManagementPage.tsx   # CRUD usuarios administradores
+│       ├── VotePage.tsx             # Votacion publica (usa VoterIdentificationForm, BattleStatusScreen, VoteTimer)
+│       └── ResultsPage.tsx          # Resultados en vivo + countdown
+│
 ├── public/
-│   ├── logo_fn.png           # Logo F*cks News Noticreo
-│   └── favicon.svg
-├── package.json
-├── tailwind.config.ts
-├── vite.config.ts
-├── tsconfig.json
-└── drizzle.config.ts
+│   └── logo_fn.png                  # Logo F*cks News Noticreo
+├── PRD.md                           # Product Requirements Document
+├── CONTEXT.md                       # Este archivo
+├── Dockerfile                       # Build Docker
+├── railway.json                     # Config Railway
+├── .env.example                     # Plantilla de variables de entorno
+└── package.json
 ```
+
+---
+
+## Esquema de Base de Datos
+
+Documentacion detallada con JSDoc en `server/db/schema.ts`.
+
+### `admin_users`
+| Columna | Tipo | Constraint | Descripcion |
+|---------|------|-----------|-------------|
+| `id` | INTEGER | PK, AUTO | ID unico |
+| `username` | TEXT | NOT NULL, UNIQUE | Nombre de usuario |
+| `password_hash` | TEXT | NOT NULL | Hash bcrypt |
+| `created_at` | TEXT | NOT NULL | Timestamp ISO |
+
+### `sessions`
+| Columna | Tipo | Constraint | Descripcion |
+|---------|------|-----------|-------------|
+| `id` | INTEGER | PK, AUTO | ID unico |
+| `token` | TEXT | NOT NULL, UNIQUE | Token nanoid(48) |
+| `user_id` | INTEGER | FK → admin_users, CASCADE | Propietario |
+| `expires_at` | TEXT | NOT NULL | Expiracion ISO |
+
+### `battles`
+| Columna | Tipo | Constraint | Descripcion |
+|---------|------|-----------|-------------|
+| `id` | INTEGER | PK, AUTO | ID unico |
+| `code` | TEXT | NOT NULL, UNIQUE | Codigo corto nanoid(8) |
+| `title` | TEXT | NOT NULL | Titulo visible |
+| `description` | TEXT | nullable | Descripcion opcional |
+| `status` | TEXT | NOT NULL, DEFAULT 'draft' | draft/active/closed/tied/tiebreaker |
+| `duration_minutes` | INTEGER | nullable | Duracion (null = sin limite) |
+| `activated_at` | TEXT | nullable | Timestamp activacion |
+| `tied_participant_ids` | TEXT | nullable | JSON array de IDs empatados |
+| `tiebreak_round` | INTEGER | DEFAULT 0 | Ronda de desempate |
+| `winner_id` | INTEGER | nullable | Ganador (al cerrar) |
+| `created_at` | TEXT | NOT NULL | Timestamp creacion |
+
+### `participants`
+| Columna | Tipo | Constraint | Descripcion |
+|---------|------|-----------|-------------|
+| `id` | INTEGER | PK, AUTO | ID unico |
+| `battle_id` | INTEGER | FK → battles, CASCADE | Batalla padre |
+| `name` | TEXT | NOT NULL | Nombre participante |
+| `headline` | TEXT | NOT NULL | Titular/noticia |
+| `avatar_url` | TEXT | nullable | URL avatar |
+| `color` | TEXT | NOT NULL, DEFAULT '#1a56a8' | Color hex |
+| `position` | INTEGER | NOT NULL, DEFAULT 0 | Orden |
+
+### `votes`
+| Columna | Tipo | Constraint | Descripcion |
+|---------|------|-----------|-------------|
+| `id` | INTEGER | PK, AUTO | ID unico |
+| `battle_id` | INTEGER | FK → battles, CASCADE | Batalla |
+| `participant_id` | INTEGER | FK → participants, CASCADE | Participante elegido |
+| `voter_name` | TEXT | NOT NULL | Nombre del votante |
+| `voter_document` | TEXT | nullable | Documento |
+| `voter_phone` | TEXT | nullable | Celular |
+| `fingerprint` | TEXT | NOT NULL | Huella dispositivo |
+| `voted_at` | TEXT | NOT NULL | Timestamp voto |
+
+**Indice unico:** `(battle_id, fingerprint)` — previene votos duplicados por dispositivo.
 
 ---
 
 ## Flujo de Uso
 
 ### Admin
-1. Accede a `/login` → se autentica (o crea admin si es primera vez)
-2. En `/admin` crea una batalla con titulo, descripcion, timer opcional (ej: 5 min), y participantes
-   - **Por defecto:** Camilo Pardo 'El mago' y Camilo Sanchez 'El Inquieto'
-   - **Headlines:** `[Titular sera dado en vivo]` (para cambiar durante el show)
-3. Activa la batalla → inicia countdown automático si tiene timer
+1. Accede a `/login` → se autentica (o crea admin si es primera vez via auto-setup)
+2. En `/admin` crea una batalla con titulo, descripcion, timer opcional, y participantes
+   - **Defaults:** Camilo Pardo 'El Mago' y Camilo Sanchez 'El Inquieto'
+3. Activa la batalla → inicia countdown automatico
 4. Muestra el QR al publico (proyector/pantalla)
 5. Ve resultados en tiempo real con countdown visible
-6. La batalla se auto-cierra cuando expira el timer, o se cierra manualmente
-7. Gestiona usuarios admin desde `/admin/usuarios`
+6. La batalla se auto-cierra al expirar → detecta empate automaticamente
+7. Si hay empate, puede iniciar ronda de desempate
+8. Gestiona usuarios admin desde `/admin/usuarios`
 
 ### Publico (Votante)
-1. Escanea el QR con su celular → llega a `/votar/:code`
-2. Ingresa su nombre (obligatorio), documento y celular (opcionales)
-3. Selecciona el titular que mas le gusta → voto registrado
-4. Ve porcentajes en tiempo real despues de votar
+1. Escanea QR → llega a `/votar/:code`
+2. Ingresa nombre (obligatorio), documento y celular (opcionales)
+3. Selecciona titular favorito → voto registrado con confirmacion visual
+4. Puede cambiar su voto mientras el timer siga activo
+5. Ve porcentajes en tiempo real via SSE
+6. Al expirar el timer, redirige automaticamente a resultados
 
 ---
 
-### Rutas
+## Rutas Frontend
 
-### Publicas
-- `GET /` — Landing page
-- `GET /login` — Login / Setup admin
-- `GET /votar/:code` — Pagina de votacion (QR destination)
-- `GET /resultados/:code` — Resultados en vivo
-
-### Privadas (requieren auth)
-- `GET /admin` — Panel de administracion
-- `GET /admin/usuarios` — Gestión de usuarios admin
-
-### API Publicas
-- `GET /api/battles/:code` — Detalle de batalla con votos y timer
-- `POST /api/votes` — Registrar voto (con info del votante)
-- `GET /api/votes/check/:code?fp=` — Verificar si ya voto
-- `GET /api/sse/:battleId` — SSE stream de actualizaciones
-- `GET /api/auth/needs-setup` — Verificar si necesita setup
-- `POST /api/auth/setup` — Crear primer admin
-- `POST /api/auth/login` — Iniciar sesion
-- `GET /api/auth/me` — Verificar sesion
-
-### API Protegidas (Bearer token)
-- `GET /api/battles` — Listar batallas
-- `POST /api/battles` — Crear batalla (con timer opcional)
-- `PATCH /api/battles/:id/status` — Cambiar estado (auto-cierre por timer)
-- `DELETE /api/battles/:id` — Eliminar batalla
-- `DELETE /api/battles/:id/votes` — Reiniciar votos
-- `GET /api/battles/:code/qr` — Generar QR
-- `GET /api/users` — Listar administradores
-- `POST /api/users` — Crear nuevo administrador
-- `PATCH /api/users/:id/username` — Cambiar username
-- `PATCH /api/users/:id/password` — Cambiar contraseña
-- `DELETE /api/users/:id` — Eliminar administrador
+| Ruta | Acceso | Componente | Descripcion |
+|------|--------|-----------|-------------|
+| `/` | Publico | `LandingPage` | Landing page |
+| `/login` | Publico | `LoginPage` | Login / Setup inicial |
+| `/votar/:code` | Publico | `VotePage` | Votacion (destino QR) |
+| `/resultados/:code` | Publico | `ResultsPage` | Resultados en vivo |
+| `/admin` | Protegido | `AdminPage` | Panel de administracion |
+| `/admin/usuarios` | Protegido | `UserManagementPage` | Gestion de admins |
 
 ---
 
-## Paleta de Colores (F*cks News)
+## API Endpoints
 
-| Token | HSL | Hex aprox. | Uso |
-|-------|-----|-----------|-----|
-| `--primary` (fn-blue) | 217 78% 41% | #1a56a8 | Botones, enlaces, branding |
-| `--accent` (fn-red) | 0 72% 51% | #dc2626 | Barra superior, acentos, ganador |
-| `--background` | 0 0% 98% | #fafafa | Fondo general |
-| `--card` | 0 0% 100% | #ffffff | Cards, navbars |
-| `--foreground` | 220 20% 10% | #141a26 | Texto principal |
-| `--muted-foreground` | 220 9% 46% | #6b7280 | Texto secundario |
+Documentacion completa en la tabla de [`README.md`](./README.md#api-reference).
+Documentacion JSDoc en `server/routes/*.ts`.
 
 ---
 
-## Esquema de Base de Datos
+## Paleta de Colores
 
-### admin_users
-- `id`, `username` (unique), `password_hash`, `created_at`
-
-### sessions
-- `id`, `token` (unique), `user_id` (FK), `expires_at`
-
-### battles
-- `id`, `code` (unique), `title`, `description`, `status` (draft/active/closed), `duration_minutes` (nullable), `activated_at` (nullable), `created_at`
-
-### participants
-- `id`, `battle_id` (FK), `name`, `headline`, `avatar_url`, `color`, `position`
-
-### votes
-- `id`, `battle_id` (FK), `participant_id` (FK), `voter_name`, `voter_document`, `voter_phone`, `fingerprint`, `voted_at`
-- UNIQUE INDEX: `(battle_id, fingerprint)`
+| Token CSS | Hex | Uso |
+|-----------|-----|-----|
+| `--primary` | `#1a56a8` | Botones, enlaces, branding |
+| `--accent` (destructive) | `#dc2626` | Alertas, acentos, ganador |
+| `--background` | `#fafafa` | Fondo general |
+| `--card` | `#ffffff` | Cards, navbars |
+| `--foreground` | `#141a26` | Texto principal |
+| `--muted-foreground` | `#6b7280` | Texto secundario |
 
 ---
 
-## Estado Actual
+## Practicas de Desarrollo
 
-### Completado
-- [x] Estructura del proyecto con Bun + Vite + React + Fastify
-- [x] Base de datos SQLite con bun:sqlite + Drizzle ORM
-- [x] CRUD completo de batallas (crear, activar, cerrar, eliminar, reiniciar votos)
-- [x] **Timer de batalla:** campo duration_minutes, auto-cierre al expirar
-- [x] **Countdown UI:** timer MM:SS visible en votacion y resultados
-- [x] **Bloqueo por tiempo:** no permite votar si la batalla expiro
-- [x] Generacion de QR por batalla
-- [x] Sistema de votacion publica con identificacion del votante
-- [x] **Info del votante:** nombre (obligatorio), documento/celular (opcionales)
-- [x] Actualizaciones en tiempo real via SSE
-- [x] Autenticacion admin (login, sesiones, setup inicial)
-- [x] **Gestión de usuarios:** crear, editar, cambiar contraseñas, eliminar admins
-- [x] Rutas protegidas (admin, usuarios) vs publicas (votar, resultados)
-- [x] UI flat minimalista con paleta F*cks News (azul/rojo/blanco)
-- [x] Logo F*cks News Noticreo integrado en todas las paginas
-- [x] **Nombres por defecto:** Camilo Pardo 'El mago' y Camilo Sanchez 'El Inquieto'
-- [x] **Mensajes de agradecimiento:** fans messages a F*cks News en todos los footers
+### Frontend
+- **Capa de servicios:** Todas las llamadas API centralizadas en `src/services/api.ts`
+- **Constantes:** Endpoints, rutas, defaults en `src/constants/index.ts`
+- **Tipos:** Interfaces documentadas con JSDoc en `src/types.ts`
+- **Componentizacion:** Paginas delegated a componentes especializados
+- **Hooks:** SSE con reconexion, countdown reactivo, monitor de estado
 
-### Pendiente (Futuras Mejoras)
-- [ ] Exportar resultados (CSV/PDF) con datos de votantes
-- [ ] Vista fullscreen para proyectar resultados en shows
-- [ ] Soporte para multiples rondas consecutivas
-- [ ] Notificaciones push cuando se activa una batalla
-- [ ] Tema oscuro (modo cine/presentacion)
-- [ ] Estadisticas históricas de batallas anteriores
-- [ ] Backup/restore de base de datos
-- [ ] Roles de usuario (admin vs moderador)
-
----
-
-## Funcionalidades Clave Implementadas
-
-### 🔐 Autenticación Completa
-- Setup automático del primer admin (`/login` detecta si no hay usuarios)
-- Login/logout con tokens JWT y sesiones persistentes
-- Protección de rutas admin con middleware
-- Gestión completa de usuarios: crear, editar, cambiar contraseñas, eliminar
-- Prevenciones: no auto-eliminarse, mantener al menos 1 admin
-
-### ⏱️ Timer de Batalla
-- Campo opcional "Duración" al crear batalla (ej: 5 minutos)
-- Al activar: guarda timestamp y calcula expiración automática
-- Countdown en tiempo real `MM:SS` visible en votación y resultados
-- Auto-cierre cuando expira + bloqueo de votos tardíos
-- API responde `expiresAt` para sincronización frontend
-
-### 🗳️ Votación Pública con Info
-- Sin autenticación requerida para votar
-- Formulario obligatorio: **nombre** (requerido), documento/celular (opcional)
-- Un voto por dispositivo usando fingerprint único
-- Resultados en tiempo real vía Server-Sent Events
-
-### 🎨 Branding F*cks News
-- Paleta azul/rojo/blanco flat minimalista
-- Logo integrado en todas las páginas
-- Mensajes de agradecimiento: *"Gracias por esa comedia ácida y bien pensada"*
-- Participantes por defecto: **Camilo Pardo 'El mago'** y **Camilo Sanchez 'El Inquieto'**
+### Backend
+- **Rutas documentadas:** Cada archivo de rutas tiene JSDoc con lista de endpoints
+- **Config centralizada:** `server/config.ts` con validacion de produccion
+- **SSE modular:** Utilidad de broadcast separada del endpoint
+- **Auto-cierre:** Timer verifica expiracion + detecta empates automaticamente
 
 ---
 
 ## Comandos
 
 ```bash
-# Instalar dependencias
-bun install
-
-# Desarrollo (API + Frontend en paralelo)
-bun run dev
-
-# Solo frontend
-bun run dev:client
-
-# Solo backend
-bun run dev:server
-
-# Build produccion
-bun run build
-
-# Produccion
-bun start
+bun install             # Instalar dependencias
+bun run dev             # Desarrollo (API + Frontend en paralelo)
+bun run dev:client      # Solo frontend → http://localhost:5173
+bun run dev:server      # Solo backend  → http://localhost:3001
+bun run build           # Build produccion
+bun start               # Servidor produccion
+bun run db:generate     # Generar migraciones Drizzle
+bun run db:migrate      # Ejecutar migraciones
 ```
 
-**Frontend:** http://localhost:5173  
-**API:** http://localhost:3001
-
 ---
 
-## Credenciales Actuales
+## Estado: PRODUCTO COMPLETO Y FUNCIONAL
 
-**Admin Principal:** `admin` / `admin123`  
-**Usuario Adicional:** `editor` / `editor123`
-
-*Nota: Puedes crear más usuarios desde `/admin/usuarios` o cambiar estas credenciales.*
-
----
-
-## Estado del Proyecto: ✅ COMPLETO
-
-Todas las funcionalidades solicitadas han sido implementadas y probadas:
-
-- ✅ **Autenticación** — Login, sesiones, gestión de usuarios
-- ✅ **Enrutamiento** — Rutas públicas y privadas
-- ✅ **Votación sin auth** — Solo requiere nombre del votante
-- ✅ **Timer automático** — Duración configurable + auto-cierre
-- ✅ **Countdown en vivo** — MM:SS visible en todas las páginas
-- ✅ **Branding F*cks News** — Logo, colores, mensajes de fans
-- ✅ **Participantes listos** — Camilo Pardo y Camilo Sanchez por defecto
-
-**El aplicativo está 100% funcional para usar en shows en vivo.**
+Todas las funcionalidades core implementadas y documentadas. Ver `PRD.md` para el roadmap de mejoras futuras.

@@ -1,5 +1,6 @@
 import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
+import { eq } from "drizzle-orm";
 import * as schema from "./schema.js";
 import config from "../config.js";
 import { mkdir } from "fs/promises";
@@ -99,5 +100,29 @@ for (const sql of tieColumns) {
   try { sqlite.exec(sql); } catch { /* column already exists */ }
 }
 
+// Migrate: add role column to admin_users if it doesn't exist
+try {
+  sqlite.exec("ALTER TABLE admin_users ADD COLUMN role TEXT NOT NULL DEFAULT 'admin'");
+} catch { /* column already exists */ }
+
 export const db = drizzle(sqlite, { schema });
 export { schema };
+
+// Seed: ensure demo user exists
+async function seedDemoUser() {
+  const existing = db
+    .select()
+    .from(schema.adminUsers)
+    .where(eq(schema.adminUsers.username, "demo"))
+    .get();
+
+  if (!existing) {
+    const hash = await Bun.password.hash("demo123", { algorithm: "bcrypt", cost: 10 });
+    db.insert(schema.adminUsers)
+      .values({ username: "demo", passwordHash: hash, role: "demo" })
+      .run();
+    console.log("[DB] Demo user created (demo / demo123)");
+  }
+}
+
+seedDemoUser().catch((err) => console.error("[DB] Failed to seed demo user:", err));

@@ -3,6 +3,8 @@ import { Zap, AlertTriangle, RefreshCw, Crown, Play } from "lucide-react";
 import { toast } from "sonner";
 import { Battle } from "../types";
 import { detectTie, getTieSummary } from "../utils/battleUtils";
+import { battleService } from "@/services/api";
+import type { ApiError } from "@/types";
 
 interface AdminTieControlsProps {
   battle: Battle;
@@ -18,30 +20,12 @@ export function AdminTieControls({ battle, onStatusUpdate, token }: AdminTieCont
   const checkTie = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/battles/${battle.id}/check-tie`, {
-        method: "POST",
-        headers: { 
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      });
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || "Error al verificar empate");
-      }
-
-      const result = await res.json();
-      toast.success(result.message);
-      
-      // Update local state based on result
-      if (result.hasTie) {
-        onStatusUpdate(battle.id, "tied");
-      } else {
-        onStatusUpdate(battle.id, "closed");
-      }
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Error al verificar empate");
+      const result = await battleService.updateStatus(token, battle.id, "closed");
+      toast.success("Verificaci\u00f3n completa");
+      onStatusUpdate(battle.id, "closed");
+    } catch (err) {
+      const msg = (err as ApiError)?.message || "Error al verificar empate";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -50,24 +34,12 @@ export function AdminTieControls({ battle, onStatusUpdate, token }: AdminTieCont
   const startTiebreaker = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/battles/${battle.id}/tiebreaker`, {
-        method: "POST",
-        headers: { 
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      });
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || "Error al iniciar desempate");
-      }
-
-      const result = await res.json();
-      toast.success(result.message);
+      await battleService.startTiebreaker(token, battle.id, 5);
+      toast.success("Desempate iniciado");
       onStatusUpdate(battle.id, "tiebreaker");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Error al iniciar desempate");
+    } catch (err) {
+      const msg = (err as ApiError)?.message || "Error al iniciar desempate";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -76,20 +48,10 @@ export function AdminTieControls({ battle, onStatusUpdate, token }: AdminTieCont
   const forceTieState = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/battles/${battle.id}/status`, {
-        method: "PATCH",
-        headers: { 
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ status: "tied" })
-      });
-
-      if (!res.ok) throw new Error("Error al forzar empate");
-
+      await battleService.updateStatus(token, battle.id, "tied");
       toast.success("Estado cambiado a empate");
       onStatusUpdate(battle.id, "tied");
-    } catch (error) {
+    } catch {
       toast.error("Error al forzar empate");
     } finally {
       setLoading(false);

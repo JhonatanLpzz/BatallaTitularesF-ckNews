@@ -1,7 +1,14 @@
+/**
+ * @fileoverview Componente raíz de la aplicación.
+ * Configura providers (tema, auth), rutas públicas/privadas y ErrorBoundary global.
+ * @module App
+ */
+
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
@@ -9,12 +16,14 @@ import AdminPage from "./pages/AdminPage";
 import UserManagementPage from "./pages/UserManagementPage";
 import VotePage from "./pages/VotePage";
 import ResultsPage from "./pages/ResultsPage";
+import { STORAGE_KEY_THEME } from "./constants";
 
 export default function App() {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="fcknews-theme">
+    <ThemeProvider defaultTheme="dark" storageKey={STORAGE_KEY_THEME}>
       <AuthProvider>
         <Toaster theme="dark" position="top-center" richColors />
+        <ErrorBoundary>
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
@@ -40,6 +49,7 @@ export default function App() {
             }
           />
         </Routes>
+        </ErrorBoundary>
       </AuthProvider>
     </ThemeProvider>
   );

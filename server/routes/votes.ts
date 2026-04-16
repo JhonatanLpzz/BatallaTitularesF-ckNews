@@ -1,8 +1,28 @@
+/**
+ * @fileoverview Rutas de votación pública y verificación de votos.
+ *
+ * Endpoints:
+ * - `POST /api/votes` — Registrar un voto nuevo (con info del votante)
+ * - `PUT  /api/votes` — Cambiar un voto existente a otro participante
+ * - `GET  /api/votes/check/:code?fp=` — Verificar si un dispositivo ya votó
+ *
+ * Cada voto registrado dispara un broadcast SSE a todos los clientes
+ * suscritos a la batalla correspondiente.
+ *
+ * @module server/routes/votes
+ */
+
 import type { FastifyInstance } from "fastify";
 import { db, schema } from "../db/index.js";
 import { eq, and } from "drizzle-orm";
 import { broadcastToBattle } from "../sse.js";
+import { sanitizeText } from "../lib/validation.js";
 
+/**
+ * Calcula los conteos y porcentajes de votos por participante en una batalla.
+ * @param battleId - ID de la batalla.
+ * @returns Participantes con métricas de votación y total de votos.
+ */
 function getVoteCounts(battleId: number) {
   const battleParticipants = db
     .select()
@@ -109,10 +129,10 @@ export async function voteRoutes(app: FastifyInstance) {
       .values({
         battleId: battle.id,
         participantId,
-        fingerprint,
-        voterName: voterName.trim(),
-        voterDocument: voterDocument?.trim() || null,
-        voterPhone: voterPhone?.trim() || null,
+        fingerprint: fingerprint.slice(0, 128),
+        voterName: sanitizeText(voterName, 100),
+        voterDocument: voterDocument?.trim() ? sanitizeText(voterDocument, 30) : null,
+        voterPhone: voterPhone?.trim() ? sanitizeText(voterPhone, 20) : null,
       })
       .run();
 

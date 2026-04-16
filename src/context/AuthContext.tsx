@@ -1,14 +1,20 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 
+/** Roles de usuario del sistema. */
+type UserRole = "admin" | "demo";
+
 interface AuthState {
   token: string | null;
   username: string | null;
+  role: UserRole | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   needsSetup: boolean;
 }
 
 interface AuthContextType extends AuthState {
+  /** `true` si el usuario autenticado es de solo lectura (demo). */
+  isDemo: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   setup: (username: string, password: string) => Promise<void>;
@@ -22,6 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({
     token: localStorage.getItem(STORAGE_KEY),
     username: null,
+    role: null,
     isAuthenticated: false,
     isLoading: true,
     needsSetup: false,
@@ -38,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setState({
           token: null,
           username: null,
+          role: null,
           isAuthenticated: false,
           isLoading: false,
           needsSetup: true,
@@ -63,6 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setState({
           token,
           username: data.username,
+          role: data.role || "admin",
           isAuthenticated: true,
           isLoading: false,
           needsSetup: false,
@@ -72,6 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setState({
           token: null,
           username: null,
+          role: null,
           isAuthenticated: false,
           isLoading: false,
           needsSetup: false,
@@ -103,6 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState({
       token: data.token,
       username: data.username,
+      role: data.role || "admin",
       isAuthenticated: true,
       isLoading: false,
       needsSetup: false,
@@ -121,6 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState({
       token: null,
       username: null,
+      role: null,
       isAuthenticated: false,
       isLoading: false,
       needsSetup: false,
@@ -144,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ ...state, login, logout, setup }}>
+    <AuthContext.Provider value={{ ...state, isDemo: state.role === "demo", login, logout, setup }}>
       {children}
     </AuthContext.Provider>
   );

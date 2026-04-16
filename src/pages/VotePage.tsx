@@ -1,24 +1,34 @@
+/**
+ * @fileoverview Página pública de votación.
+ * Flujo: Identificación del votante → Selección de titular → Resultados en vivo.
+ * Refactorizado: formulario en {@link VoterIdentificationForm},
+ * estados de error en {@link BattleStatusScreen}, timer en {@link VoteTimer}.
+ * @module pages/VotePage
+ */
+
 import { useState, useEffect, useCallback } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   CheckCircle2,
-  XCircle,
   Loader2,
-  Clock,
-  Timer,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn, generateFingerprint } from "@/lib/utils";
-import type { Battle, Participant, VoteUpdate } from "@/types";
+import { battleService, voteService } from "@/services/api";
+import { BATTLE_STATUS, LIVE_STATUSES } from "@/constants";
+import type { Battle, Participant, VoteUpdate, ApiError } from "@/types";
 import { useSSE } from "@/hooks/useSSE";
-import { useCountdown } from "@/hooks/useCountdown";
 import { Header } from "@/components/Header";
+import { VoteTimer } from "@/components/VoteTimer";
+import { VoterIdentificationForm } from "@/components/VoterIdentificationForm";
+import { BattleStatusScreen } from "@/components/BattleStatusScreen";
+
+// ---------------------------------------------------------------------------
+// Componente principal
+// ---------------------------------------------------------------------------
 
 export default function VotePage() {
   const { code } = useParams<{ code: string }>();
@@ -35,19 +45,18 @@ export default function VotePage() {
   const [voterReady, setVoterReady] = useState(false);
   const [expired, setExpired] = useState(false);
 
+  // ---- Data fetching -------------------------------------------------------
+
   const fetchBattle = useCallback(async () => {
     if (!code) return;
     try {
-      const res = await fetch(`/api/battles/${code}`);
-      if (!res.ok) throw new Error("No encontrada");
-      const data = await res.json();
+      const data = await battleService.getByCode(code);
       setBattle(data);
       const fp = generateFingerprint();
-      const voteCheck = await fetch(`/api/votes/check/${code}?fp=${fp}`);
-      const { hasVoted: voted, participantId } = await voteCheck.json();
-      setHasVoted(voted);
-      setVotedFor(participantId ?? null);
-      if (voted) setVoterReady(true);
+      const voteCheck = await voteService.check(code, fp);
+      setHasVoted(voteCheck.hasVoted);
+      setVotedFor(voteCheck.participantId ?? null);
+      if (voteCheck.hasVoted) setVoterReady(true);
     } catch {
       setError("Batalla no encontrada");
     } finally {
@@ -57,8 +66,10 @@ export default function VotePage() {
 
   useEffect(() => { fetchBattle(); }, [fetchBattle]);
 
+  // ---- SSE en tiempo real --------------------------------------------------
+
   useSSE(code, {
-    enabled: !!battle && (battle.status === "active" || battle.status === "tiebreaker"),
+    enabled: !!battle && LIVE_STATUSES.includes(battle.status),
     onMessage: (data) => {
       const update = data as VoteUpdate;
       if (update.type === "vote_update" && battle) {
@@ -67,54 +78,62 @@ export default function VotePage() {
     },
   });
 
+  // ---- Voting actions ------------------------------------------------------
+
   const castVote = async (participantId: number) => {
     if (!code || hasVoted || !voterReady) return;
     setVoting(participantId);
     try {
-      const fp = generateFingerprint();
-      const res = await fetch("/api/votes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          battleCode: code,
-          participantId,
-          fingerprint: fp,
-          voterName: voterName.trim(),
-          voterDocument: voterDocument.trim() || undefined,
-          voterPhone: voterPhone.trim() || undefined,
-        }),
+      await voteService.cast({
+        battleCode: code,
+        participantId,
+        fingerprint: generateFingerprint(),
+        voterName: voterName.trim(),
+        voterDocument: voterDocument.trim() || undefined,
+        voterPhone: voterPhone.trim() || undefined,
       });
-      if (res.status === 409) { setHasVoted(true); return; }
-      if (!res.ok) throw new Error("Error al votar");
       setHasVoted(true);
       setVotedFor(participantId);
       toast.success("¡Voto registrado!");
     } catch (err) {
+      if ((err as ApiError).status === 409) {
+        setHasVoted(true);
+        return;
+      }
       toast.error("No se pudo registrar el voto");
-    } finally { setVoting(null); }
+    } finally {
+      setVoting(null);
+    }
   };
 
   const changeVote = async (participantId: number) => {
     if (!code || !hasVoted || !voterReady || votedFor === participantId) return;
     setVoting(participantId);
     try {
-      const fp = generateFingerprint();
-      const res = await fetch("/api/votes", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          battleCode: code,
-          participantId,
-          fingerprint: fp,
-        }),
+      await voteService.change({
+        battleCode: code,
+        participantId,
+        fingerprint: generateFingerprint(),
       });
-      if (!res.ok) throw new Error("Error");
       setVotedFor(participantId);
       toast.success("Voto actualizado");
     } catch {
       toast.error("No se pudo cambiar el voto");
-    } finally { setVoting(null); }
+    } finally {
+      setVoting(null);
+    }
   };
+
+  // ---- Voter identification handler ----------------------------------------
+
+  const handleVoterSubmit = (data: { name: string; document: string; phone: string }) => {
+    setVoterName(data.name);
+    setVoterDocument(data.document);
+    setVoterPhone(data.phone);
+    setVoterReady(true);
+  };
+
+  // ---- Loading state -------------------------------------------------------
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-background">
@@ -125,111 +144,25 @@ export default function VotePage() {
     </div>
   );
 
-  // --- ESTADOS DE ERROR / DRAFT / CLOSED ---
-  if (error || !battle || battle.status === "draft" || battle.status === "closed" || battle.status === "tied") {
-    const isClosed = battle?.status === "closed";
-    const isTied = battle?.status === "tied";
-    const isDraft = battle?.status === "draft";
+  // ---- Error / Draft / Closed / Tied states --------------------------------
 
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] blur-[120px] rounded-full" />
-
-        <div className="glass-card rounded-[40px] border border-white/5 bg-white/[0.02] p-10 text-center max-w-sm w-full z-10 backdrop-blur-3xl animate-in fade-in zoom-in duration-700">
-          <img src="/logo_fn.png" alt="Logo" className="h-16 mx-auto mb-8 drop-shadow-2xl" />
-
-          {error && <XCircle className="h-14 w-14 text-error mx-auto mb-4 opacity-80" />}
-          {isDraft && <Clock className="h-14 w-14 text-zinc-500 mx-auto mb-4 opacity-80" />}
-          {(isClosed || isTied) && <div className="h-1 w-12 bg-primary mx-auto mb-6 rounded-full" />}
-
-          <h2 className="text-2xl font-black tracking-tighter text-foreground mb-2 uppercase">
-            {error ? "Error" : isDraft ? "Próximamente" : isTied ? "¡Empate!" : "Finalizada"}
-          </h2>
-
-          <p className=" text-sm mb-10 font-medium">
-            {error || (isDraft ? "La votación aún no ha comenzado." : isTied ? "La batalla terminó en tablas." : "Esta batalla ha concluido.")}
-          </p>
-
-          <Link to={isClosed || isTied ? `/resultados/${code}` : "/"}>
-            <Button variant="outline" className="w-full">
-              {isClosed || isTied ? "VER RESULTADOS" : "VOLVER"}
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
+  if (error || !battle || battle.status === BATTLE_STATUS.DRAFT || battle.status === BATTLE_STATUS.CLOSED || battle.status === BATTLE_STATUS.TIED) {
+    return <BattleStatusScreen code={code || ""} battle={battle} error={error} />;
   }
 
-  // --- PANTALLA DE IDENTIFICACIÓN ---
+  // ---- Voter identification form -------------------------------------------
+
   if (!voterReady && !hasVoted) {
     return (
-      <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4 selection:bg-primary/30">
-        <div className="fixed inset-0 -z-10">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[150px] rounded-full animate-pulse" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[150px] rounded-full" />
-        </div>
-
-        <div className="w-full max-w-[460px] animate-in fade-in slide-in-from-bottom-8 duration-1000">
-          <div className="glass-card rounded-[40px] border border-white/5 bg-white/[0.02] backdrop-blur-3xl p-8 sm:p-12 relative overflow-hidden">
-            <div className="absolute top-6 right-8 opacity-40 hover:opacity-100 transition-opacity">
-              <ThemeToggle />
-            </div>
-
-            <div className="flex flex-col items-center text-center">
-              <img src="/logo_fn.png" alt="Logo" className="h-14 mb-10 drop-shadow-2xl" />
-
-              <h1 className="text-3xl font-black">{battle?.title}</h1>
-              <p className=" text-sm mb-10 font-medium">Completa tus datos para habilitar el voto.</p>
-
-              <form onSubmit={(e) => { e.preventDefault(); voterName.trim() && setVoterReady(true); }} className="w-full space-y-6 text-left">
-                <div className="space-y-2">
-                  <label>Nombre Completo</label>
-                  <div className="relative">
-                    <Input
-                      value={voterName}
-                      onChange={e => setVoterName(e.target.value)}
-                      placeholder="Ej. Jhonatan Lopez"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label>Documento</label>
-                    <div className="relative">
-                      <Input
-                        value={voterDocument}
-                        onChange={e => setVoterDocument(e.target.value)}
-                        placeholder="Opcional"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label>Celular</label>
-                    <div className="relative">
-                      <Input
-                        value={voterPhone}
-                        onChange={e => setVoterPhone(e.target.value)}
-                        placeholder="Opcional"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <Button variant="outline" className="w-full">
-                  INGRESAR A VOTAR
-                  <ChevronRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
+      <VoterIdentificationForm
+        battleTitle={battle?.title || ""}
+        onSubmit={handleVoterSubmit}
+      />
     );
   }
 
-  // --- PANTALLA DE VOTACIÓN PRINCIPAL ---
+  // ---- Main voting screen --------------------------------------------------
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/30 overflow-x-hidden pt-6">
       <div className="fixed inset-0 -z-10 pointer-events-none">
@@ -257,7 +190,7 @@ export default function VotePage() {
         containerClassName="max-w-4xl"
       />
 
-      {battle?.status === "tiebreaker" && (
+      {battle?.status === BATTLE_STATUS.TIEBREAKER && (
         <div className="bg-primary text-primary-foreground py-2 overflow-hidden relative">
           <div className="flex items-center justify-center gap-4 animate-pulse">
             <AlertTriangle className="h-4 w-4" />
@@ -285,7 +218,7 @@ export default function VotePage() {
         <div className="space-y-4 mt-8">
           {battle?.participants?.map((participant: Participant, idx: number) => {
             const isVotedFor = votedFor === participant.id;
-            const isTiebreakerDisabled = battle.status === "tiebreaker" && battle.tiedParticipantIds && !battle.tiedParticipantIds.includes(participant.id);
+            const isTiebreakerDisabled = battle.status === BATTLE_STATUS.TIEBREAKER && battle.tiedParticipantIds && !battle.tiedParticipantIds.includes(participant.id);
             const isDisabled = voting !== null || isTiebreakerDisabled;
 
             return (
@@ -378,36 +311,6 @@ export default function VotePage() {
           </div>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function VoteTimer({ expiresAt, expired, onExpire }: { expiresAt?: string | null; expired: boolean; onExpire: () => void }) {
-  const countdown = useCountdown(expiresAt || "");
-  const { code } = useParams<{ code: string }>();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (countdown?.isExpired && !expired) {
-      onExpire();
-      // Redirigir a resultados cuando el tiempo se acaba
-      setTimeout(() => {
-        navigate(`/resultados/${code}`);
-      }, 1000); // Pequeña espera para mostrar "FINAL"
-    }
-  }, [countdown, expired, onExpire, code, navigate]);
-
-  if (!expiresAt) return null;
-
-  return (
-    <div className="pl-4 border-l border-white/10 flex flex-col items-end">
-      <span className="text-[9px] uppercase tracking-[0.2em]">Cierra en</span>
-      <div className="flex items-center gap-2">
-        <Timer className="h-4 w-4 text-destructive animate-pulse" />
-        <span className="text-2xl font-black font-mono text-destructive tabular-nums tracking-tighter leading-none">
-          {countdown?.isExpired || expired ? "FINAL" : countdown?.display || "00:00"}
-        </span>
-      </div>
     </div>
   );
 }

@@ -1,3 +1,15 @@
+/**
+ * @fileoverview Entry point del servidor Fastify para Batalla de Titulares.
+ *
+ * Responsabilidades:
+ * - Configura CORS según el entorno (dev/prod).
+ * - Registra los plugins de rutas: auth, battles, votes, SSE.
+ * - Sirve el build estático de Vite en producción con SPA fallback.
+ * - Expone un endpoint `/health` para health checks (Railway, etc.).
+ *
+ * @module server/index
+ */
+
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";

@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { Header } from "@/components/Header";
+import { userService } from "@/services/api";
+import type { ApiError } from "@/types";
 
 interface AdminUser {
   id: number;
@@ -17,7 +19,7 @@ interface AdminUser {
 
 export default function UserManagementPage() {
   const navigate = useNavigate();
-  const { token, logout } = useAuth();
+  const { token, logout, isDemo } = useAuth();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,13 +35,10 @@ export default function UserManagementPage() {
   const [editPassword, setEditPassword] = useState("");
   const [updating, setUpdating] = useState(false);
 
-  const authHeaders = { Authorization: `Bearer ${token}` };
-
   const fetchUsers = useCallback(async () => {
+    if (!token) return;
     try {
-      const res = await fetch("/api/users", { headers: authHeaders });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const data = await userService.list(token);
       setUsers(data);
     } catch {
       toast.error("Error al cargar usuarios");
@@ -53,62 +52,37 @@ export default function UserManagementPage() {
   }, [fetchUsers]);
 
   const createUser = async () => {
-    if (!newUsername.trim() || !newPassword.trim()) {
+    if (!token || !newUsername.trim() || !newPassword.trim()) {
       return toast.error("Usuario y contraseña requeridos");
     }
 
     setCreating(true);
     try {
-      const res = await fetch("/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders },
-        body: JSON.stringify({ username: newUsername.trim(), password: newPassword.trim() }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error);
-      }
-
+      await userService.create(token, newUsername.trim(), newPassword.trim());
       toast.success("Usuario creado");
       setShowCreate(false);
       setNewUsername("");
       setNewPassword("");
       fetchUsers();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error al crear usuario");
+      const msg = (err as ApiError)?.message || "Error al crear usuario";
+      toast.error(msg);
     } finally {
       setCreating(false);
     }
   };
 
   const updateUser = async () => {
-    if (!editUser) return;
+    if (!editUser || !token) return;
 
     setUpdating(true);
     try {
       if (editUsername.trim() !== editUser.username) {
-        const res = await fetch(`/api/users/${editUser.id}/username`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json", ...authHeaders },
-          body: JSON.stringify({ username: editUsername.trim() }),
-        });
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.error);
-        }
+        await userService.updateUsername(token, editUser.id, editUsername.trim());
       }
 
       if (editPassword.trim()) {
-        const res = await fetch(`/api/users/${editUser.id}/password`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json", ...authHeaders },
-          body: JSON.stringify({ password: editPassword.trim() }),
-        });
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.error);
-        }
+        await userService.updatePassword(token, editUser.id, editPassword.trim());
       }
 
       toast.success("Usuario actualizado");
@@ -117,30 +91,23 @@ export default function UserManagementPage() {
       setEditPassword("");
       fetchUsers();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error al actualizar usuario");
+      const msg = (err as ApiError)?.message || "Error al actualizar usuario";
+      toast.error(msg);
     } finally {
       setUpdating(false);
     }
   };
 
   const deleteUser = async (user: AdminUser) => {
-    if (!confirm(`Eliminar usuario "${user.username}"?`)) return;
+    if (!token || !confirm(`Eliminar usuario "${user.username}"?`)) return;
 
     try {
-      const res = await fetch(`/api/users/${user.id}`, {
-        method: "DELETE",
-        headers: authHeaders,
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error);
-      }
-
+      await userService.delete(token, user.id);
       toast.success("Usuario eliminado");
       fetchUsers();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error al eliminar usuario");
+      const msg = (err as ApiError)?.message || "Error al eliminar usuario";
+      toast.error(msg);
     }
   };
 
@@ -192,16 +159,24 @@ export default function UserManagementPage() {
         }
       />
 
+      {isDemo && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 text-center">
+          <span className="text-xs font-bold tracking-wider uppercase text-amber-400">Modo Demo — Solo lectura</span>
+        </div>
+      )}
+
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full flex-1">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 sm:mb-12 mt-16 md:mt-13 animate-fade-in-up">
           <div className="text-center sm:text-left">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-2">Administradores</h1>
             <p className="text-muted-foreground">Gestión de usuarios del sistema</p>
           </div>
-          <Button onClick={() => setShowCreate(true)} variant="outline">
-            <Plus className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
-            Nuevo Usuario
-          </Button>
+          {!isDemo && (
+            <Button onClick={() => setShowCreate(true)} variant="outline">
+              <Plus className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
+              Nuevo Usuario
+            </Button>
+          )}
         </div>
 
         {loading ? (
@@ -238,6 +213,7 @@ export default function UserManagementPage() {
                         </p>
                       </div>
                     </div>
+                    {!isDemo && (
                     <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                       <Button
                         size="sm"
@@ -257,6 +233,7 @@ export default function UserManagementPage() {
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -267,15 +244,14 @@ export default function UserManagementPage() {
 
       {/* Create User Dialog */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent onClose={() => setShowCreate(false)} className="glass-card border-white/10 max-w-2xl rounded-[32px] p-0">
+        <DialogContent onClose={() => setShowCreate(false)}>
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-foreground mb-2 tracking-tight">Nuevo Usuario</DialogTitle>
-            <p className="text-sm">Crea un nuevo administrador del sistema</p>
+            <DialogTitle>Crear Nuevo Usuario</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-5 mt-4">
+          <div className="space-y-4 mt-4">
             <div>
-              <label className="text-[13px] ml-1 font-medium mb-1.5 block">Usuario</label>
+              <label className="text-sm font-medium mb-1.5 block">Usuario</label>
               <Input
                 placeholder="Nombre de usuario"
                 value={newUsername}
@@ -285,38 +261,35 @@ export default function UserManagementPage() {
             </div>
 
             <div>
-              <label className="text-[13px] ml-1 font-medium mb-1.5 block">Contraseña</label>
+              <label className="text-sm font-medium mb-1.5 block">Contraseña</label>
               <Input
                 type="password"
-                placeholder="Mínimo 4 caracteres"
+                placeholder="Minimo 4 caracteres"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
               />
             </div>
 
-            <Button
-              onClick={createUser}
-              disabled={creating}
-              variant="outline"
-            >
-              {creating ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Plus className="h-5 w-5 mr-2" />}
-              {creating ? "Creando..." : "Crear Usuario"}
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={createUser} disabled={creating} className="flex-1">
+                {creating && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
+                Crear Usuario
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Edit User Dialog */}
       <Dialog open={!!editUser} onOpenChange={() => setEditUser(null)}>
-        <DialogContent onClose={() => setEditUser(null)} className="glass-card border-white/10 max-w-2xl rounded-[32px] p-0">
+        <DialogContent onClose={() => setEditUser(null)}>
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-foreground mb-2 tracking-tight">Editar Usuario</DialogTitle>
-            <p className="text-sm">Modifica los datos del administrador</p>
+            <DialogTitle>Editar Usuario</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-5 mt-4">
+          <div className="space-y-4 mt-4">
             <div>
-              <label className="text-[13px] ml-1 font-medium mb-1.5 block">Usuario</label>
+              <label className="text-sm font-medium mb-1.5 block">Usuario</label>
               <Input
                 placeholder="Nombre de usuario"
                 value={editUsername}
@@ -325,12 +298,12 @@ export default function UserManagementPage() {
             </div>
 
             <div>
-              <label className="text-[13px] ml-1 font-medium mb-1.5 block">
+              <label className="text-sm font-medium mb-1.5 block">
                 Nueva Contraseña <span className="text-muted-foreground font-normal">(opcional)</span>
               </label>
               <Input
                 type="password"
-                placeholder="Dejar vacío para no cambiar"
+                placeholder="Dejar vacio para no cambiar"
                 value={editPassword}
                 onChange={(e) => setEditPassword(e.target.value)}
               />
@@ -341,18 +314,13 @@ export default function UserManagementPage() {
               )}
             </div>
 
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setEditUser(null)}
-                disabled={updating}
-                className="flex-1"
-              >
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setEditUser(null)} className="flex-1">
                 Cancelar
               </Button>
               <Button onClick={updateUser} disabled={updating} className="flex-1">
-                {updating ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Edit2 className="h-5 w-5 mr-2" />}
-                {updating ? "Actualizando..." : "Guardar Cambios"}
+                {updating && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
+                Guardar Cambios
               </Button>
             </div>
           </div>
