@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Play, Swords, Globe, Github, LogIn } from "lucide-react";
+import { Play, Swords, Github, LogIn, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Battle } from "@/types";
 import { Header } from "@/components/Header";
@@ -38,53 +38,70 @@ const TypewriterText = ({ text, className }: { text: string; className?: string 
   );
 };
 
+function BattleStatusBadge({ status }: { status: string }) {
+  if (status === "draft") {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="relative flex h-2 w-2">
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-status-warning" />
+        </span>
+        <p className="text-sm text-status-warning font-medium">EN PREPARACIÓN</p>
+      </div>
+    );
+  }
+  if (status === "active" || status === "tiebreaker") {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success" />
+        </span>
+        <p className="text-sm text-status-success font-medium">EN VIVO</p>
+      </div>
+    );
+  }
+  // closed
+  return (
+    <div className="flex items-center gap-2">
+      <Trophy className="h-3.5 w-3.5 text-muted-foreground" />
+      <p className="text-sm text-muted-foreground font-medium">FINALIZADA</p>
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const [activeBattles, setActiveBattles] = useState<Battle[]>([]);
 
   useEffect(() => {
     fetch("/api/battles/active")
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then(data => {
         if (Array.isArray(data)) {
           setActiveBattles(data);
         }
       })
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    const checkModals = () => {
-      const hasOpenModal = !!document.querySelector('[role="dialog"]');
-      document.body.style.overflow = hasOpenModal ? 'hidden' : '';
-    };
-
-    const observer = new MutationObserver(checkModals);
-    observer.observe(document.body, { childList: true, subtree: true });
-    
-    checkModals();
-    
-    return () => {
-      observer.disconnect();
-      document.body.style.overflow = '';
-    };
+      .catch(err => console.error("[LandingPage] Failed to fetch battles:", err));
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden selection:bg-campaign-gold/30">
-      {/* Animated background elements */}
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden selection:bg-campaign-blue/30">
+      {/* Animated background elements — blue theme */}
       <div className="fixed inset-0 -z-10 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/10 rounded-full blur-[120px] animate-breathe" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-campaign-red/10 rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '3s' }} />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-blue/10 rounded-full blur-[120px] animate-breathe" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white/[0.03] rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '3s' }} />
       </div>
 
       <Header showAdminButton={true} />
 
       <main className="flex-1 flex flex-col items-center justify-center p-6 text-center mt-20 relative z-10">
         <div className="w-full max-w-3xl mx-auto">
-          <div className="animate-spring-up inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-campaign-gold/20 bg-campaign-gold/5 text-campaign-gold font-medium text-sm sm:text-base mb-8 shadow-[0_0_20px_rgba(212,175,55,0.1)]">
+          <div className="animate-spring-up inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-campaign-blue/20 bg-campaign-blue/5 text-campaign-blue font-medium text-sm sm:text-base mb-8 shadow-[0_0_20px_rgba(26,86,168,0.1)]">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-campaign-gold opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-campaign-gold"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-campaign-blue opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-campaign-blue"></span>
             </span>
             Sistema de Votación Interactivo
           </div>
@@ -107,33 +124,16 @@ export default function LandingPage() {
           </p>
 
           <div className="animate-spring-up stagger-6 space-y-4 w-full max-w-md mx-auto">
-            <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">Batallas Activas</p>
+            <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">Batallas</p>
             {activeBattles.length > 0 ? (
               activeBattles.map(battle => (
                 <Link key={battle.id} to={`/votar/${battle.code}`} className="block group">
-                  <div className="glass-card rounded-[28px] p-6 flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-300 hover:bg-white/[0.05] hover:border-campaign-gold/40 hover:shadow-[0_0_30px_rgba(212,175,55,0.15)] group-active:scale-[0.98]">
+                  <div className="glass-card rounded-[28px] p-6 flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-300 hover:bg-white/[0.05] hover:border-white/20 hover:shadow-[0_0_30px_rgba(26,86,168,0.15)] group-active:scale-[0.98]">
                     <div className="text-left flex-1 min-w-0">
                       <h3 className="font-bold text-foreground text-xl truncate mb-1 tracking-tight">{battle.title}</h3>
-                      <div className="flex items-center gap-2">
-                        {battle.status === "draft" ? (
-                          <>
-                            <span className="relative flex h-2 w-2">
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-status-warning"></span>
-                            </span>
-                            <p className="text-sm text-status-warning font-medium">EN PREPARACIÓN</p>
-                          </>
-                        ) : (
-                          <>
-                            <span className="relative flex h-2 w-2">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success"></span>
-                            </span>
-                            <p className="text-sm text-status-success font-medium">EN VIVO</p>
-                          </>
-                        )}
-                      </div>
+                      <BattleStatusBadge status={battle.status} />
                     </div>
-                    <div className="w-12 h-12 rounded-2xl bg-campaign-gold text-black flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+                    <div className="w-12 h-12 rounded-2xl bg-campaign-blue text-white flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(26,86,168,0.4)]">
                       <Play className="h-6 w-6 ml-1" />
                     </div>
                   </div>
@@ -151,13 +151,13 @@ export default function LandingPage() {
           {/* Quick Access */}
           <div className="animate-spring-up stagger-8 mt-16 flex flex-col sm:flex-row items-center justify-center gap-3">
             <a href="https://github.com/JhonatanLpzz/BatallaTitularesF-ckNews" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" className="rounded-xl gap-2 border-white/10 hover:bg-white/5">
+              <Button variant="outline" className="rounded-xl gap-2 border-white/10 hover:bg-white/5 hover:text-white">
                 <Github className="h-4 w-4" />
                 Ver Repositorio
               </Button>
             </a>
             <Link to="/login">
-              <Button variant="ghost" className="rounded-xl gap-2 text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" className="rounded-xl gap-2 text-muted-foreground hover:text-white hover:bg-white/5">
                 <LogIn className="h-4 w-4" />
                 Demo: <code className="text-xs bg-white/10 px-1.5 py-0.5 rounded">demo</code> / <code className="text-xs bg-white/10 px-1.5 py-0.5 rounded">demo123</code>
               </Button>

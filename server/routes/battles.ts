@@ -83,12 +83,12 @@ export async function battleRoutes(app: FastifyInstance) {
     }));
   });
 
-  // Get active battles (public)
+  // Get visible battles for public landing (excludes only 'tied' which is a transient internal state)
   app.get("/api/battles/active", async () => {
     const allBattles = db.select().from(schema.battles).orderBy(schema.battles.createdAt).all();
     
     return allBattles
-      .filter(battle => ["draft", "active", "tiebreaker"].includes(battle.status))
+      .filter(battle => ["draft", "active", "tiebreaker", "closed"].includes(battle.status))
       .map(battle => ({
         ...battle,
         expiresAt: computeExpiresAt(battle.activatedAt, battle.durationMinutes),
