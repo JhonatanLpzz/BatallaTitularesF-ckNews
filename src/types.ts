@@ -82,6 +82,8 @@ export interface AdminUser {
   id: number;
   /** Nombre de usuario (único en el sistema). */
   username: string;
+  /** Rol del usuario. */
+  role: "admin" | "demo";
   /** Timestamp ISO de creación de la cuenta. */
   createdAt: string;
 }

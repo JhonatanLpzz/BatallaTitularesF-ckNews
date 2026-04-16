@@ -111,8 +111,9 @@ Los shows de comedia interactivos necesitan sistemas de votación rápidos, intu
 #### 3.2.1 Gestión de Usuarios Admin 🔸
 **Prioridad:** P1 (Alta)
 - Multiple administradores con CRUD completo
-- Cambio de credenciales
-- Setup automático primer admin
+- Roles de usuario discriminados (`admin` maestro vs `demo` solo lectura)
+- Solo los admins pueden eliminar a los usuarios `demo`
+- Cambio de credenciales y setup automático primer admin
 
 #### 3.2.2 Datos de Votantes 🔸
 **Prioridad:** P1 (Alta)
@@ -137,8 +138,8 @@ Los shows de comedia interactivos necesitan sistemas de votación rápidos, intu
 #### 3.3.2 Mejoras de UX 🔹
 **Prioridad:** P2 (Media)
 - Modo fullscreen para proyección
-- Tema oscuro
 - Notificaciones push
+- Gestos móviles nativos
 
 ---
 
@@ -322,6 +323,13 @@ GET/POST    /api/users           # Gestión administradores
 - ✅ Branding F*cks News
 - ✅ Responsive design móvil
 - ✅ Testing en dispositivos reales
+
+#### Fase 4: UX/UI Premium & Seguridad (Completado)
+- ✅ Roles de administrador (Admin Maestro vs Demo View-Only)
+- ✅ Efectos de cursor avanzados "Antigravity Glow" sin latencia
+- ✅ Typewriter effects y soporte Framer Motion
+- ✅ View transitions integradas fluido y animaciones CSS Background
+- ✅ Ocultar/Visualizar contraseña en login
 
 ### 8.2 Roadmap Futuro
 

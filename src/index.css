@@ -72,8 +72,40 @@
 
     body {
         @apply bg-background text-foreground font-sans antialiased;
-        background: var(--vote-gradient);
+        background: linear-gradient(
+            -45deg,
+            hsl(0, 0%, 5%),
+            hsl(359, 100%, 12%),
+            hsl(45, 90%, 8%),
+            hsl(0, 0%, 8%)
+        );
+        background-size: 400% 400%;
+        animation: gradient-shift 15s ease infinite;
         min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    /* ─── View Transitions API ─── */
+    @view-transition {
+        navigation: auto;
+    }
+
+    ::view-transition-old(root) {
+        animation: vt-fade-out 0.2s cubic-bezier(0.4, 0, 1, 1) both;
+    }
+
+    ::view-transition-new(root) {
+        animation: vt-fade-in 0.3s cubic-bezier(0, 0, 0.2, 1) 0.1s both;
+    }
+
+    @keyframes vt-fade-out {
+        to { opacity: 0; filter: blur(4px); transform: scale(0.98); }
+    }
+
+    @keyframes vt-fade-in {
+        from { opacity: 0; filter: blur(4px); transform: scale(1.02); }
     }
 
     .campaign-gradient {
@@ -91,12 +123,93 @@
 
     .glass-card {
         @apply bg-white/[0.03] border border-white/[0.06] backdrop-blur-xl shadow-2xl;
+        -webkit-backdrop-filter: blur(24px) saturate(1.8);
+        backdrop-filter: blur(24px) saturate(1.8);
+        transition:
+            transform 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+            box-shadow 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+            border-color 0.4s ease;
+    }
+
+    .glass-card:hover {
+        border-color: hsl(var(--border) / 0.15);
+        box-shadow:
+            0 8px 32px -4px hsl(220 25% 4% / 0.4),
+            0 0 0 1px hsl(0 0% 100% / 0.04),
+            inset 0 1px 0 hsl(0 0% 100% / 0.06);
+    }
+
+    /* Liquid Glass — enhanced depth layer for special cards */
+    .liquid-glass {
+        @apply relative overflow-hidden;
+        background:
+            linear-gradient(135deg, hsl(0 0% 100% / 0.06) 0%, transparent 50%, hsl(0 0% 100% / 0.03) 100%);
+        border: 1px solid hsl(0 0% 100% / 0.08);
+        -webkit-backdrop-filter: blur(40px) saturate(2) brightness(1.05);
+        backdrop-filter: blur(40px) saturate(2) brightness(1.05);
+        box-shadow:
+            0 16px 48px -8px hsl(220 25% 4% / 0.5),
+            inset 0 1px 0 hsl(0 0% 100% / 0.1),
+            inset 0 -1px 0 hsl(0 0% 0% / 0.05);
+        transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .liquid-glass::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(135deg, hsl(0 0% 100% / 0.08) 0%, transparent 60%);
+        pointer-events: none;
+        opacity: 0.5;
+        transition: opacity 0.5s ease;
+    }
+
+    .liquid-glass:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            0 24px 64px -12px hsl(220 25% 4% / 0.6),
+            inset 0 1px 0 hsl(0 0% 100% / 0.15),
+            inset 0 -1px 0 hsl(0 0% 0% / 0.05);
+    }
+
+    .liquid-glass:hover::before {
+        opacity: 0.8;
     }
 
     .campaign-button {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         min-height: 44px;
         /* Touch-friendly minimum */
+    }
+
+    /* ─── Apple-style button micro-interactions ─── */
+    button, a[role="button"], [role="button"] {
+        transition:
+            transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+            opacity 0.2s ease,
+            box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    button:active:not(:disabled), a[role="button"]:active {
+        transform: scale(0.97);
+    }
+
+    /* ─── Focus rings — Apple-style ─── */
+    :focus-visible {
+        outline: none;
+        box-shadow:
+            0 0 0 3px hsl(var(--background)),
+            0 0 0 5px hsl(var(--ring) / 0.4);
+        border-radius: inherit;
+    }
+
+    /* ─── Smooth input transitions ─── */
+    input, textarea, select {
+        transition:
+            border-color 0.25s ease,
+            box-shadow 0.25s ease,
+            background-color 0.25s ease;
     }
 
     /* Mobile-optimized styles */
@@ -199,6 +312,66 @@
         }
     }
 
+    /* ─── Apple spring entrance ─── */
+    @keyframes spring-up {
+        0% {
+            opacity: 0;
+            transform: translateY(24px) scale(0.96);
+            filter: blur(4px);
+        }
+        60% {
+            opacity: 1;
+            transform: translateY(-3px) scale(1.005);
+            filter: blur(0);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+    }
+
+    @keyframes spring-scale {
+        0% {
+            opacity: 0;
+            transform: scale(0.9);
+            filter: blur(6px);
+        }
+        60% {
+            opacity: 1;
+            transform: scale(1.02);
+            filter: blur(0);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+            filter: blur(0);
+        }
+    }
+
+    @keyframes slide-in-right {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+            filter: blur(4px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+            filter: blur(0);
+        }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+
+    @keyframes subtle-breathe {
+        0%, 100% { opacity: 0.4; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.05); }
+    }
+
     .animate-fade-in-up {
         animation: fade-in-up 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -210,6 +383,60 @@
     .animate-gradient-shift {
         background-size: 200% 200%;
         animation: gradient-shift 8s ease infinite;
+    }
+
+    .animate-spring-up {
+        animation: spring-up 0.7s cubic-bezier(0.23, 1, 0.32, 1) both;
+    }
+
+    .animate-spring-scale {
+        animation: spring-scale 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
+    }
+
+    .animate-slide-in-right {
+        animation: slide-in-right 0.5s cubic-bezier(0.23, 1, 0.32, 1) both;
+    }
+
+    .animate-float {
+        animation: float 4s ease-in-out infinite;
+    }
+
+    .animate-breathe {
+        animation: subtle-breathe 6s ease-in-out infinite;
+    }
+
+    /* ─── Stagger delay utilities ─── */
+    .stagger-1 { animation-delay: 0.05s; }
+    .stagger-2 { animation-delay: 0.1s; }
+    .stagger-3 { animation-delay: 0.15s; }
+    .stagger-4 { animation-delay: 0.2s; }
+    .stagger-5 { animation-delay: 0.25s; }
+    .stagger-6 { animation-delay: 0.3s; }
+    .stagger-7 { animation-delay: 0.35s; }
+    .stagger-8 { animation-delay: 0.4s; }
+
+    /* ─── Gold text gradient (Apple-style) ─── */
+    .campaign-gold-gradient {
+        background: linear-gradient(135deg, hsl(45 96% 70%), hsl(38 90% 55%), hsl(45 96% 70%));
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradient-shift 4s ease infinite;
+    }
+
+    /* ─── Prefer reduced motion ─── */
+    @media (prefers-reduced-motion: reduce) {
+        *, ::before, ::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation: none !important;
+        }
     }
 }
 

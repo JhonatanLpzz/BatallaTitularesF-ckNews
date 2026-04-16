@@ -4,6 +4,39 @@ import { Play, Swords, Globe, Github, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Battle } from "@/types";
 import { Header } from "@/components/Header";
+import { motion } from "framer-motion";
+
+const TypewriterText = ({ text, className }: { text: string; className?: string }) => {
+  const letters = Array.from(text);
+
+  const container = {
+    hidden: { opacity: 0 },
+    visible: (i = 1) => ({
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 * i },
+    }),
+  };
+
+  const child = {
+    visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { type: "spring", damping: 12, stiffness: 200 } },
+    hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
+  };
+
+  return (
+    <motion.span
+      className={`inline-flex overflow-hidden relative ${className || ""}`}
+      variants={container}
+      initial="hidden"
+      animate="visible"
+    >
+      {letters.map((letter, index) => (
+        <motion.span variants={child} key={index} className="inline-block relative">
+          {letter === " " ? "\u00A0" : letter}
+        </motion.span>
+      ))}
+    </motion.span>
+  );
+};
 
 export default function LandingPage() {
   const [activeBattles, setActiveBattles] = useState<Battle[]>([]);
@@ -40,15 +73,15 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden selection:bg-campaign-gold/30">
       {/* Animated background elements */}
       <div className="fixed inset-0 -z-10 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-campaign-red/10 rounded-full blur-[120px] animate-pulse delay-1000" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/10 rounded-full blur-[120px] animate-breathe" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-campaign-red/10 rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '3s' }} />
       </div>
 
       <Header showAdminButton={true} />
 
       <main className="flex-1 flex flex-col items-center justify-center p-6 text-center mt-20 relative z-10">
-        <div className="animate-fade-in-up w-full max-w-3xl mx-auto">
-          <div className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-campaign-gold/20 bg-campaign-gold/5 text-campaign-gold font-medium text-sm sm:text-base mb-8 shadow-[0_0_20px_rgba(212,175,55,0.1)]">
+        <div className="w-full max-w-3xl mx-auto">
+          <div className="animate-spring-up inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-campaign-gold/20 bg-campaign-gold/5 text-campaign-gold font-medium text-sm sm:text-base mb-8 shadow-[0_0_20px_rgba(212,175,55,0.1)]">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-campaign-gold opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-campaign-gold"></span>
@@ -57,15 +90,23 @@ export default function LandingPage() {
           </div>
           
           <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tighter text-foreground mb-6 leading-none">
-            BATALLA DE<br />
-            <span className="campaign-gold-gradient animate-glow-pulse block mt-2">TITULARES</span>
+            <TypewriterText text="BATALLA DE" />
+            <br />
+            <motion.span 
+              initial={{ opacity: 0, scale: 0.8, filter: "blur(12px)", y: 20 }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)", y: 0 }}
+              transition={{ delay: 1.2, duration: 0.8, ease: "easeOut" }}
+              className="campaign-gold-gradient animate-glow-pulse block mt-2"
+            >
+              TITULARES
+            </motion.span>
           </h1>
           
-          <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
+          <p className="animate-spring-up stagger-4 text-lg sm:text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
             La competencia de comedia donde los titulares más <span className="text-campaign-red">absurdos</span> se enfrentan y el público decide.
           </p>
 
-          <div className="space-y-4 w-full max-w-md mx-auto">
+          <div className="animate-spring-up stagger-6 space-y-4 w-full max-w-md mx-auto">
             <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">Batallas Activas</p>
             {activeBattles.length > 0 ? (
               activeBattles.map(battle => (
@@ -97,7 +138,7 @@ export default function LandingPage() {
           </div>
 
           {/* Quick Access */}
-          <div className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="animate-spring-up stagger-8 mt-16 flex flex-col sm:flex-row items-center justify-center gap-3">
             <a href="https://github.com/JhonatanLpzz/BatallaTitularesF-ckNews" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" className="rounded-xl gap-2 border-white/10 hover:bg-white/5">
                 <Github className="h-4 w-4" />

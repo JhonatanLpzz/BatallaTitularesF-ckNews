@@ -15,6 +15,7 @@
 |------|-----------|---------|
 | **Runtime** | Bun | >= 1.0 |
 | **Frontend** | React + TypeScript + Vite | 18 / 5.7 / 6.0 |
+| **Animación** | Framer Motion | 11.18 |
 | **Estilos** | TailwindCSS + shadcn/ui | 3.4 / custom |
 | **Backend** | Fastify | 5.2 |
 | **ORM** | Drizzle ORM | 0.38 |
@@ -114,6 +115,7 @@ Documentacion detallada con JSDoc en `server/db/schema.ts`.
 | `id` | INTEGER | PK, AUTO | ID unico |
 | `username` | TEXT | NOT NULL, UNIQUE | Nombre de usuario |
 | `password_hash` | TEXT | NOT NULL | Hash bcrypt |
+| `role` | TEXT | DEFAULT 'admin' | Puede ser 'admin' o 'demo' |
 | `created_at` | TEXT | NOT NULL | Timestamp ISO |
 
 ### `sessions`
@@ -215,9 +217,9 @@ Documentacion JSDoc en `server/routes/*.ts`.
 |-----------|-----|-----|
 | `--primary` | `#1a56a8` | Botones, enlaces, branding |
 | `--accent` (destructive) | `#dc2626` | Alertas, acentos, ganador |
-| `--background` | `#fafafa` | Fondo general |
+| `--background` | `Dark Animated` | Fondo dinámico negro ahumado con toques de brillo rojo y dorado |
 | `--card` | `#ffffff` | Cards, navbars |
-| `--foreground` | `#141a26` | Texto principal |
+| `--foreground` | `#fafafa` | Texto principal |
 | `--muted-foreground` | `#6b7280` | Texto secundario |
 
 ---

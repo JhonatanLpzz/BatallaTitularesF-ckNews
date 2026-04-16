@@ -220,11 +220,11 @@ export async function authRoutes(app: FastifyInstance) {
   });
 
   // Create new user (admin only, blocked for demo)
-  app.post<{ Body: { username: string; password: string } }>(
+  app.post<{ Body: { username: string; password: string; role: "admin" | "demo" } }>(
     "/api/users",
     { preHandler: [requireAuth, requireAdminRole] },
     async (req, reply) => {
-      const { username, password } = req.body;
+      const { username, password, role } = req.body;
       
       if (!username?.trim() || !password || password.length < 4) {
         return reply.status(400).send({ error: "Usuario y contraseña (min 4 chars) requeridos" });
@@ -237,8 +237,8 @@ export async function authRoutes(app: FastifyInstance) {
 
       const passwordHash = await hashPassword(password);
       const user = db.insert(schema.adminUsers)
-        .values({ username: sanitizeText(username, 50), passwordHash })
-        .returning({ id: schema.adminUsers.id, username: schema.adminUsers.username, createdAt: schema.adminUsers.createdAt })
+        .values({ username: sanitizeText(username, 50), passwordHash, role: role === "demo" ? "demo" : "admin" })
+        .returning({ id: schema.adminUsers.id, username: schema.adminUsers.username, role: schema.adminUsers.role, createdAt: schema.adminUsers.createdAt })
         .get();
 
       return user;
@@ -321,17 +321,14 @@ export async function authRoutes(app: FastifyInstance) {
         return reply.status(404).send({ error: "Usuario no encontrado" });
       }
 
-      // Prevent deleting the demo user
-      if (user.role === "demo") {
-        return reply.status(403).send({ error: "El usuario demo no se puede eliminar" });
-      }
-
-      // Ensure at least one real admin remains
-      const adminCount = db.select().from(schema.adminUsers)
-        .where(eq(schema.adminUsers.role, "admin"))
-        .all().length;
-      if (adminCount <= 1) {
-        return reply.status(403).send({ error: "Debe existir al menos un administrador" });
+      // Ensure at least one real admin remains if trying to delete an admin
+      if (user.role === "admin") {
+        const adminCount = db.select().from(schema.adminUsers)
+          .where(eq(schema.adminUsers.role, "admin"))
+          .all().length;
+        if (adminCount <= 1) {
+          return reply.status(403).send({ error: "Debe existir al menos un administrador" });
+        }
       }
 
       db.delete(schema.adminUsers).where(eq(schema.adminUsers.id, id)).run();

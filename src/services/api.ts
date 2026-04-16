@@ -297,12 +297,13 @@ export const userService = {
    * @param token - Token de sesión admin.
    * @param username - Nombre de usuario.
    * @param password - Contraseña (mínimo 4 caracteres).
+   * @param role - Rol (admin o demo).
    */
-  create(token: string, username: string, password: string) {
+  create(token: string, username: string, password: string, role: string) {
     return request<AdminUser>(API_USERS.CREATE, {
       method: "POST",
       headers: authHeaders(token),
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password, role }),
     });
   },
 

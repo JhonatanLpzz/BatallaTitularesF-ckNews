@@ -87,6 +87,24 @@ const config: Config = {
         },
         "shimmer": {
           "100%": { transform: "translateX(100%)" }
+        },
+        "spring-up": {
+          "0%": { opacity: "0", transform: "translateY(24px) scale(0.96)", filter: "blur(4px)" },
+          "60%": { opacity: "1", transform: "translateY(-3px) scale(1.005)", filter: "blur(0)" },
+          "100%": { opacity: "1", transform: "translateY(0) scale(1)", filter: "blur(0)" },
+        },
+        "spring-scale": {
+          "0%": { opacity: "0", transform: "scale(0.9)", filter: "blur(6px)" },
+          "60%": { opacity: "1", transform: "scale(1.02)", filter: "blur(0)" },
+          "100%": { opacity: "1", transform: "scale(1)", filter: "blur(0)" },
+        },
+        "slide-in-right": {
+          from: { opacity: "0", transform: "translateX(20px)", filter: "blur(4px)" },
+          to: { opacity: "1", transform: "translateX(0)", filter: "blur(0)" },
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-6px)" },
         }
       },
       animation: {
@@ -94,6 +112,10 @@ const config: Config = {
         "fade-in-up": "fade-in-up 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards",
         "scale-in": "scale-in 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards",
         "shimmer": "shimmer 2.5s infinite",
+        "spring-up": "spring-up 0.7s cubic-bezier(0.23, 1, 0.32, 1) both",
+        "spring-scale": "spring-scale 0.6s cubic-bezier(0.23, 1, 0.32, 1) both",
+        "slide-in-right": "slide-in-right 0.5s cubic-bezier(0.23, 1, 0.32, 1) both",
+        "float": "float 4s ease-in-out infinite",
       },
     },
   },

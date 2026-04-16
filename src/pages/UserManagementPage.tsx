@@ -14,6 +14,7 @@ import type { ApiError } from "@/types";
 interface AdminUser {
   id: number;
   username: string;
+  role: "admin" | "demo";
   createdAt: string;
 }
 
@@ -27,6 +28,7 @@ export default function UserManagementPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [newRole, setNewRole] = useState<"admin" | "demo">("admin");
   const [creating, setCreating] = useState(false);
 
   // Edit user dialogs
@@ -58,11 +60,12 @@ export default function UserManagementPage() {
 
     setCreating(true);
     try {
-      await userService.create(token, newUsername.trim(), newPassword.trim());
+      await userService.create(token, newUsername.trim(), newPassword.trim(), newRole);
       toast.success("Usuario creado");
       setShowCreate(false);
       setNewUsername("");
       setNewPassword("");
+      setNewRole("admin");
       fetchUsers();
     } catch (err) {
       const msg = (err as ApiError)?.message || "Error al crear usuario";
@@ -206,7 +209,11 @@ export default function UserManagementPage() {
                         <User className="h-6 w-6 sm:h-7 sm:w-7" />
                       </div>
                       <div className="min-w-0">
-                        <h3 className="font-bold text-xl sm:text-2xl text-foreground tracking-tight truncate">{user.username}</h3>
+                        <h3 className="font-bold text-xl sm:text-2xl text-foreground tracking-tight truncate flex items-center gap-2">
+                          {user.username}
+                          {user.role === "demo" && <span className="text-xs bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded-full uppercase tracking-widest font-semibold">Demo</span>}
+                          {user.role === "admin" && <span className="text-xs bg-blue-500/20 text-blue-500 px-2 py-0.5 rounded-full uppercase tracking-widest font-semibold">Admin</span>}
+                        </h3>
                         <p className="text-sm sm:text-base text-muted-foreground flex items-center gap-2 mt-1">
                           <Clock className="h-3.5 w-3.5" />
                           Creado: {new Date(user.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -268,6 +275,18 @@ export default function UserManagementPage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
               />
+            </div>
+
+            <div>
+               <label className="text-sm font-medium mb-1.5 block">Rol del Usuario</label>
+               <select
+                 className="flex h-10 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+                 value={newRole}
+                 onChange={(e) => setNewRole(e.target.value as "admin" | "demo")}
+               >
+                 <option value="admin" className="bg-background">Administrador (Total)</option>
+                 <option value="demo" className="bg-background">Demo (Solo Lectura)</option>
+               </select>
             </div>
 
             <div className="flex gap-2">
