@@ -11,8 +11,15 @@
 [![SQLite](https://img.shields.io/badge/db-SQLite-003b57?logo=sqlite&logoColor=white)](https://sqlite.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red)](#licencia)
 [![Live Demo](https://img.shields.io/badge/DEMO_EN_VIVO-Probar_Ahora-ff6b35?style=for-the-badge&logo=railway&logoColor=white)](https://batallatitularesf-cknews-production.up.railway.app/)
+[![GitHub](https://img.shields.io/badge/Repo-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/JhonatanLpzz/BatallaTitularesF-ckNews)
 
-**[Probalo en vivo](https://batallatitularesf-cknews-production.up.railway.app/)** — Escanea, vota y juzga por vos mismo la calidad del software.
+| | Link |
+|---|---|
+| **Landing** | [batallatitularesf-cknews-production.up.railway.app](https://batallatitularesf-cknews-production.up.railway.app/) |
+| **Login Admin** | [/login](https://batallatitularesf-cknews-production.up.railway.app/login) |
+| **Repositorio** | [github.com/JhonatanLpzz/BatallaTitularesF-ckNews](https://github.com/JhonatanLpzz/BatallaTitularesF-ckNews) |
+
+**Credenciales Demo (solo lectura):** `demo` / `demo123`
 
 </div>
 
