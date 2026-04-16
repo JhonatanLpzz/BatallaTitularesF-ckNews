@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
     html {
@@ -71,7 +69,7 @@
     }
 
     * {
-        @apply border-border;
+        border-color: hsl(var(--border));
     }
 
     body {
@@ -85,10 +83,7 @@
         );
         background-size: 400% 400%;
         animation: gradient-shift 15s ease infinite;
-        min-height: 100vh;
-        width: 100vw;
-        overflow-x: hidden;
-        overscroll-behavior-y: none;
+        min-height: 100dvh;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeLegibility;
@@ -451,6 +446,13 @@
 .fn-accent-bar {
     height: 3px;
     background: hsl(var(--fn-blue));
+}
+
+/* Prevent horizontal scroll and zoom bounce — plain CSS outside @layer */
+body {
+    width: 100vw;
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
 }
 
 @layer utilities {
