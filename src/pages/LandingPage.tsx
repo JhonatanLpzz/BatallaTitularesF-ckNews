@@ -115,11 +115,22 @@ export default function LandingPage() {
                     <div className="text-left flex-1 min-w-0">
                       <h3 className="font-bold text-foreground text-xl truncate mb-1 tracking-tight">{battle.title}</h3>
                       <div className="flex items-center gap-2">
-                        <span className="relative flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success"></span>
-                        </span>
-                        <p className="text-sm text-status-success font-medium">EN VIVO</p>
+                        {battle.status === "draft" ? (
+                          <>
+                            <span className="relative flex h-2 w-2">
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-status-warning"></span>
+                            </span>
+                            <p className="text-sm text-status-warning font-medium">EN PREPARACIÓN</p>
+                          </>
+                        ) : (
+                          <>
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success"></span>
+                            </span>
+                            <p className="text-sm text-status-success font-medium">EN VIVO</p>
+                          </>
+                        )}
                       </div>
                     </div>
                     <div className="w-12 h-12 rounded-2xl bg-campaign-gold text-black flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(212,175,55,0.4)]">

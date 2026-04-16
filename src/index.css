@@ -74,10 +74,10 @@
         @apply bg-background text-foreground font-sans antialiased;
         background: linear-gradient(
             -45deg,
+            hsl(0, 0%, 2%),
+            hsl(220, 80%, 10%),
             hsl(0, 0%, 5%),
-            hsl(359, 100%, 12%),
-            hsl(45, 90%, 8%),
-            hsl(0, 0%, 8%)
+            hsl(220, 100%, 8%)
         );
         background-size: 400% 400%;
         animation: gradient-shift 15s ease infinite;
@@ -109,11 +109,11 @@
     }
 
     .campaign-gradient {
-        background: linear-gradient(135deg, hsl(220 100% 36%) 0%, hsl(220 100% 24%) 50%, hsl(359 100% 50%) 100%);
+        background: linear-gradient(135deg, hsl(220 100% 36%) 0%, hsl(220 100% 20%) 50%, hsl(0 0% 10%)) 100%;
     }
 
     .campaign-text-glow {
-        text-shadow: 0 0 20px hsl(45 96% 65% / 0.5);
+        text-shadow: 0 0 20px hsl(0 0% 100% / 0.4);
     }
 
     .campaign-card {
@@ -237,9 +237,9 @@
 
     .battle-winner {
         @apply relative;
-        background: linear-gradient(135deg, hsl(45 96% 65% / 0.1) 0%, hsl(0 72% 55% / 0.1) 100%);
-        border: 1px solid hsl(45 96% 65% / 0.3);
-        box-shadow: 0 0 30px hsl(45 96% 65% / 0.2);
+        background: linear-gradient(135deg, hsl(220 100% 45% / 0.1) 0%, hsl(0 0% 100% / 0.1) 100%);
+        border: 1px solid hsl(220 100% 45% / 0.3);
+        box-shadow: 0 0 30px hsl(220 100% 45% / 0.2);
     }
 
     .voting-card {
@@ -248,7 +248,7 @@
     }
 
     .voting-card:hover {
-        box-shadow: 0 25px 50px -12px hsl(45 96% 65% / 0.2);
+        box-shadow: 0 25px 50px -12px hsl(220 100% 50% / 0.15);
     }
 
     /* Professional minimal scrollbar */
@@ -290,11 +290,11 @@
 
         0%,
         100% {
-            text-shadow: 0 0 20px hsl(45 96% 65% / 0.5);
+            text-shadow: 0 0 20px hsl(220 100% 50% / 0.5);
         }
 
         50% {
-            text-shadow: 0 0 30px hsl(45 96% 65% / 0.8);
+            text-shadow: 0 0 30px hsl(0 0% 100% / 0.8);
         }
     }
 
@@ -443,7 +443,7 @@
 /* Flat accent bar */
 .fn-accent-bar {
     height: 3px;
-    background: hsl(var(--fn-red));
+    background: hsl(var(--fn-blue));
 }
 
 @layer utilities {

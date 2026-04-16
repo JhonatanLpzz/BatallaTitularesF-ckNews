@@ -88,7 +88,7 @@ export async function battleRoutes(app: FastifyInstance) {
     const allBattles = db.select().from(schema.battles).orderBy(schema.battles.createdAt).all();
     
     return allBattles
-      .filter(battle => battle.status === "active" || battle.status === "tiebreaker")
+      .filter(battle => ["draft", "active", "tiebreaker"].includes(battle.status))
       .map(battle => ({
         ...battle,
         expiresAt: computeExpiresAt(battle.activatedAt, battle.durationMinutes),

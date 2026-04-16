@@ -40,8 +40,8 @@ function MouseGlowEffect() {
   }, [mouseX, mouseY]);
 
   const background = useMotionTemplate`
-    radial-gradient(1200px circle at ${smoothX}px ${smoothY}px, rgba(220, 38, 38, 0.08), transparent 40%),
-    radial-gradient(800px circle at ${smoothX}px ${smoothY}px, rgba(212, 175, 55, 0.08), transparent 50%)
+    radial-gradient(1200px circle at ${smoothX}px ${smoothY}px, rgba(26, 86, 168, 0.12), transparent 40%),
+    radial-gradient(800px circle at ${smoothX}px ${smoothY}px, rgba(255, 255, 255, 0.05), transparent 50%)
   `;
 
   return (
