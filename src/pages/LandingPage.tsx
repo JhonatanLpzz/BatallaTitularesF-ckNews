@@ -42,11 +42,11 @@ export default function LandingPage() {
   const [activeBattles, setActiveBattles] = useState<Battle[]>([]);
 
   useEffect(() => {
-    fetch("/api/battles")
+    fetch("/api/battles/active")
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
-          setActiveBattles(data.filter(b => b.status === "active" || b.status === "tiebreaker"));
+          setActiveBattles(data);
         }
       })
       .catch(console.error);

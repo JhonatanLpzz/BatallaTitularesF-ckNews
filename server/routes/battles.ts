@@ -83,6 +83,18 @@ export async function battleRoutes(app: FastifyInstance) {
     }));
   });
 
+  // Get active battles (public)
+  app.get("/api/battles/active", async () => {
+    const allBattles = db.select().from(schema.battles).orderBy(schema.battles.createdAt).all();
+    
+    return allBattles
+      .filter(battle => battle.status === "active" || battle.status === "tiebreaker")
+      .map(battle => ({
+        ...battle,
+        expiresAt: computeExpiresAt(battle.activatedAt, battle.durationMinutes),
+      }));
+  });
+
   // Get single battle with participants and vote counts (public)
   app.get<{ Params: { code: string } }>("/api/battles/:code", async (req, reply) => {
     const { code } = req.params;

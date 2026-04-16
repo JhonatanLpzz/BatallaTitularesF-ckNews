@@ -126,34 +126,36 @@ export function CreateBattleDialog({ open, onOpenChange, onCreated }: CreateBatt
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent onClose={() => onOpenChange(false)} className="glass-card border-white/10 max-w-2xl rounded-[32px] p-0">
+      <DialogContent onClose={() => onOpenChange(false)} className="glass-card border-white/10 max-w-2xl rounded-[32px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-foreground mb-2 tracking-tight">Nueva Batalla</DialogTitle>
-          <p className=" text-sm">Configura los detalles de la competencia</p>
+          <DialogTitle className="text-2xl sm:text-3xl font-bold text-foreground mb-2 tracking-tight">Nueva Batalla</DialogTitle>
+          <p className="text-sm text-zinc-400">Configura los detalles de la competencia</p>
         </DialogHeader>
 
-        <div className="space-y-5 mt-4">
+        <div className="space-y-6 mt-6">
           <div>
-            <label className="text-[13px]  ml-1 font-medium mb-1.5 block">Título</label>
+            <label className="text-sm text-zinc-300 ml-1 font-medium mb-2 block">Título</label>
             <Input
               placeholder="Ej: Ronda 1 - Noticias Absurdas"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              className="bg-black/20 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
             />
           </div>
 
           <div>
-            <label className="text-[13px]  ml-1 font-medium mb-1.5 block">Descripción (opcional)</label>
+            <label className="text-sm text-zinc-300 ml-1 font-medium mb-2 block">Descripción (opcional)</label>
             <Textarea
               placeholder="Descripción breve..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
+              className="bg-black/20 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
             />
           </div>
 
           <div>
-            <label className="text-[13px]  ml-1 font-medium mb-1.5 block">Duración (opcional)</label>
+            <label className="text-sm text-zinc-300 ml-1 font-medium mb-2 block">Duración (opcional)</label>
             <div className="flex items-center gap-3">
               <Input
                 type="number"
@@ -161,35 +163,35 @@ export function CreateBattleDialog({ open, onOpenChange, onCreated }: CreateBatt
                 placeholder="Sin límite"
                 value={durationMinutes}
                 onChange={(e) => setDurationMinutes(e.target.value)}
-                className="w-32"
+                className="w-32 bg-black/20 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
               />
-              <span className="text-sm text-muted-foreground font-medium">minutos</span>
+              <span className="text-sm text-zinc-400 font-medium">minutos</span>
             </div>
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <label className="text-[13px]  ml-1 font-medium">Participantes</label>
-              <Button variant="outline" size="sm" onClick={addParticipant}>
-                <Plus className="h-3 w-3 mr-1.5" /> Agregar
+            <div className="flex items-center justify-between mb-4">
+              <label className="text-sm text-zinc-300 ml-1 font-medium">Participantes</label>
+              <Button variant="outline" size="sm" onClick={addParticipant} className="hover:text-white border-white/10 hover:bg-white/10">
+                <Plus className="h-4 w-4 mr-1.5" /> Agregar
               </Button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {participants.map((p, idx) => (
-                <div key={idx} className="flex flex-col sm:flex-row gap-3 items-start bg-white/[0.02] p-4 rounded-2xl border border-white/5 relative group transition-colors hover:bg-white/[0.04]">
+                <div key={idx} className="flex flex-col sm:flex-row gap-4 items-start bg-black/20 p-5 rounded-[20px] border border-white/5 relative group transition-colors hover:border-white/10">
                   <div className="flex-1 w-full space-y-3">
                     <Input
                       placeholder={`Participante ${idx + 1}`}
                       value={p.name}
                       onChange={(e) => updateParticipant(idx, "name", e.target.value)}
-                      className="h-11"
+                      className="h-11 bg-transparent border-white/10 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
                     />
                     <Input
                       placeholder="Titular/Noticia..."
                       value={p.headline}
                       onChange={(e) => updateParticipant(idx, "headline", e.target.value)}
-                      className="h-11"
+                      className="h-11 bg-transparent border-white/10 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
                     />
                   </div>
 

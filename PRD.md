@@ -138,6 +138,7 @@ Los shows de comedia interactivos necesitan sistemas de votación rápidos, intu
 #### 3.3.2 Mejoras de UX 🔹
 **Prioridad:** P2 (Media)
 - Modo fullscreen para proyección
+- Configuraciones manuales de Accesibilidad
 - Notificaciones push
 - Gestos móviles nativos
 
@@ -189,6 +190,7 @@ votes (id, battle_id, participant_id, voter_name, voter_document, voter_phone, f
 
 #### Públicos
 ```
+GET  /api/battles/active         # Listar solo batallas En Vivo
 GET  /api/battles/:code          # Detalle batalla + timer
 POST /api/votes                  # Registrar voto
 GET  /api/votes/check/:code?fp=  # Verificar voto existente
@@ -327,8 +329,9 @@ GET/POST    /api/users           # Gestión administradores
 #### Fase 4: UX/UI Premium & Seguridad (Completado)
 - ✅ Roles de administrador (Admin Maestro vs Demo View-Only)
 - ✅ Efectos de cursor avanzados "Antigravity Glow" sin latencia
-- ✅ Typewriter effects y soporte Framer Motion
-- ✅ View transitions integradas fluido y animaciones CSS Background
+- ✅ Typewriter effects y soporte Framer Motion para transiciones instantaneas
+- ✅ Fix de viewport rendering a Modal Context
+- ✅ Menú de Accesibilidad implementado (High Contrast, Motion Freeze)
 - ✅ Ocultar/Visualizar contraseña en login
 
 ### 8.2 Roadmap Futuro

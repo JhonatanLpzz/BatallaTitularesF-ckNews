@@ -19,6 +19,7 @@ import ResultsPage from "./pages/ResultsPage";
 import { STORAGE_KEY_THEME } from "./constants";
 import { useEffect } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from "framer-motion";
+import { AccessibilityMenu } from "./components/AccessibilityMenu";
 
 function MouseGlowEffect() {
   const mouseX = useMotionValue(window.innerWidth / 2);
@@ -55,10 +56,10 @@ function MouseGlowEffect() {
 const PageTransition = ({ children }: { children: React.ReactNode }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, filter: "blur(12px)", scale: 0.97, y: 10 }}
+      initial={{ opacity: 0, filter: "blur(4px)", scale: 0.98, y: 5 }}
       animate={{ opacity: 1, filter: "blur(0px)", scale: 1, y: 0 }}
-      exit={{ opacity: 0, filter: "blur(12px)", scale: 1.03, y: -10 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      exit={{ opacity: 0, filter: "blur(4px)", scale: 0.98, y: -5 }}
+      transition={{ duration: 0.15, ease: "easeOut" }}
       className="flex flex-col flex-1 w-full min-h-screen"
     >
       {children}
@@ -73,7 +74,10 @@ export default function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey={STORAGE_KEY_THEME}>
       <AuthProvider>
+        {/* Fondo oscuro profundo base para enmarcar las transiciones */}
+        <div className="fixed inset-0 -z-50 bg-black" />
         <MouseGlowEffect />
+        <AccessibilityMenu />
         <Toaster theme="dark" position="top-center" richColors />
         <ErrorBoundary>
           <AnimatePresence mode="wait">

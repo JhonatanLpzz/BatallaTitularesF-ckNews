@@ -83,6 +83,7 @@ batalla-titulares-fcknews/
 │   │   ├── ThemeToggle.tsx          # Toggle tema claro/oscuro
 │   │   ├── TieManager.tsx           # Gestion de empates
 │   │   ├── AdminTieControls.tsx     # Controles de empate admin
+│   │   ├── AccessibilityMenu.tsx    # Menu flotante de accesibilidad (alto contraste, fuentes)
 │   │   └── ui/                      # Componentes shadcn/ui base
 │   │
 │   └── pages/
@@ -208,6 +209,9 @@ Documentacion detallada con JSDoc en `server/db/schema.ts`.
 
 Documentacion completa en la tabla de [`README.md`](./README.md#api-reference).
 Documentacion JSDoc en `server/routes/*.ts`.
+
+**Endpoints Públicos Nuevos Adicionales:**
+- `GET /api/battles/active`: Retorna de forma segura solo las competencias corriendo en estado "active" o "tiebreaker" destinadas a Landing Pages publicas.
 
 ---
 
