@@ -8,7 +8,7 @@ body {
 
 @layer base {
     html {
-        touch-action: manipulation;
+        touch-action: pan-x pan-y;
         -webkit-text-size-adjust: 100%;
     }
     :root {
