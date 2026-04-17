@@ -38,10 +38,10 @@ export default function ResultsPage() {
         setBattle((prev) =>
           prev
             ? {
-                ...prev,
-                participants: update.participants,
-                totalVotes: update.totalVotes,
-              }
+              ...prev,
+              participants: update.participants,
+              totalVotes: update.totalVotes,
+            }
             : prev
         );
       }
@@ -79,7 +79,7 @@ export default function ResultsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center py-12"
         >
           <h1 className="text-4xl md:text-6xl font-black tracking-tight">
             {battle.title}
