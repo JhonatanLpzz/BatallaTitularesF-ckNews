@@ -91,7 +91,7 @@ export default function ResultsPage() {
 
         {/* Total votes */}
         <div className="flex justify-center mb-10">
-          <div className="glass-card px-6 py-3 rounded-xl border border-white/10 backdrop-blur-md">
+          <div className="glass-card px-6 py-3 rounded-xl border border-border backdrop-blur-md">
             <span className="text-xs text-muted-foreground uppercase tracking-widest">
               Total votos
             </span>
@@ -115,7 +115,7 @@ export default function ResultsPage() {
                 transition={{ delay: i * 0.1 }}
                 className={cn(
                   "relative rounded-2xl p-6 border backdrop-blur-md",
-                  "bg-white/[0.03] border-white/10",
+                  "bg-secondary border-border",
                   isWinner && "ring-2 ring-yellow-400/50"
                 )}
               >
@@ -160,7 +160,7 @@ export default function ResultsPage() {
                 </div>
 
                 {/* Bottom progress */}
-                <div className="mt-4 h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                <div className="mt-4 h-2 w-full bg-secondary rounded-full overflow-hidden">
                   <motion.div
                     className="h-full"
                     style={{ backgroundColor: p.color }}

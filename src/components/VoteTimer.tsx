@@ -24,16 +24,10 @@ interface VoteTimerProps {
   onExpire: () => void;
 }
 
-// ---------------------------------------------------------------------------
-// Componente
-// ---------------------------------------------------------------------------
-
 /**
  * Componente de countdown visible para el público durante la votación.
  * Muestra el tiempo restante en formato "MM:SS" y redirige automáticamente
  * a la página de resultados cuando el timer expira.
- *
- * @param props - {@link VoteTimerProps}
  */
 export function VoteTimer({ expiresAt, expired, onExpire }: VoteTimerProps) {
   const countdown = useCountdown(expiresAt || "");
@@ -52,7 +46,7 @@ export function VoteTimer({ expiresAt, expired, onExpire }: VoteTimerProps) {
   if (!expiresAt) return null;
 
   return (
-    <div className="pl-4 border-l border-white/10 flex flex-col items-end">
+    <div className="pl-4 border-l border-border flex flex-col items-end">
       <span className="text-[9px] uppercase tracking-[0.2em]">Cierra en</span>
       <div className="flex items-center gap-2">
         <Timer className="h-4 w-4 text-destructive animate-pulse" />

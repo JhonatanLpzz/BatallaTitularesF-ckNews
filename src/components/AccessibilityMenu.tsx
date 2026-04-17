@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Accessibility, Type, Eye, Play, Pause } from "lucide-react";
+import { Accessibility, Type, Eye, Play, Pause, Droplets } from "lucide-react";
 import { Button } from "./ui/button";
 
 export function AccessibilityMenu() {
@@ -7,6 +7,8 @@ export function AccessibilityMenu() {
   const [textSize, setTextSize] = useState<"normal" | "large" | "xl">("normal");
   const [highContrast, setHighContrast] = useState(false);
   const [pauseAnimations, setPauseAnimations] = useState(false);
+  const [showBackground, setShowBackground] = useState(true);
+  const [blurBackground, setBlurBackground] = useState(false);
 
   useEffect(() => {
     // Manejar tamaño de texto
@@ -27,7 +29,20 @@ export function AccessibilityMenu() {
     } else {
       document.body.classList.remove("a11y-reduce-motion");
     }
-  }, [textSize, highContrast, pauseAnimations]);
+    // Manejar fondo global
+    if (!showBackground) {
+      document.body.classList.add("a11y-hide-bg");
+    } else {
+      document.body.classList.remove("a11y-hide-bg");
+    }
+
+    // Manejar desenfoque de fondo
+    if (blurBackground) {
+      document.body.classList.add("a11y-blur-bg");
+    } else {
+      document.body.classList.remove("a11y-blur-bg");
+    }
+  }, [textSize, highContrast, pauseAnimations, showBackground, blurBackground]);
 
   const cycleTextSize = () => {
     if (textSize === "normal") setTextSize("large");
@@ -38,7 +53,7 @@ export function AccessibilityMenu() {
   return (
     <div className="fixed bottom-4 left-4 z-[9999]">
       {isOpen && (
-        <div className="absolute bottom-full left-0 mb-2 p-3 bg-card border border-border/50 rounded-2xl shadow-xl flex flex-col gap-2 w-48 animate-fade-in-up">
+        <div className="absolute bottom-full left-0 mb-2 p-3 glass-medium rounded-2xl flex flex-col gap-2 w-48 animate-fade-in-up">
           <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1 px-1">
             Accesibilidad
           </div>
@@ -72,13 +87,34 @@ export function AccessibilityMenu() {
             {pauseAnimations ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
             {pauseAnimations ? "Activar Efectos" : "Pausar Efectos"}
           </Button>
+
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={`w-full justify-start gap-2 ${showBackground ? 'text-campaign-blue' : 'text-muted-foreground'}`}
+            onClick={() => setShowBackground(!showBackground)}
+          >
+            <Play className="h-4 w-4 rotate-90" />
+            {showBackground ? "Ocultar Fondo" : "Mostrar Fondo"}
+          </Button>
+
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={`w-full justify-start gap-2 ${blurBackground ? 'text-campaign-blue' : 'text-muted-foreground'}`}
+            onClick={() => setBlurBackground(!blurBackground)}
+            disabled={!showBackground}
+          >
+            <Droplets className="h-4 w-4" />
+            {blurBackground ? "Quitar Blur" : "Poner Blur"}
+          </Button>
         </div>
       )}
 
       <Button
         variant="secondary"
         size="icon"
-        className="rounded-full shadow-lg border border-border bg-background/50 backdrop-blur-md h-12 w-12"
+        className="rounded-full glass-medium h-12 w-12"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Menú de Accesibilidad"
       >

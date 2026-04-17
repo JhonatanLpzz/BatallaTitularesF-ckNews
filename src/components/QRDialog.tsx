@@ -59,7 +59,7 @@ export function QRDialog({ qrData, onClose }: QRDialogProps) {
         <div className="w-full space-y-4">
           <p className=" text-sm">Los asistentes pueden escanear este QR o visitar:</p>
 
-          <div className="flex items-center gap-2 bg-secondary/50 border border-border p-2 rounded-xl">
+          <div className="flex items-center gap-2 bg-secondary border border-border p-2 rounded-xl">
             <code className="text-xs md:text-sm font-mono flex-1 truncate px-2">
               {qrData?.url}
             </code>

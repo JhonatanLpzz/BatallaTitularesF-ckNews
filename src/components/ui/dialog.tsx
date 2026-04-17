@@ -117,14 +117,14 @@ function DialogContent({
       exit="exit"
       transition={{ type: "spring", damping: 25, stiffness: 200 }}
       className={cn(
-        "relative z-[10000] w-full max-w-lg rounded-xl border border-white/5 bg-background shadow-2xl pointer-events-auto flex flex-col max-h-[90vh] sm:max-h-[85vh]",
+        "relative z-[10000] w-full max-w-lg glass-heavy border border-white/10 shadow-2xl pointer-events-auto flex flex-col max-h-[90vh] sm:max-h-[85vh]",
         className
       )}
       onClick={(e) => e.stopPropagation()}
     >
       <button
         onClick={handleClose}
-        className="absolute right-4 top-4 rounded-full p-2 bg-white/5 text-muted-foreground opacity-70 transition-all hover:opacity-100 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-campaign-gold focus:ring-offset-2 focus:ring-offset-background z-10"
+        className="absolute right-4 top-4 rounded-full p-2 bg-secondary text-muted-foreground opacity-70 transition-all hover:opacity-100 hover:bg-accent hover:text-foreground focus:outline-none focus:ring-2 focus:ring-campaign-gold focus:ring-offset-2 focus:ring-offset-background z-10"
         aria-label="Close"
       >
         <X className="h-4 w-4" />

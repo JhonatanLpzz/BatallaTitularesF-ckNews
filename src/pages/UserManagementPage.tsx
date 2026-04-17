@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { Plus, Edit2, Trash2, User, Loader2, LogOut, Swords, Users, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Plus, Edit2, Trash2, User, Loader2, LogOut, Swords, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AppDialog } from "@/components/AppDialog";
 import { useAuth } from "@/context/AuthContext";
-import { cn } from "@/lib/utils";
 import { Header } from "@/components/Header";
 import { userService } from "@/services/api";
 import type { ApiError } from "@/types";
@@ -126,12 +125,7 @@ export default function UserManagementPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative">
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-[120px] animate-pulse delay-1000" />
-      </div>
-
+    <div className="min-h-screen text-foreground flex flex-col relative selection:bg-campaign-blue/30">
       <Header
         leftContent={
           <div className="hidden sm:block min-w-0">
@@ -187,13 +181,13 @@ export default function UserManagementPage() {
             <Loader2 className="h-10 w-10 animate-spin opacity-50" />
           </div>
         ) : users.length === 0 ? (
-          <div className="glass-card rounded-[32px] text-center py-20 px-6 animate-in fade-in zoom-in duration-500 max-w-2xl mx-auto mt-10">
-            <div className="w-24 h-24 bg-white/5 rounded-[24px] mx-auto flex items-center justify-center mb-8 border border-white/10 shadow-2xl transform -rotate-6">
+          <div className="glass-card text-center py-20 px-6 animate-in fade-in zoom-in duration-500 max-w-2xl mx-auto mt-10">
+            <div className="w-24 h-24 bg-secondary rounded-[24px] mx-auto flex items-center justify-center mb-8 border border-white/10 shadow-2xl transform -rotate-6">
               <User className="h-12 w-12" />
             </div>
             <h3 className="text-2xl font-bold text-foreground mb-4 tracking-tight">No hay usuarios</h3>
             <p className="text-muted-foreground mb-8 max-w-md mx-auto leading-relaxed text-base">Crea el primer administrador del sistema</p>
-            <Button onClick={() => setShowCreate(true)} className="h-14 px-8 rounded-2xl bg-white text-black hover:bg-zinc-200 font-semibold shadow-xl hover:-translate-y-1 transition-all">
+            <Button onClick={() => setShowCreate(true)} className="h-14 px-8 rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-xl hover:-translate-y-1 transition-all">
               <Plus className="h-5 w-5 mr-2" />
               Crear Primer Usuario
             </Button>
@@ -201,11 +195,11 @@ export default function UserManagementPage() {
         ) : (
           <div className="space-y-6 sm:space-y-8">
             {users.map((user, idx) => (
-              <div key={user.id} className="glass-card rounded-[32px] animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
-                <div className="px-5 sm:px-8 py-5 sm:py-8 border-b border-white/5 bg-white/[0.01]">
+              <div key={user.id} className="glass-card animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+                <div className="px-5 sm:px-8 py-5 sm:py-8 border-b border-white/10 bg-muted/5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[16px] flex items-center justify-center shrink-0 shadow-lg">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[16px] bg-secondary flex items-center justify-center shrink-0 shadow-lg">
                         <User className="h-6 w-6 sm:h-7 sm:w-7" />
                       </div>
                       <div className="min-w-0">

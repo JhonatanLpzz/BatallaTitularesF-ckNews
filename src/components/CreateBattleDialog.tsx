@@ -35,15 +35,9 @@ interface CreateBattleDialogProps {
   onCreated: () => void;
 }
 
-// ---------------------------------------------------------------------------
-// Componente
-// ---------------------------------------------------------------------------
-
 /**
  * Diálogo modal que permite al administrador crear una nueva batalla
  * con título, descripción, duración opcional y lista de participantes.
- *
- * @param props - {@link CreateBattleDialogProps}
  */
 export function CreateBattleDialog({ open, onOpenChange, onCreated }: CreateBattleDialogProps) {
   const { token } = useAuth();
@@ -94,8 +88,6 @@ export function CreateBattleDialog({ open, onOpenChange, onCreated }: CreateBatt
     ]);
   };
 
-  // ---- Submit --------------------------------------------------------------
-
   const handleCreate = async () => {
     if (!title.trim()) return toast.error("Ingresa un titulo");
     if (participants.some((p) => !p.name.trim() || !p.headline.trim())) {
@@ -121,8 +113,6 @@ export function CreateBattleDialog({ open, onOpenChange, onCreated }: CreateBatt
       setCreating(false);
     }
   };
-
-  // ---- Render --------------------------------------------------------------
 
   return (
     <AppDialog
@@ -150,7 +140,7 @@ export function CreateBattleDialog({ open, onOpenChange, onCreated }: CreateBatt
             placeholder="Ej: Ronda 1 - Noticias Absurdas"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="bg-black/20 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
+            className="bg-muted/50 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
           />
         </div>
 
@@ -161,7 +151,7 @@ export function CreateBattleDialog({ open, onOpenChange, onCreated }: CreateBatt
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
-            className="bg-black/20 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
+            className="bg-muted/50 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
           />
         </div>
 
@@ -174,9 +164,9 @@ export function CreateBattleDialog({ open, onOpenChange, onCreated }: CreateBatt
               placeholder="Sin límite"
               value={durationMinutes}
               onChange={(e) => setDurationMinutes(e.target.value)}
-              className="w-32 bg-black/20 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
+              className="w-32 bg-muted/50 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
             />
-            <span className="text-sm text-zinc-400 font-medium">minutos</span>
+            <span className="text-sm text-muted-foreground font-medium">minutos</span>
           </div>
         </div>
 
@@ -190,7 +180,7 @@ export function CreateBattleDialog({ open, onOpenChange, onCreated }: CreateBatt
 
           <div className="space-y-4">
             {participants.map((p, idx) => (
-              <div key={idx} className="flex flex-col sm:flex-row gap-4 items-start bg-black/20 p-5 rounded-[20px] border border-border relative group transition-colors hover:border-accent">
+              <div key={idx} className="flex flex-col sm:flex-row gap-4 items-start bg-muted/50 p-5 rounded-[20px] border border-border relative group transition-colors hover:border-accent">
                 <div className="flex-1 w-full space-y-3">
                   <Input
                     placeholder={`Participante ${idx + 1}`}

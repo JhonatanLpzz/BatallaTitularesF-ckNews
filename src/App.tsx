@@ -20,6 +20,7 @@ import { STORAGE_KEY_THEME } from "./constants";
 import { useEffect } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from "framer-motion";
 import { AccessibilityMenu } from "./components/AccessibilityMenu";
+import { GlobalBackground } from "./components/GlobalBackground";
 
 function MouseGlowEffect() {
   const mouseX = useMotionValue(window.innerWidth / 2);
@@ -79,6 +80,7 @@ export default function App() {
         <div className="fixed inset-0 -z-40 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_10%,rgba(0,0,0,0.85)_100%)] mix-blend-multiply" />
         <div className="fixed top-0 inset-x-0 h-[60vh] -z-40 pointer-events-none bg-gradient-to-b from-white/[0.04] to-transparent mix-blend-screen" />
 
+        <GlobalBackground />
         <MouseGlowEffect />
         <AccessibilityMenu />
         <Toaster theme="dark" position="top-center" richColors />

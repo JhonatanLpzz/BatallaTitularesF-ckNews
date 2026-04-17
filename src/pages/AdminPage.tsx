@@ -145,7 +145,9 @@ export default function AdminPage() {
   // ---- Render --------------------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative">
+    <div className="min-h-screen text-foreground flex flex-col relative selection:bg-campaign-blue/30">
+
+
       <Header
         leftContent={
           <div className="hidden sm:block min-w-0">
@@ -201,8 +203,8 @@ export default function AdminPage() {
             <Loader2 className="h-10 w-10 animate-spin opacity-50" />
           </div>
         ) : battles.length === 0 ? (
-          <div className="glass-card rounded-[32px] text-center py-20 px-6 animate-in fade-in zoom-in duration-500 max-w-2xl mx-auto mt-10">
-            <div className="w-24 h-24 bg-accent rounded-[24px] mx-auto flex items-center justify-center mb-8 border border-border shadow-2xl transform -rotate-6">
+          <div className="glass-card text-center py-20 px-6 animate-in fade-in zoom-in duration-500 max-w-2xl mx-auto mt-10">
+            <div className="w-24 h-24 bg-accent rounded-[24px] mx-auto flex items-center justify-center mb-8 border border-white/10 shadow-2xl transform -rotate-6">
               <Swords className="h-12 w-12 " />
             </div>
             <h3 className="text-2xl font-bold text-foreground mb-4 tracking-tight">No hay batallas activas</h3>
@@ -217,7 +219,7 @@ export default function AdminPage() {
             {battles
               .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
               .map((battle, idx) => (
-              <div key={battle.id} className="glass-card rounded-[32px] overflow-hidden animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+              <div key={battle.id} className="glass-card overflow-hidden animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
                 {/* Mobile-Optimized Header */}
                 <div className="px-5 sm:px-8 py-5 sm:py-8 border-b border-border bg-muted/5">
                   <div className="space-y-5">
@@ -232,13 +234,22 @@ export default function AdminPage() {
                             ? 'bg-status-warning/10 text-status-warning border border-status-warning/20 shadow-[0_0_15px_rgba(234,179,8,0.15)]'
                             : battle.status === 'tiebreaker'
                               ? 'bg-status-warning/10 text-status-warning border border-status-warning/20 shadow-[0_0_15px_rgba(249,115,22,0.15)]'
-                              : 'bg-white/5 text-muted-foreground border border-white/10'
+                              : 'bg-secondary text-muted-foreground border border-border'
                         }`}>
-                        <div className={`w-2 h-2 rounded-full ${battle.status === 'active' ? 'bg-status-success animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]' :
-                          battle.status === 'tiebreaker' ? 'bg-status-warning animate-pulse shadow-[0_0_10px_rgba(249,115,22,0.5)]' :
-                            battle.status === 'tied' ? 'bg-status-warning shadow-[0_0_10px_rgba(234,179,8,0.5)]' :
-                              battle.status === 'closed' ? 'bg-muted-foreground' : 'bg-muted-foreground'
-                          }`} />
+                        <span className="relative flex items-center justify-center h-2 w-2">
+                          {(battle.status === 'active' || battle.status === 'tiebreaker') && (
+                            <span className={cn(
+                              "animate-ping absolute inset-0 inline-flex h-full w-full rounded-full opacity-75",
+                              battle.status === 'active' ? 'bg-status-success' : 'bg-status-warning'
+                            )} />
+                          )}
+                          <span className={cn(
+                            "relative inline-flex rounded-full h-2 w-2 shadow-[0_0_10px_rgba(0,0,0,0.2)]",
+                            battle.status === 'active' ? 'bg-status-success' :
+                            (battle.status === 'tiebreaker' || battle.status === 'tied') ? 'bg-status-warning' :
+                            'bg-muted-foreground'
+                          )} />
+                        </span>
                         {battle.status === 'active' ? 'EN VIVO' :
                           battle.status === 'tied' ? 'EMPATE' :
                             battle.status === 'tiebreaker' ? 'DESEMPATE' :

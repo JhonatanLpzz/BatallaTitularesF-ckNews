@@ -57,8 +57,8 @@ function BattleStatusBadge({ status }: { status: Battle["status"] }) {
   if (status === "active" || status === "tiebreaker") {
     return (
       <div className="flex items-center gap-2">
-        <span className="relative h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75" />
+        <span className="relative flex items-center justify-center h-2 w-2">
+          <span className="animate-ping absolute inset-0 inline-flex h-full w-full rounded-full bg-status-success opacity-75" />
           <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success" />
         </span>
         <p className="text-sm text-status-success font-medium">EN VIVO</p>
@@ -105,19 +105,16 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full max-w-[100vw] overflow-x-visible bg-background text-foreground flex flex-col relative selection:bg-campaign-blue/30">
-      <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-blue/10 rounded-full blur-[120px] animate-breathe" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white/[0.03] rounded-full blur-[120px] animate-breathe" style={{ animationDelay: "3s" }} />
-      </div>
+    <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden text-foreground flex flex-col relative selection:bg-campaign-blue/30">
+
 
       <Header showAdminButton={true} />
 
-      <main className="flex-1 flex flex-col items-center justify-center p-6 text-center mt-6 relative z-10">
+      <main className="flex-1 flex flex-col items-center justify-center p-6 text-center mt-6 relative">
         <div className="w-full max-w-3xl mx-auto">
           <div className="animate-spring-up inline-flex items-center gap-2 px-4 py-2 rounded-full border border-campaign-blue/20 bg-campaign-blue/5 text-campaign-blue font-medium text-sm mb-8">
-            <span className="relative h-2 w-2">
-              <span className="animate-ping absolute h-full w-full rounded-full bg-campaign-blue opacity-75" />
+            <span className="relative flex items-center justify-center h-2 w-2">
+              <span className="animate-ping absolute inset-0 h-full w-full rounded-full bg-campaign-blue opacity-75" />
               <span className="relative h-2 w-2 rounded-full bg-campaign-blue" />
             </span>
             Sistema de Votación Interactivo
@@ -129,7 +126,7 @@ export default function LandingPage() {
             <motion.span
               initial={{ opacity: 0, scale: 0.85, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ delay: 1, duration: 0.7 }}
+              transition={{ delay: 1.2, duration: 0.8 }}
               className="campaign-gold-gradient block mt-2"
             >
               TITULARES
@@ -148,7 +145,7 @@ export default function LandingPage() {
             ) : activeBattles.length > 0 ? (
               activeBattles.map(battle => (
                 <Link key={battle.id} to={`/votar/${battle.code}`} className="block group">
-                  <div className="glass-card rounded-[28px] p-6 flex items-center justify-between gap-4 hover:bg-accent/50 transition">
+                  <div className="glass-card p-6 flex items-center justify-between gap-4 hover:bg-accent/20 transition-all duration-300">
                     <div className="text-left flex-1 min-w-0">
                       <h3 className="font-bold text-xl truncate mb-1">{battle.title}</h3>
                       <BattleStatusBadge status={battle.status} />
@@ -160,7 +157,7 @@ export default function LandingPage() {
                 </Link>
               ))
             ) : (
-              <div className="glass-card rounded-[32px] p-8 text-center">
+              <div className="glass-card p-8 text-center">
                 <Swords className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
                 <h3 className="text-xl font-bold mb-2">Preparando el show</h3>
                 <p className="text-muted-foreground">
@@ -198,6 +195,10 @@ export default function LandingPage() {
           <span>Jhonatan Lopez Conde</span>
           <span>•</span>
           <span>Bogotá</span>
+          <span>•</span>
+          <a href="https://science.nasa.gov/image-detail/amf-6903870/" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition">
+            NASA Artemis II
+          </a>
           <span>•</span>
           <a href="https://github.com/JhonatanLpzz/BatallaTitularesF-ckNews" target="_blank" rel="noopener noreferrer">
             <ExternalLink className="h-3 w-3" />

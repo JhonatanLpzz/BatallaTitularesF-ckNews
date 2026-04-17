@@ -66,7 +66,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
       return (
         <div className="min-h-[400px] flex items-center justify-center p-8">
-          <div className="glass-card rounded-[32px] border border-white/5 bg-white/[0.02] p-10 text-center max-w-md w-full backdrop-blur-3xl">
+          <div className="glass-card rounded-[32px] border border-border bg-card/40 p-10 text-center max-w-md w-full backdrop-blur-3xl">
             <AlertTriangle className="h-14 w-14 text-destructive mx-auto mb-6 opacity-80" />
             <h2 className="text-xl font-bold text-foreground mb-2 tracking-tight">
               Algo salió mal
@@ -75,7 +75,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               Ocurrió un error inesperado. Puedes intentar recargar esta sección.
             </p>
             {this.state.error && (
-              <pre className="text-xs text-muted-foreground bg-black/10 dark:bg-black/30 rounded-xl p-4 mb-6 overflow-auto max-h-32 text-left">
+              <pre className="text-xs text-muted-foreground bg-muted/50 rounded-xl p-4 mb-6 overflow-auto max-h-32 text-left">
                 {this.state.error.message}
               </pre>
             )}
