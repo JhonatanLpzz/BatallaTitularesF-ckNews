@@ -74,7 +74,7 @@ export default function ResultsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans pt-8">
       {/* Background blobs */}
-      <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
+      <div className="fixed inset-0 -z-10 pointer-events-none">
         <div className="absolute top-[30%] -right-[20%] w-[50%] h-[50%] blur-[120px] rounded-full" />
         <div className="absolute bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-campaign-blue/5 blur-[120px] rounded-full" />
       </div>
@@ -143,7 +143,7 @@ export default function ResultsPage() {
               <div
                 key={participant.id}
                 className={cn(
-                  "glass-card rounded-[28px] overflow-hidden transition-all duration-500 animate-fade-in-up",
+                  "glass-card rounded-[28px] transition-all duration-500 animate-fade-in-up",
                   isWinner && "border-campaign-gold/40 bg-campaign-gold/[0.02]"
                 )}
                 style={{ animationDelay: `${idx * 150}ms` }}

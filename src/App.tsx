@@ -25,7 +25,6 @@ function MouseGlowEffect() {
   const mouseX = useMotionValue(window.innerWidth / 2);
   const mouseY = useMotionValue(window.innerHeight / 2);
 
-  // Very smooth spring physics for the flashlight effect
   const smoothX = useSpring(mouseX, { stiffness: 50, damping: 20, mass: 0.5 });
   const smoothY = useSpring(mouseY, { stiffness: 50, damping: 20, mass: 0.5 });
 
@@ -45,14 +44,13 @@ function MouseGlowEffect() {
   `;
 
   return (
-    <motion.div 
-      className="pointer-events-none fixed inset-0 z-[100] mix-blend-color-dodge opacity-80"
+    <motion.div
+      className="pointer-events-none fixed inset-0 z-[100] mix-blend-screen opacity-80"
       style={{ background }}
     />
   );
 }
 
-// Wrapper to animate routes nicely
 const PageTransition = ({ children }: { children: React.ReactNode }) => {
   return (
     <motion.div
@@ -60,7 +58,7 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
       animate={{ opacity: 1, filter: "blur(0px)", scale: 1, y: 0 }}
       exit={{ opacity: 0, filter: "blur(2px)", scale: 1, y: -3 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
-      className="flex flex-col flex-1 w-full min-h-screen"
+      className="flex flex-col flex-1 w-full max-w-[100vw] overflow-x-hidden min-h-screen"
     >
       {children}
     </motion.div>

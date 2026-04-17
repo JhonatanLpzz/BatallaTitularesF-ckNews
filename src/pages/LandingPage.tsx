@@ -87,9 +87,9 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden selection:bg-campaign-blue/30">
+    <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-background text-foreground flex flex-col relative overflow-hidden selection:bg-campaign-blue/30">
       {/* Animated background elements — blue theme */}
-      <div className="fixed inset-0 -z-10 pointer-events-none">
+      <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-blue/10 rounded-full blur-[120px] animate-breathe" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white/[0.03] rounded-full blur-[120px] animate-breathe" style={{ animationDelay: '3s' }} />
       </div>

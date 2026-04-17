@@ -56,11 +56,37 @@ function DialogContent({
   onClose?: () => void;
 }) {
   const context = React.useContext(DialogContext);
-  
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [canScrollUp, setCanScrollUp] = React.useState(false);
+  const [canScrollDown, setCanScrollDown] = React.useState(false);
+
   const handleClose = () => {
     if (onClose) onClose();
     if (context) context.onOpenChange(false);
   };
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollUp(el.scrollTop > 5);
+    setCanScrollDown(Math.ceil(el.scrollTop + el.clientHeight) < el.scrollHeight - 5);
+  };
+
+  React.useEffect(() => {
+    handleScroll();
+    window.addEventListener('resize', handleScroll);
+    return () => window.removeEventListener('resize', handleScroll);
+  }, [children]);
+
+  // Dynamic edge mask depending on scroll state
+  let maskStyle = "none";
+  if (canScrollUp && canScrollDown) {
+    maskStyle = "linear-gradient(to bottom, transparent, black 24px, black calc(100% - 24px), transparent 100%)";
+  } else if (canScrollUp) {
+    maskStyle = "linear-gradient(to bottom, transparent, black 24px, black 100%)";
+  } else if (canScrollDown) {
+    maskStyle = "linear-gradient(to bottom, black 0%, black calc(100% - 24px), transparent 100%)";
+  }
 
   return (
     <div
@@ -77,7 +103,15 @@ function DialogContent({
       >
         <X className="h-4 w-4" />
       </button>
-      <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 sm:p-8 no-scrollbar">
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto overflow-x-hidden p-6 sm:p-8 no-scrollbar transition-[mask-image] duration-300"
+        style={{
+          maskImage: maskStyle,
+          WebkitMaskImage: maskStyle
+        }}
+      >
         {children}
       </div>
     </div>

@@ -126,7 +126,7 @@ export default function UserManagementPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative">
       <div className="fixed inset-0 -z-10">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-[120px] animate-pulse delay-1000" />
@@ -201,7 +201,7 @@ export default function UserManagementPage() {
         ) : (
           <div className="space-y-6 sm:space-y-8">
             {users.map((user, idx) => (
-              <div key={user.id} className="glass-card rounded-[32px] overflow-hidden animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+              <div key={user.id} className="glass-card rounded-[32px] animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
                 <div className="px-5 sm:px-8 py-5 sm:py-8 border-b border-white/5 bg-white/[0.01]">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">

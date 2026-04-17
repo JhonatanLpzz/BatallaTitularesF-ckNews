@@ -31,9 +31,9 @@ export function Header({
   }, []);
 
   return (
-    <nav 
+    <nav
       className={cn(
-        "fixed top-1 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
+        "sticky top-1 z-50 transition-all duration-300 ease-in-out",
         scrolled ? "px-2 sm:px-4 py-2" : "px-0 py-0"
       )}
     >

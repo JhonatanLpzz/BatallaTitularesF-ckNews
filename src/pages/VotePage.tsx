@@ -191,7 +191,7 @@ export default function VotePage() {
       />
 
       {battle?.status === BATTLE_STATUS.TIEBREAKER && (
-        <div className="bg-primary text-primary-foreground py-2 overflow-hidden relative">
+        <div className="bg-primary text-primary-foreground py-2 relative">
           <div className="flex items-center justify-center gap-4 animate-pulse">
             <AlertTriangle className="h-4 w-4" />
             <span className="text-[11px] font-black tracking-[0.3em] uppercase text-primary-foreground">Ronda de Desempate Activa</span>
@@ -227,7 +227,7 @@ export default function VotePage() {
                 onClick={() => !isDisabled && (hasVoted ? changeVote(participant.id) : castVote(participant.id))}
                 disabled={isDisabled}
                 className={cn(
-                  "relative w-full text-left rounded-[32px] overflow-hidden transition-all duration-500 group border",
+                  "relative w-full text-left rounded-[32px] transition-all duration-500 group border",
                   "bg-white/[0.02] border-white/5 hover:border-white/10 hover:bg-white/[0.04]",
                   isDisabled ? "cursor-not-allowed opacity-40" : "cursor-pointer active:scale-[0.98]",
                   isVotedFor && "border-primary/40 bg-primary/[0.05]"
@@ -237,7 +237,7 @@ export default function VotePage() {
                 {/* Barra de progreso Líquida Premium */}
                 {hasVoted && (
                   <div
-                    className="absolute inset-y-0 left-0 transition-all duration-&lsqb;2000ms&rsqb; ease-&lsqb;cubic-bezier(0.16,1,0.3,1)&rsqb; overflow-hidden"
+                    className="absolute inset-y-0 left-0 transition-all duration-&lsqb;2000ms&rsqb; ease-&lsqb;cubic-bezier(0.16,1,0.3,1)&rsqb;"
                     style={{ width: `${participant.percentage}%` }}
                   >
                     <div

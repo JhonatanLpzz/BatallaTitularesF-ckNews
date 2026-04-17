@@ -145,7 +145,7 @@ export default function AdminPage() {
   // ---- Render --------------------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative">
       <Header
         leftContent={
           <div className="hidden sm:block min-w-0">
