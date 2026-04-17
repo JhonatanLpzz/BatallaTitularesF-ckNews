@@ -4,7 +4,7 @@ import { Plus, Edit2, Trash2, User, Loader2, LogOut, Swords, Users, Clock } from
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AppDialog } from "@/components/AppDialog";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { Header } from "@/components/Header";
@@ -169,7 +169,7 @@ export default function UserManagementPage() {
       )}
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full flex-1">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 sm:mb-12 mt-16 md:mt-13 animate-fade-in-up">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 sm:mb-12 mt-5 md:mt-4 animate-fade-in-up">
           <div className="text-center sm:text-left">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-2">Administradores</h1>
             <p className="text-muted-foreground">Gestión de usuarios del sistema</p>
@@ -250,101 +250,99 @@ export default function UserManagementPage() {
       </main>
 
       {/* Create User Dialog */}
-      <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent onClose={() => setShowCreate(false)}>
-          <DialogHeader>
-            <DialogTitle>Crear Nuevo Usuario</DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-4 mt-4">
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">Usuario</label>
-              <Input
-                placeholder="Nombre de usuario"
-                value={newUsername}
-                onChange={(e) => setNewUsername(e.target.value)}
-                autoFocus
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">Contraseña</label>
-              <Input
-                type="password"
-                placeholder="Minimo 4 caracteres"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-            </div>
-
-            <div>
-               <label className="text-sm font-medium mb-1.5 block">Rol del Usuario</label>
-               <select
-                 className="flex h-10 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-                 value={newRole}
-                 onChange={(e) => setNewRole(e.target.value as "admin" | "demo")}
-               >
-                 <option value="admin" className="bg-background">Administrador (Total)</option>
-                 <option value="demo" className="bg-background">Demo (Solo Lectura)</option>
-               </select>
-            </div>
-
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={createUser} disabled={creating} className="flex-1">
-                {creating && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
-                Crear Usuario
-              </Button>
-            </div>
+      <AppDialog
+        isOpen={showCreate}
+        onClose={() => setShowCreate(false)}
+        title="Crear Nuevo Usuario"
+        description="Configura un nuevo acceso para el sistema"
+        footer={
+          <Button onClick={createUser} disabled={creating} className="flex-1 h-12 rounded-xl">
+            {creating && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
+            Crear Usuario
+          </Button>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Usuario</label>
+            <Input
+              placeholder="Nombre de usuario"
+              value={newUsername}
+              onChange={(e) => setNewUsername(e.target.value)}
+              autoFocus
+            />
           </div>
-        </DialogContent>
-      </Dialog>
+
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Contraseña</label>
+            <Input
+              type="password"
+              placeholder="Minimo 4 caracteres"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </div>
+
+          <div>
+             <label className="text-sm font-medium mb-1.5 block">Rol del Usuario</label>
+             <select
+               className="flex h-10 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+               value={newRole}
+               onChange={(e) => setNewRole(e.target.value as "admin" | "demo")}
+             >
+               <option value="admin" className="bg-background">Administrador (Total)</option>
+               <option value="demo" className="bg-background">Demo (Solo Lectura)</option>
+             </select>
+          </div>
+        </div>
+      </AppDialog>
 
       {/* Edit User Dialog */}
-      <Dialog open={!!editUser} onOpenChange={() => setEditUser(null)}>
-        <DialogContent onClose={() => setEditUser(null)}>
-          <DialogHeader>
-            <DialogTitle>Editar Usuario</DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-4 mt-4">
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">Usuario</label>
-              <Input
-                placeholder="Nombre de usuario"
-                value={editUsername}
-                onChange={(e) => setEditUsername(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">
-                Nueva Contraseña <span className="text-muted-foreground font-normal">(opcional)</span>
-              </label>
-              <Input
-                type="password"
-                placeholder="Dejar vacio para no cambiar"
-                value={editPassword}
-                onChange={(e) => setEditPassword(e.target.value)}
-              />
-              {editPassword && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Cambiar contraseña cerrará todas las sesiones del usuario
-                </p>
-              )}
-            </div>
-
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setEditUser(null)} className="flex-1">
-                Cancelar
-              </Button>
-              <Button onClick={updateUser} disabled={updating} className="flex-1">
-                {updating && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
-                Guardar Cambios
-              </Button>
-            </div>
+      <AppDialog
+        isOpen={!!editUser}
+        onClose={() => setEditUser(null)}
+        title="Editar Usuario"
+        description="Modifica las credenciales existentes"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setEditUser(null)} className="flex-1 h-12 rounded-xl">
+              Cancelar
+            </Button>
+            <Button onClick={updateUser} disabled={updating} className="flex-1 h-12 rounded-xl">
+              {updating && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
+              Guardar Cambios
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Usuario</label>
+            <Input
+              placeholder="Nombre de usuario"
+              value={editUsername}
+              onChange={(e) => setEditUsername(e.target.value)}
+            />
           </div>
-        </DialogContent>
-      </Dialog>
+
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">
+              Nueva Contraseña <span className="text-muted-foreground font-normal">(opcional)</span>
+            </label>
+            <Input
+              type="password"
+              placeholder="Dejar vacio para no cambiar"
+              value={editPassword}
+              onChange={(e) => setEditPassword(e.target.value)}
+            />
+            {editPassword && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Cambiar contraseña cerrará todas las sesiones del usuario
+              </p>
+            )}
+          </div>
+        </div>
+      </AppDialog>
     </div>
   );
 }

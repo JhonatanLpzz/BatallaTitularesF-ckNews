@@ -183,7 +183,7 @@ export default function AdminPage() {
       )}
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full flex-1">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 sm:mb-12 mt-16 md:mt-13 animate-fade-in-up">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 sm:mb-12 mt-5 md:mt-4 animate-fade-in-up">
           <div className="text-center sm:text-left">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-2">Panel de Control</h1>
             <p className="text-muted-foreground">Gestiona las batallas en tiempo real</p>
@@ -202,7 +202,7 @@ export default function AdminPage() {
           </div>
         ) : battles.length === 0 ? (
           <div className="glass-card rounded-[32px] text-center py-20 px-6 animate-in fade-in zoom-in duration-500 max-w-2xl mx-auto mt-10">
-            <div className="w-24 h-24 bg-white/5 rounded-[24px] mx-auto flex items-center justify-center mb-8 border border-white/10 shadow-2xl transform -rotate-6">
+            <div className="w-24 h-24 bg-accent rounded-[24px] mx-auto flex items-center justify-center mb-8 border border-border shadow-2xl transform -rotate-6">
               <Swords className="h-12 w-12 " />
             </div>
             <h3 className="text-2xl font-bold text-foreground mb-4 tracking-tight">No hay batallas activas</h3>
@@ -219,7 +219,7 @@ export default function AdminPage() {
               .map((battle, idx) => (
               <div key={battle.id} className="glass-card rounded-[32px] overflow-hidden animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
                 {/* Mobile-Optimized Header */}
-                <div className="px-5 sm:px-8 py-5 sm:py-8 border-b border-white/5 bg-white/[0.01]">
+                <div className="px-5 sm:px-8 py-5 sm:py-8 border-b border-border bg-muted/5">
                   <div className="space-y-5">
                     {/* Title and Status - Mobile Stack */}
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -227,7 +227,7 @@ export default function AdminPage() {
                       <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold tracking-wide self-start ${battle.status === 'active'
                         ? 'bg-status-success/10 text-status-success border border-status-success/20 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
                         : battle.status === 'closed'
-                          ? 'bg-white/5 text-muted-foreground border border-white/10'
+                          ? 'bg-secondary text-muted-foreground border border-border'
                           : battle.status === 'tied'
                             ? 'bg-status-warning/10 text-status-warning border border-status-warning/20 shadow-[0_0_15px_rgba(234,179,8,0.15)]'
                             : battle.status === 'tiebreaker'
@@ -255,7 +255,7 @@ export default function AdminPage() {
                     <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:gap-6 text-sm pt-2">
                       <div className="flex items-center gap-2">
                         <span className="text-muted-foreground">Código:</span>
-                        <code className="font-mono text-foreground font-bold text-sm sm:text-base px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg tracking-wider">
+                        <code className="font-mono text-foreground font-bold text-sm sm:text-base px-3 py-1.5 bg-secondary border border-border rounded-lg tracking-wider">
                           {battle.code}
                         </code>
                       </div>
@@ -293,7 +293,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* Mobile-Optimized Action Bar */}
-                <div className="px-5 sm:px-8 py-5 sm:py-6 bg-black/10 dark:bg-black/30">
+                <div className="px-5 sm:px-8 py-5 sm:py-6 bg-muted/20">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
                     {/* Primary CTA */}
                     {!isDemo && (
@@ -344,14 +344,14 @@ export default function AdminPage() {
                         <Button
                           variant="outline"
                           onClick={() => showQR(battle)}
-                          className="flex-1 sm:flex-none h-12 sm:h-11 px-5 sm:px-6 rounded-xl hover:bg-white/10 text-foreground border-white/10"
+                          className="flex-1 sm:flex-none h-12 sm:h-11 px-5 sm:px-6 rounded-xl"
                         >
                           <QrCode className="h-5 w-5 sm:h-4 sm:w-4 mr-2" />
                           <span className="sm:hidden">QR</span>
                           <span className="hidden sm:inline">Mostrar QR</span>
                         </Button>
 
-                        <Button variant="outline" asChild className="flex-1 sm:flex-none h-12 sm:h-11 px-5 sm:px-6 rounded-xl hover:bg-white/10 text-foreground border-white/10">
+                        <Button variant="outline" asChild className="flex-1 sm:flex-none h-12 sm:h-11 px-5 sm:px-6 rounded-xl">
                           <Link to={ROUTES.RESULTS(battle.code)}>
                             <BarChart3 className="h-5 w-5 sm:h-4 sm:w-4 mr-2" />
                             <span className="sm:hidden">Resultados</span>
@@ -362,7 +362,7 @@ export default function AdminPage() {
 
                       {/* Utility Actions - Mobile Friendly */}
                       {!isDemo && (
-                      <div className="flex items-center justify-center gap-3 mt-2 sm:mt-0 sm:justify-start sm:ml-4 sm:border-l sm:border-white/10 sm:pl-4">
+                      <div className="flex items-center justify-center gap-3 mt-2 sm:mt-0 sm:justify-start sm:ml-4 sm:border-l sm:border-border sm:pl-4">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -377,7 +377,7 @@ export default function AdminPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => deleteBattle(battle.id)}
-                          className="h-12 sm:h-11 w-12 sm:w-11 p-0 hover:bg-destructive/10 hover:text-destructive text-muted-foreground rounded-xl"
+                          className="h-12 sm:h-11 w-12 sm:w-11 p-0 hover:bg-destructive/10 hover:text-destructive rounded-xl"
                           title="Eliminar batalla"
                         >
                           <Trash2 className="h-5 w-5 sm:h-4 sm:w-4" />

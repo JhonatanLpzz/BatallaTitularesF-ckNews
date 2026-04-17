@@ -56,7 +56,7 @@ export function VoterIdentificationForm({ battleTitle, onSubmit }: VoterIdentifi
       </div>
 
       <div className="w-full max-w-[460px] animate-in fade-in slide-in-from-bottom-8 duration-1000">
-        <div className="glass-card rounded-[40px] border border-white/5 bg-white/[0.02] backdrop-blur-3xl p-8 sm:p-12 relative overflow-hidden">
+        <div className="glass-card rounded-[40px] border border-border bg-secondary/5 backdrop-blur-3xl p-8 sm:p-12 relative overflow-hidden">
           <div className="absolute top-6 right-8 opacity-40 hover:opacity-100 transition-opacity">
             <ThemeToggle />
           </div>

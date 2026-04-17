@@ -46,7 +46,7 @@ export function AccessibilityMenu() {
           <Button 
             variant="ghost" 
             size="sm" 
-            className="w-full justify-start gap-2 hover:bg-white/10"
+            className="w-full justify-start gap-2"
             onClick={cycleTextSize}
           >
             <Type className="h-4 w-4" />
@@ -56,7 +56,7 @@ export function AccessibilityMenu() {
           <Button 
             variant="ghost" 
             size="sm" 
-            className={`w-full justify-start gap-2 hover:bg-white/10 ${highContrast ? 'text-campaign-gold' : ''}`}
+            className={`w-full justify-start gap-2 ${highContrast ? 'text-campaign-gold' : ''}`}
             onClick={() => setHighContrast(!highContrast)}
           >
             <Eye className="h-4 w-4" />
@@ -66,7 +66,7 @@ export function AccessibilityMenu() {
           <Button 
             variant="ghost" 
             size="sm" 
-            className={`w-full justify-start gap-2 hover:bg-white/10 ${pauseAnimations ? 'text-campaign-red' : ''}`}
+            className={`w-full justify-start gap-2 ${pauseAnimations ? 'text-campaign-red' : ''}`}
             onClick={() => setPauseAnimations(!pauseAnimations)}
           >
             {pauseAnimations ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
@@ -78,7 +78,7 @@ export function AccessibilityMenu() {
       <Button
         variant="secondary"
         size="icon"
-        className="rounded-full shadow-lg border border-white/10 hover:bg-white/10 bg-background/50 backdrop-blur-md h-12 w-12"
+        className="rounded-full shadow-lg border border-border bg-background/50 backdrop-blur-md h-12 w-12"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Menú de Accesibilidad"
       >

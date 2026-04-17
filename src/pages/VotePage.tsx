@@ -200,10 +200,10 @@ export default function VotePage() {
         </div>
       )}
 
-      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-12 pt-24">
+      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-12 pt-8">
         {hasVoted && (
           <div className="animate-in fade-in slide-in-from-top-6 duration-700">
-            <div className="glass-card rounded-[32px] border border-green-300 dark:border-green-600 bg-green-500 bg-opacity-15 p-6 flex items-center justify-between backdrop-blur-3xl">
+            <div className="glass-card rounded-[32px] border border-status-success/30 bg-status-success/10 p-6 flex items-center justify-between backdrop-blur-3xl">
               <div className="flex items-center gap-4 text-left">
                 <CheckCircle2 className="h-16 w-16" />
                 <div>
@@ -228,7 +228,7 @@ export default function VotePage() {
                 disabled={isDisabled}
                 className={cn(
                   "relative w-full text-left rounded-[32px] transition-all duration-500 group border",
-                  "bg-white/[0.02] border-white/5 hover:border-white/10 hover:bg-white/[0.04]",
+                  "bg-secondary/30 border-border hover:border-accent hover:bg-secondary/50",
                   isDisabled ? "cursor-not-allowed opacity-40" : "cursor-pointer active:scale-[0.98]",
                   isVotedFor && "border-primary/40 bg-primary/[0.05]"
                 )}
@@ -278,7 +278,7 @@ export default function VotePage() {
                   ) : (
                     <div className={cn(
                       "h-14 w-14 rounded-2xl border flex items-center justify-center transition-all duration-500 shrink-0",
-                      isTiebreakerDisabled ? "border-white/5 /10" : "border-white/10 group-hover:bg-primary group-hover:text-primary-foreground  group-hover:rotate-12"
+                      isTiebreakerDisabled ? "border-border" : "border-border group-hover:bg-primary group-hover:text-primary-foreground  group-hover:rotate-12"
                     )}>
                       {voting === participant.id ? <Loader2 className="h-6 w-6 animate-spin" /> : <ChevronRight className="h-6 w-6" />}
                     </div>
@@ -297,7 +297,7 @@ export default function VotePage() {
       </main>
 
       {/* Footer con créditos originales */}
-      <footer className="mt-auto border-t border-white/5 py-16 px-6 bg-white/[0.01]">
+      <footer className="mt-auto border-t border-border py-16 px-6 bg-muted/5">
         <div className="max-w-3xl mx-auto text-center">
           <p className=" text-sm font-medium leading-relaxed max-w-md mx-auto mb-8">
             Un tributo a la comedia de <span className="text-foreground font-bold">F*cks News Noticreo</span>.

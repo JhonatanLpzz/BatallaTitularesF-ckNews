@@ -2,6 +2,7 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface DialogProps {
   open: boolean;
@@ -23,24 +24,29 @@ function Dialog({ open, onOpenChange, children }: DialogProps) {
     };
   }, [open]);
 
-  if (!open) return null;
-
   return createPortal(
     <DialogContext.Provider value={{ onOpenChange }}>
-      <div className="fixed inset-0 z-[9999]">
-        <div 
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" 
-          onClick={() => onOpenChange(false)} 
-          aria-hidden="true"
-        />
-        <div 
-          className="fixed inset-0 flex items-center justify-center p-4 sm:p-6 pointer-events-none"
-          role="dialog"
-          aria-modal="true"
-        >
-          {children}
-        </div>
-      </div>
+      <AnimatePresence>
+        {open && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm" 
+              onClick={() => onOpenChange(false)} 
+              aria-hidden="true"
+            />
+            <div 
+              className="fixed inset-0 flex items-center justify-center p-4 sm:p-6 pointer-events-none"
+              role="dialog"
+              aria-modal="true"
+            >
+              {children}
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
     </DialogContext.Provider>,
     document.body
   );
@@ -50,10 +56,12 @@ function DialogContent({
   className,
   children,
   onClose,
+  animation = "bottom",
 }: {
   className?: string;
   children: React.ReactNode;
   onClose?: () => void;
+  animation?: "top" | "bottom";
 }) {
   const context = React.useContext(DialogContext);
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -88,10 +96,28 @@ function DialogContent({
     maskStyle = "linear-gradient(to bottom, black 0%, black calc(100% - 24px), transparent 100%)";
   }
 
+  const variants = {
+    top: {
+      initial: { y: -100, opacity: 0 },
+      animate: { y: 0, opacity: 1 },
+      exit: { y: -100, opacity: 0 },
+    },
+    bottom: {
+      initial: { y: 100, opacity: 0 },
+      animate: { y: 0, opacity: 1 },
+      exit: { y: 100, opacity: 0 },
+    }
+  };
+
   return (
-    <div
+    <motion.div
+      variants={variants[animation]}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={{ type: "spring", damping: 25, stiffness: 200 }}
       className={cn(
-        "relative z-[10000] w-full max-w-lg rounded-xl border border-white/5 bg-background shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200 pointer-events-auto flex flex-col max-h-[90vh] sm:max-h-[85vh]",
+        "relative z-[10000] w-full max-w-lg rounded-xl border border-white/5 bg-background shadow-2xl pointer-events-auto flex flex-col max-h-[90vh] sm:max-h-[85vh]",
         className
       )}
       onClick={(e) => e.stopPropagation()}
@@ -114,7 +140,7 @@ function DialogContent({
       >
         {children}
       </div>
-    </div>
+    </motion.div>
   );
 }
 

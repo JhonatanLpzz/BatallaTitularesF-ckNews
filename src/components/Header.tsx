@@ -39,7 +39,7 @@ export function Header({
     >
       <div
         className={cn(
-          "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between glass-card border-b border-white/[0.06]",
+          "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between glass-card border-b border-border",
           scrolled
             ? "max-w-4xl h-14 rounded-3xl shadow-2xl px-4 sm:px-6"
             : "max-w-6xl h-16 rounded-sm border-x-0 border-t-0 px-6",

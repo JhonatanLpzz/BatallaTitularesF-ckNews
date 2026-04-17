@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AppDialog } from "@/components/AppDialog";
 import { useAuth } from "@/context/AuthContext";
 import { battleService } from "@/services/api";
 import {
@@ -125,111 +125,112 @@ export function CreateBattleDialog({ open, onOpenChange, onCreated }: CreateBatt
   // ---- Render --------------------------------------------------------------
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent onClose={() => onOpenChange(false)} className="glass-card border-white/10 max-w-2xl rounded-[32px]">
-        <DialogHeader>
-          <DialogTitle className="text-2xl sm:text-3xl font-bold text-foreground mb-2 tracking-tight">Nueva Batalla</DialogTitle>
-          <p className="text-sm text-zinc-400">Configura los detalles de la competencia</p>
-        </DialogHeader>
-
-        <div className="space-y-6 mt-6">
-          <div>
-            <label className="text-sm text-zinc-300 ml-1 font-medium mb-2 block">Título</label>
-            <Input
-              placeholder="Ej: Ronda 1 - Noticias Absurdas"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="bg-black/20 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-zinc-300 ml-1 font-medium mb-2 block">Descripción (opcional)</label>
-            <Textarea
-              placeholder="Descripción breve..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={2}
-              className="bg-black/20 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-zinc-300 ml-1 font-medium mb-2 block">Duración (opcional)</label>
-            <div className="flex items-center gap-3">
-              <Input
-                type="number"
-                min="1"
-                placeholder="Sin límite"
-                value={durationMinutes}
-                onChange={(e) => setDurationMinutes(e.target.value)}
-                className="w-32 bg-black/20 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
-              />
-              <span className="text-sm text-zinc-400 font-medium">minutos</span>
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <label className="text-sm text-zinc-300 ml-1 font-medium">Participantes</label>
-              <Button variant="outline" size="sm" onClick={addParticipant} className="hover:text-white border-white/10 hover:bg-white/10">
-                <Plus className="h-4 w-4 mr-1.5" /> Agregar
-              </Button>
-            </div>
-
-            <div className="space-y-4">
-              {participants.map((p, idx) => (
-                <div key={idx} className="flex flex-col sm:flex-row gap-4 items-start bg-black/20 p-5 rounded-[20px] border border-white/5 relative group transition-colors hover:border-white/10">
-                  <div className="flex-1 w-full space-y-3">
-                    <Input
-                      placeholder={`Participante ${idx + 1}`}
-                      value={p.name}
-                      onChange={(e) => updateParticipant(idx, "name", e.target.value)}
-                      className="h-11 bg-transparent border-white/10 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
-                    />
-                    <Input
-                      placeholder="Titular/Noticia..."
-                      value={p.headline}
-                      onChange={(e) => updateParticipant(idx, "headline", e.target.value)}
-                      className="h-11 bg-transparent border-white/10 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
-                    <div className="flex items-center gap-2 flex-1 sm:flex-none">
-                      <label className="text-xs text-muted-foreground sm:hidden">Color:</label>
-                      <input
-                        type="color"
-                        value={p.color}
-                        onChange={(e) => updateParticipant(idx, "color", e.target.value)}
-                        className="h-11 w-11 rounded-xl cursor-pointer bg-transparent border-0 p-1 hover:scale-105 transition-transform shrink-0"
-                      />
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeParticipant(idx)}
-                      disabled={participants.length <= MIN_PARTICIPANTS}
-                      className="h-11 w-11 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <Button
-            onClick={handleCreate}
-            disabled={creating}
-            variant="outline"
-          >
-            {creating ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Plus className="h-5 w-5 mr-2" />}
-            {creating ? "Creando..." : "Crear Batalla"}
-          </Button>
+    <AppDialog
+      isOpen={open}
+      onClose={() => onOpenChange(false)}
+      title="Nueva Batalla"
+      description="Configura los detalles de la competencia"
+      className="max-w-2xl"
+      footer={
+        <Button
+          onClick={handleCreate}
+          disabled={creating}
+          variant="outline"
+          className="flex-1 h-12 rounded-xl"
+        >
+          {creating ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Plus className="h-5 w-5 mr-2" />}
+          {creating ? "Creando..." : "Crear Batalla"}
+        </Button>
+      }
+    >
+      <div className="space-y-6">
+        <div>
+          <label className="text-sm font-medium mb-1.5 block">Título</label>
+          <Input
+            placeholder="Ej: Ronda 1 - Noticias Absurdas"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="bg-black/20 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
+          />
         </div>
-      </DialogContent>
-    </Dialog>
+
+        <div>
+          <label className="text-sm font-medium mb-1.5 block">Descripción (opcional)</label>
+          <Textarea
+            placeholder="Descripción breve..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={2}
+            className="bg-black/20 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium mb-1.5 block">Duración (opcional)</label>
+          <div className="flex items-center gap-3">
+            <Input
+              type="number"
+              min="1"
+              placeholder="Sin límite"
+              value={durationMinutes}
+              onChange={(e) => setDurationMinutes(e.target.value)}
+              className="w-32 bg-black/20 focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
+            />
+            <span className="text-sm text-zinc-400 font-medium">minutos</span>
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <label className="text-sm font-medium">Participantes</label>
+            <Button variant="outline" size="sm" onClick={addParticipant}>
+              <Plus className="h-4 w-4 mr-1.5" /> Agregar
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            {participants.map((p, idx) => (
+              <div key={idx} className="flex flex-col sm:flex-row gap-4 items-start bg-black/20 p-5 rounded-[20px] border border-border relative group transition-colors hover:border-accent">
+                <div className="flex-1 w-full space-y-3">
+                  <Input
+                    placeholder={`Participante ${idx + 1}`}
+                    value={p.name}
+                    onChange={(e) => updateParticipant(idx, "name", e.target.value)}
+                    className="h-11 bg-transparent border-input focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
+                  />
+                  <Input
+                    placeholder="Titular/Noticia..."
+                    value={p.headline}
+                    onChange={(e) => updateParticipant(idx, "headline", e.target.value)}
+                    className="h-11 bg-transparent border-input focus-visible:ring-campaign-gold/50 focus-visible:border-campaign-gold"
+                  />
+                </div>
+
+                <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
+                  <div className="flex items-center gap-2 flex-1 sm:flex-none">
+                    <label className="text-xs text-muted-foreground sm:hidden">Color:</label>
+                    <input
+                      type="color"
+                      value={p.color}
+                      onChange={(e) => updateParticipant(idx, "color", e.target.value)}
+                      className="h-11 w-11 rounded-xl cursor-pointer bg-transparent border-0 p-1 hover:scale-105 transition-transform shrink-0"
+                    />
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeParticipant(idx)}
+                    disabled={participants.length <= MIN_PARTICIPANTS}
+                    className="h-11 w-11 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </AppDialog>
   );
 }

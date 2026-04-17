@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Loader2, Timer, Swords } from "lucide-react";
+import { Loader2, Timer, Trophy } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -20,8 +21,6 @@ export default function ResultsPage() {
     try {
       const data = await battleService.getByCode(code);
       setBattle(data);
-    } catch {
-      // error
     } finally {
       setLoading(false);
     }
@@ -35,10 +34,15 @@ export default function ResultsPage() {
     enabled: !!battle,
     onMessage: (data) => {
       const update = data as VoteUpdate;
-
-      if (update.type === "vote_update" && battle) {
+      if (update.type === "vote_update") {
         setBattle((prev) =>
-          prev ? { ...prev, participants: update.participants, totalVotes: update.totalVotes } : prev
+          prev
+            ? {
+                ...prev,
+                participants: update.participants,
+                totalVotes: update.totalVotes,
+              }
+            : prev
         );
       }
     },
@@ -47,222 +51,132 @@ export default function ResultsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="relative flex items-center justify-center">
-          <div className="absolute h-16 w-16 border-t-2 rounded-full animate-spin opacity-20" />
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        </div>
+        <Loader2 className="animate-spin text-primary" />
       </div>
     );
   }
 
   if (!battle) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <div className="glass-card rounded-[32px] p-8 text-center max-w-sm w-full">
-          <p className="text-muted-foreground mb-4">Batalla no encontrada</p>
-          <Link to="/">
-            <Button className="bg-white/10 hover:bg-white/20 text-foreground rounded-xl mt-4">Volver</Button>
-          </Link>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <Link to="/">
+          <Button>Volver</Button>
+        </Link>
       </div>
     );
   }
 
-  const sorted = [...(battle.participants || [])].sort((a, b) => b.votes - a.votes);
-  const maxVotes = sorted.length > 0 ? sorted[0].votes : 0;
+  const sorted = [...battle.participants].sort((a, b) => b.votes - a.votes);
+  const maxVotes = sorted[0]?.votes ?? 1;
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans pt-8">
-      {/* Background blobs */}
-      <div className="fixed inset-0 -z-10 pointer-events-none">
-        <div className="absolute top-[30%] -right-[20%] w-[50%] h-[50%] blur-[120px] rounded-full" />
-        <div className="absolute bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-campaign-blue/5 blur-[120px] rounded-full" />
-      </div>
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <Header />
 
-      <Header
-        leftContent={
-          <div className="hidden sm:block min-w-0">
-            <h1 className="font-bold truncate text-lg">RESULTADOS</h1>
-            <p className="text-muted-foreground text-xs">Batalla de Titulares</p>
-          </div>
-        }
-        rightContent={
-          <div className="flex items-center gap-4 flex-shrink-0">
-            <div className="text-right hidden sm:block">
-              <span className="block text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-bold">Total Votos</span>
-              <span className="text-lg font-semibold tabular-nums text-primary tracking-tight">{battle.totalVotes || 0}</span>
-            </div>
-            {battle.status === "active" && (
-              <Badge className="bg-status-success/20 text-status-success border-status-success/30 text-[10px] sm:text-xs animate-pulse px-2 rounded-lg">VIVO</Badge>
-            )}
-            {battle.status === "tied" && (
-              <Badge className="bg-status-warning/20 text-status-warning border-status-warning/30 text-[10px] sm:text-xs px-2 rounded-lg">EMPATE</Badge>
-            )}
-            {battle.status === "tiebreaker" && (
-              <Badge className="bg-status-warning/20 text-status-warning border-status-warning/30 text-[10px] sm:text-xs animate-pulse px-2 rounded-lg">DESEMPATE</Badge>
-            )}
-            <CountdownBadge expiresAt={battle.expiresAt} />
-          </div>
-        }
-      />
+      <main className="max-w-4xl mx-auto w-full px-4 pt-3 pb-10 flex-1">
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full flex-1">
-        {/* Mobile-Optimized Title */}
-        <div className="text-center mb-8 sm:mb-12 animate-fade-in-up mt-8 md:mt-12">
-          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight mb-2 sm:mb-4 px-2">
-            <span className="animate-glow-pulse leading-tight">{battle.title}</span>
+        {/* Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl md:text-6xl font-black tracking-tight">
+            {battle.title}
           </h1>
-          {battle.description && (
-            <p className="text-muted-foreground text-sm sm:text-lg px-4 leading-relaxed font-medium">{battle.description}</p>
-          )}
-          <div className="w-16 sm:w-24 h-1 bg-gradient-to-r mx-auto mt-4 sm:mt-6 rounded-full opacity-50" />
+          <p className="text-muted-foreground text-sm mt-2 uppercase tracking-widest">
+            Resultados en tiempo real
+          </p>
+        </motion.div>
+
+        {/* Total votes */}
+        <div className="flex justify-center mb-10">
+          <div className="glass-card px-6 py-3 rounded-xl border border-white/10 backdrop-blur-md">
+            <span className="text-xs text-muted-foreground uppercase tracking-widest">
+              Total votos
+            </span>
+            <div className="text-2xl font-bold text-center">
+              {battle.totalVotes}
+            </div>
+          </div>
         </div>
 
-        {/* Tie / Tiebreaker Banner */}
-        {(battle.status === "tied" || battle.status === "tiebreaker") && (
-          <div className={`glass-card rounded-[24px] p-6 mb-8 border text-center ${battle.status === "tied"
-            ? "border-status-warning/40 bg-status-warning/5"
-            : "border-status-warning/50 bg-status-warning/5"
-            }`}>
-            <p className={`font-semibold text-sm ${battle.status === "tied" ? "text-status-warning" : "text-status-warning"
-              }`}>
-              {battle.status === "tied"
-                ? "La batalla terminó en empate. El administrador puede iniciar una ronda de desempate."
-                : `Ronda de desempate${battle.tiebreakRound ? ` #${battle.tiebreakRound}` : ""} en curso.`}
-            </p>
-          </div>
-        )}
-
-        {/* Liquid Glass Results */}
-        <div className="space-y-4 sm:space-y-6">
-          {sorted.map((participant: Participant, idx: number) => {
-            const isWinner = idx === 0 && participant.votes > 0 && battle.status === "closed";
-            const barWidth = maxVotes > 0 ? (participant.votes / maxVotes) * 100 : 0;
+        {/* Participants */}
+        <div className="space-y-6">
+          {sorted.map((p, i) => {
+            const percentage = (p.votes / maxVotes) * 100;
+            const isWinner = i === 0 && battle.status === "closed";
 
             return (
-              <div
-                key={participant.id}
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
                 className={cn(
-                  "glass-card rounded-[28px] transition-all duration-500 animate-fade-in-up",
-                  isWinner && "border-campaign-gold/40 bg-campaign-gold/[0.02]"
+                  "relative rounded-2xl p-6 border backdrop-blur-md",
+                  "bg-white/[0.03] border-white/10",
+                  isWinner && "ring-2 ring-yellow-400/50"
                 )}
-                style={{ animationDelay: `${idx * 150}ms` }}
               >
-                <div className="relative p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center gap-6">
-                  {/* Layer Liquid Progress Bar */}
-                  <div
-                    className="absolute inset-y-0 left-0 transition-all duration-1000 ease-&lsqb;cubic-bezier(0.23,1,0.32,1)&rsqb; z-0"
-                    style={{
-                      width: `${barWidth}%`,
-                      backgroundColor: participant.color,
-                      opacity: 0.15,
-                    }}
-                  />
+                {/* Progress Bar */}
+                <motion.div
+                  className="absolute left-0 top-0 h-full rounded-2xl opacity-20"
+                  style={{ backgroundColor: p.color }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${percentage}%` }}
+                  transition={{ duration: 0.8 }}
+                />
 
-                  {/* Header Row - Position + Name + Percentage */}
-                  <div className="flex items-center justify-between sm:justify-start gap-4 sm:gap-6 z-10 w-full sm:w-auto">
+                {/* Content */}
+                <div className="relative z-10 flex items-center justify-between gap-4">
 
-                    {/* Name + Champion Badge (Mobile) */}
-                    <div className="flex items-center gap-3 flex-1 min-w-0 sm:hidden">
-                      <div
-                        className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.3)] shrink-0"
-                        style={{ backgroundColor: participant.color }}
-                      />
-                      <span className="font-bold text-lg text-foreground tracking-tight overflow-auto text-nowrap no-scrollbar">{participant.name}</span>
-
-                    </div>
-
-                    {/* Percentage (Mobile) */}
-                    <div className="flex flex-col items-end sm:hidden shrink-0">
-                      <span
-                        className="text-2xl font-bold leading-none tracking-tighter"
-                        style={{ color: participant.color }}
-                      >
-                        {participant.percentage}%
-                      </span>
-                      <span className="text-[11px] text-muted-foreground font-bold uppercase tracking-tighter mt-1">
-                        {participant.votes} votos
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Desktop Layout Content */}
-                  <div className="flex-1 min-w-0 hidden sm:flex flex-col justify-center z-10">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.3)]"
-                          style={{ backgroundColor: participant.color }}
-                        />
-                        <span className="font-bold text-xl text-foreground overflow-auto ">{participant.name}</span>
-
-                      </div>
-                      <div className="flex items-end gap-4">
-                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-tighter pb-1">
-                          {participant.votes} votos
-                        </span>
-                        <span
-                          className="text-4xl font-bold tracking-tighter leading-none"
-                          style={{ color: participant.color }}
-                        >
-                          {participant.percentage}%
-                        </span>
-                      </div>
-                    </div>
-                    <div className="overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
-                      <p className="text-muted-foreground font-medium leading-snug inline-block pe-2">
-                        {participant.headline}
-                      </p>
-                      {isWinner && (
-                        <span className="text-xs font-bold mt-2 px-2 rounded-full w-fit" style={{ color: participant.color, backgroundColor: `${participant.color}20`, border: `1px solid ${participant.color}40` }}>
-                          GANADOR
-                        </span>
-                      )}
-                    </div>
-
-                  </div>
-                </div>
-
-                {/* Headline - Full Width (Mobile only) */}
-                <div className="px-6 pb-6 sm:hidden relative z-10">
-                  <div className="overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
-                    <p className="text-sm text-muted-foreground font-medium leading-relaxed inline-block">
-                      {participant.headline}
-                    </p>
-                  </div>
-                  {isWinner && (
-                    <span className="text-xs font-bold mt-2 px-2 rounded-full" style={{ color: participant.color, backgroundColor: `${participant.color}20`, border: `1px solid ${participant.color}40` }}>
-                      GANADOR
+                  {/* Left */}
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: p.color }}
+                    />
+                    <span className="font-semibold text-lg">
+                      {p.name}
                     </span>
-                  )}
+                    {isWinner && (
+                      <Trophy className="h-4 w-4 text-yellow-400" />
+                    )}
+                  </div>
+
+                  {/* Right */}
+                  <div className="text-right">
+                    <div
+                      className="text-3xl font-black tracking-tighter"
+                      style={{ color: p.color }}
+                    >
+                      {p.percentage}%
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {p.votes} votos
+                    </div>
+                  </div>
                 </div>
-              </div>
+
+                {/* Bottom progress */}
+                <div className="mt-4 h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full"
+                    style={{ backgroundColor: p.color }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${percentage}%` }}
+                    transition={{ duration: 0.8 }}
+                  />
+                </div>
+              </motion.div>
             );
           })}
         </div>
-
-        {(!battle.participants || battle.participants.length === 0) && (
-          <div className="glass-card rounded-[32px] p-12 text-center mt-8">
-            <Swords className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <p className="text-lg text-muted-foreground font-medium">No hay participantes en esta batalla</p>
-          </div>
-        )}
       </main>
 
-      {/* Footer minimalista Apple Style */}
-      <footer className="mt-auto border-t border-white/[0.06] py-12 px-6 bg-background/80 backdrop-blur-md">
-        <div className="max-w-3xl mx-auto text-center space-y-6">
-          <p className="text-muted-foreground text-sm leading-relaxed max-w-xl mx-auto">
-            Un tributo a la comedia de <span className="font-medium">F*cks News Noticreo</span>.
-            Gracias por el apoyo y las risas constantes.
-          </p>
-          <div className="flex flex-col items-center gap-2 text-muted-foreground ">
-            <span className="text-[10px] uppercase tracking-[0.1em]font-bold">Desarrollado por</span>
-            <span className="text-sm font-medium">
-              Jhonatan Lopez Conde
-            </span>
-          </div>
-        </div>
+      <footer className="text-center text-xs text-muted-foreground py-6">
+        Jhonatan Lopez Conde — Bogotá
       </footer>
     </div>
   );
@@ -272,20 +186,10 @@ function CountdownBadge({ expiresAt }: { expiresAt?: string | null }) {
   const countdown = useCountdown(expiresAt || "");
   if (!countdown || !expiresAt) return null;
 
-  if (countdown.isExpired) {
-    return <Badge variant="destructive" className="text-[10px] px-2 rounded-lg">FINALIZADA</Badge>;
-  }
-
   return (
-    <div className="pl-4 sm:pl-6 border-l border-white/10 flex flex-col items-end">
-      <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-bold mb-0.5">Cierre en</span>
-      <div className="flex items-center gap-1 sm:gap-2">
-        <Timer className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-campaign-red" />
-        <span className="text-base sm:text-lg font-mono font-bold text-campaign-red tabular-nums tracking-tighter drop-shadow-sm">
-          <span className="hidden sm:inline">{countdown.display}</span>
-          <span className="sm:hidden">{countdown.display.split(':')[0]}:{countdown.display.split(':')[1]}</span>
-        </span>
-      </div>
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <Timer className="h-4 w-4" />
+      <span>{countdown.display}</span>
     </div>
   );
 }
