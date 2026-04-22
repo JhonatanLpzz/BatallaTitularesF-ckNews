@@ -5,7 +5,7 @@
 
 **Proyecto:** Batalla de Titulares — F\*cks News Noticreo  
 **Desarrollado por:** Jhonatan Lopez Conde — Bogota, Colombia  
-**Ultima actualizacion:** Abril 2026
+**Ultima actualizacion:** Abril 2026 — Arquitectura WebSocket, Ranking Global, N+1 fixes
 
 ---
 
@@ -20,7 +20,8 @@
 | **Backend** | Fastify | 5.2 |
 | **ORM** | Drizzle ORM | 0.38 |
 | **Base de datos** | SQLite (bun:sqlite) | embedded |
-| **Real-time** | Server-Sent Events (SSE) | nativo |
+| **Real-time** | Socket.IO (WebSockets) | 4.8 |
+| **Confetti** | canvas-confetti | 1.9 |
 | **QR** | qrcode | 1.5 (server-side) |
 | **Auth** | Bcrypt (Bun.password) + nanoid sessions | — |
 
@@ -33,15 +34,19 @@ batalla-titulares-fcknews/
 ├── server/                          # === BACKEND (Fastify) ===
 │   ├── index.ts                     # Entry point, CORS, static serve, health check
 │   ├── config.ts                    # Configuracion env vars centralizada
-│   ├── sse.ts                       # Utilidad SSE: addClient, removeClient, broadcast
+│   ├── sse.ts                       # Legado SSE (heartbeat 25s, limpieza de conexiones)
+│   ├── realtime/
+│   │   ├── websocket.ts            # Servidor Socket.IO con rooms por battleCode
+│   │   └── publisher.ts            # Publisher desacoplado (adaptador de transporte)
 │   ├── db/
 │   │   ├── schema.ts               # Esquema Drizzle ORM (5 tablas con JSDoc)
-│   │   └── index.ts                # Conexion SQLite + migraciones inline
+│   │   └── index.ts                # Conexion SQLite + migraciones inline + 4 indices
 │   └── routes/
 │       ├── auth.ts                  # Auth: login, logout, setup, CRUD usuarios
-│       ├── battles.ts              # CRUD batallas + timer + auto-cierre + QR
-│       ├── votes.ts                # Registro/cambio votos + SSE broadcast
-│       └── sse.ts                  # Endpoint SSE por batalla
+│       ├── battles.ts              # CRUD batallas + timer + auto-cierre + QR (N+1 fixed)
+│       ├── votes.ts                # Registro/cambio votos + rate limiting + WS publish
+│       ├── rankings.ts             # Endpoint ranking global agregado
+│       └── sse.ts                  # Endpoint SSE legado (mantenido por compatibilidad)
 │
 ├── src/                             # === FRONTEND (React 18) ===
 │   ├── App.tsx                      # Router principal + ThemeProvider + AuthProvider
@@ -54,13 +59,14 @@ batalla-titulares-fcknews/
 │   │
 │   ├── services/
 │   │   └── api.ts                  # Capa de servicios: authService, battleService,
-│   │                                #   voteService, userService (tipado fuerte)
+│   │                                #   voteService, rankingService, userService
 │   ├── context/
 │   │   ├── AuthContext.tsx          # Estado de autenticacion global
 │   │   └── ThemeContext.tsx         # Tema claro/oscuro
 │   │
 │   ├── hooks/
-│   │   ├── useSSE.ts               # SSE con reconexion automatica
+│   │   ├── useWebSocket.ts         # Socket.IO con rooms, join/leave, reconexion
+│   │   ├── useSSE.ts               # SSE legado (no usado activamente)
 │   │   ├── useCountdown.ts         # Countdown reactivo MM:SS
 │   │   └── useBattleStatusMonitor.ts # Polling de estado para batallas activas
 │   │
@@ -73,7 +79,7 @@ batalla-titulares-fcknews/
 │   │   ├── CreateBattleDialog.tsx   # Modal crear batalla
 │   │   ├── QRDialog.tsx             # Modal mostrar QR
 │   │   ├── VoteTimer.tsx            # Countdown publico + redirect al expirar
-│   │   ├── VoterIdentificationForm.tsx # Formulario identificacion votante
+│   │   ├── VoterIdentificationForm.tsx # Formulario identificacion (legacy, no requerido)
 │   │   ├── Header.tsx               # Header reutilizable
 │   │   ├── ProtectedRoute.tsx       # Guard de rutas admin
 │   │   ├── ResultsChart.tsx         # Grafico de resultados
@@ -87,12 +93,13 @@ batalla-titulares-fcknews/
 │   │   └── ui/                      # Componentes shadcn/ui base
 │   │
 │   └── pages/
-│       ├── LandingPage.tsx          # Landing publica de bienvenida
+│       ├── LandingPage.tsx          # Landing publica + boton ranking global
 │       ├── LoginPage.tsx            # Login admin + setup inicial
-│       ├── AdminPage.tsx            # Panel admin (usa CreateBattleDialog, QRDialog, AdminTimer)
+│       ├── AdminPage.tsx            # Panel admin (CreateBattleDialog, QRDialog, AdminTimer)
 │       ├── UserManagementPage.tsx   # CRUD usuarios administradores
-│       ├── VotePage.tsx             # Votacion publica (usa VoterIdentificationForm, BattleStatusScreen, VoteTimer)
-│       └── ResultsPage.tsx          # Resultados en vivo + countdown
+│       ├── VotePage.tsx             # Votacion publica (nombre opcional, confetti, haptic)
+│       ├── ResultsPage.tsx          # Resultados en vivo + countdown
+│       └── RankingPage.tsx          # Ranking global de participantes (/ranking)
 │
 ├── public/
 │   └── logo_fn.png                  # Logo F*cks News Noticreo
@@ -165,7 +172,12 @@ Documentacion detallada con JSDoc en `server/db/schema.ts`.
 | `fingerprint` | TEXT | NOT NULL | Huella dispositivo |
 | `voted_at` | TEXT | NOT NULL | Timestamp voto |
 
-**Indice unico:** `(battle_id, fingerprint)` — previene votos duplicados por dispositivo.
+**Indices:**
+- `UNIQUE (battle_id, fingerprint)` — previene votos duplicados por dispositivo
+- `idx_votes_participant_id` — acelera COUNT por participante
+- `idx_votes_battle_participant` — acelera agregaciones JOIN
+- `idx_participants_battle_position` — acelera ORDER BY en listados
+- `idx_battles_status_created` — acelera filtros por estado
 
 ---
 
@@ -184,11 +196,12 @@ Documentacion detallada con JSDoc en `server/db/schema.ts`.
 
 ### Publico (Votante)
 1. Escanea QR → llega a `/votar/:code`
-2. Ingresa nombre (obligatorio), documento y celular (opcionales)
-3. Selecciona titular favorito → voto registrado con confirmacion visual
+2. Selecciona titular favorito directamente (**nombre es opcional**, se asigna alias anonimo)
+3. Voto registrado → confetti animado + haptic feedback en movil
 4. Puede cambiar su voto mientras el timer siga activo
-5. Ve porcentajes en tiempo real via SSE
+5. Ve porcentajes en tiempo real via **WebSocket (Socket.IO)**
 6. Al expirar el timer, redirige automaticamente a resultados
+7. Puede explorar el ranking global en `/ranking`
 
 ---
 
@@ -196,9 +209,10 @@ Documentacion detallada con JSDoc en `server/db/schema.ts`.
 
 | Ruta | Acceso | Componente | Descripcion |
 |------|--------|-----------|-------------|
-| `/` | Publico | `LandingPage` | Landing page |
+| `/` | Publico | `LandingPage` | Landing page con batallas activas |
 | `/login` | Publico | `LoginPage` | Login / Setup inicial |
-| `/votar/:code` | Publico | `VotePage` | Votacion (destino QR) |
+| `/ranking` | Publico | `RankingPage` | Ranking global de participantes |
+| `/votar/:code` | Publico | `VotePage` | Votacion publica (destino QR) |
 | `/resultados/:code` | Publico | `ResultsPage` | Resultados en vivo |
 | `/admin` | Protegido | `AdminPage` | Panel de administracion |
 | `/admin/usuarios` | Protegido | `UserManagementPage` | Gestion de admins |
@@ -210,8 +224,15 @@ Documentacion detallada con JSDoc en `server/db/schema.ts`.
 Documentacion completa en la tabla de [`README.md`](./README.md#api-reference).
 Documentacion JSDoc en `server/routes/*.ts`.
 
-**Endpoints Públicos Nuevos Adicionales:**
-- `GET /api/battles/active`: Retorna de forma segura solo las competencias corriendo en estado "active" o "tiebreaker" destinadas a Landing Pages publicas.
+**Endpoints publicos adicionales:**
+- `GET /api/battles/active` — Batallas en estado active/tiebreaker/closed para landing page
+- `GET /api/rankings/global` — Ranking global agregado por nombre de participante (votos, wins, batallas)
+
+**Tiempo real (WebSocket):**
+- Path: `/ws/socket.io`
+- El cliente emite `join_battle(battleCode)` para suscribirse a un room
+- El servidor emite `vote_update` con `{ participants, totalVotes }` en cada voto
+- Publisher desacoplado en `server/realtime/publisher.ts` — intercambiable por Redis Pub/Sub
 
 ---
 
@@ -232,15 +253,18 @@ Documentacion JSDoc en `server/routes/*.ts`.
 
 ### Frontend
 - **Capa de servicios:** Todas las llamadas API centralizadas en `src/services/api.ts`
-- **Constantes:** Endpoints, rutas, defaults en `src/constants/index.ts`
-- **Tipos:** Interfaces documentadas con JSDoc en `src/types.ts`
+- **Constantes:** Endpoints, rutas, defaults, `WS_PATH` en `src/constants/index.ts`
+- **Tipos:** Interfaces documentadas con JSDoc en `src/types.ts` (`WSEvent`, `GlobalRankingEntry`)
 - **Componentizacion:** Paginas delegated a componentes especializados
-- **Hooks:** SSE con reconexion, countdown reactivo, monitor de estado
+- **Hooks:** `useWebSocket` (Socket.IO con rooms), countdown reactivo, monitor de estado
+- **UX:** Nombre votante opcional (alias anonimo), confetti en voto, haptic feedback movil
 
 ### Backend
 - **Rutas documentadas:** Cada archivo de rutas tiene JSDoc con lista de endpoints
 - **Config centralizada:** `server/config.ts` con validacion de produccion
-- **SSE modular:** Utilidad de broadcast separada del endpoint
+- **WebSocket desacoplado:** `server/realtime/publisher.ts` abstrae el transporte; sustituible por Redis Pub/Sub
+- **Rate limiting:** Sliding window en memoria por fingerprint (`Map<string, number[]>`)
+- **N+1 eliminado:** Todas las queries de conteo usan `LEFT JOIN + GROUP BY` en lugar de loops
 - **Auto-cierre:** Timer verifica expiracion + detecta empates automaticamente
 
 ---
