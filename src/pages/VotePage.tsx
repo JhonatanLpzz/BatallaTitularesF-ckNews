@@ -1,13 +1,14 @@
 /**
  * @fileoverview Página pública de votación.
- * Flujo: Identificación del votante → Selección de titular → Resultados en vivo.
- * Refactorizado: formulario en {@link VoterIdentificationForm},
- * estados de error en {@link BattleStatusScreen}, timer en {@link VoteTimer}.
+ * Flujo: Selección de titular → Resultados en vivo.
+ * El nombre del votante es opcional (anónimo por defecto).
+ * Incluye confetti + haptic feedback al votar.
  * @module pages/VotePage
  */
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
+import confetti from "canvas-confetti";
 import {
   CheckCircle2,
   Loader2,
@@ -20,11 +21,36 @@ import { cn, generateFingerprint } from "@/lib/utils";
 import { battleService, voteService } from "@/services/api";
 import { BATTLE_STATUS, LIVE_STATUSES } from "@/constants";
 import type { Battle, Participant, VoteUpdate, ApiError } from "@/types";
-import { useSSE } from "@/hooks/useSSE";
+import { useWebSocket } from "@/hooks/useWebSocket";
 import { Header } from "@/components/Header";
 import { VoteTimer } from "@/components/VoteTimer";
-import { VoterIdentificationForm } from "@/components/VoterIdentificationForm";
 import { BattleStatusScreen } from "@/components/BattleStatusScreen";
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+const ANONYMOUS_NAMES = [
+  "Fan Anónimo", "Votante Rápido", "Espectador", "Voz del Público",
+  "Participante", "Fan F*ckNews", "Ninja Anónimo", "Votante Secreto",
+];
+
+function getAnonymousName(): string {
+  return ANONYMOUS_NAMES[Math.floor(Math.random() * ANONYMOUS_NAMES.length)];
+}
+
+function triggerVoteConfetti(color: string) {
+  confetti({
+    particleCount: 60,
+    spread: 70,
+    origin: { y: 0.75 },
+    colors: [color, "#ffffff", color + "99"],
+    disableForReducedMotion: true,
+  });
+  if (typeof navigator !== "undefined" && navigator.vibrate) {
+    navigator.vibrate([40, 60, 40]);
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Componente principal
@@ -38,11 +64,6 @@ export default function VotePage() {
   const [hasVoted, setHasVoted] = useState(false);
   const [votedFor, setVotedFor] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const [voterName, setVoterName] = useState("");
-  const [voterDocument, setVoterDocument] = useState("");
-  const [voterPhone, setVoterPhone] = useState("");
-  const [voterReady, setVoterReady] = useState(false);
   const [expired, setExpired] = useState(false);
 
   // ---- Data fetching -------------------------------------------------------
@@ -56,7 +77,6 @@ export default function VotePage() {
       const voteCheck = await voteService.check(code, fp);
       setHasVoted(voteCheck.hasVoted);
       setVotedFor(voteCheck.participantId ?? null);
-      if (voteCheck.hasVoted) setVoterReady(true);
     } catch {
       setError("Batalla no encontrada");
     } finally {
@@ -66,9 +86,9 @@ export default function VotePage() {
 
   useEffect(() => { fetchBattle(); }, [fetchBattle]);
 
-  // ---- SSE en tiempo real --------------------------------------------------
+  // ---- WebSocket en tiempo real --------------------------------------------
 
-  useSSE(code, {
+  useWebSocket(code, {
     enabled: !!battle && LIVE_STATUSES.includes(battle.status),
     onMessage: (data) => {
       const update = data as VoteUpdate;
@@ -81,20 +101,25 @@ export default function VotePage() {
   // ---- Voting actions ------------------------------------------------------
 
   const castVote = async (participantId: number) => {
-    if (!code || hasVoted || !voterReady) return;
+    if (!code || hasVoted) return;
     setVoting(participantId);
+
+    const voterName = localStorage.getItem(`voter_name_${code}`) || getAnonymousName();
+
     try {
       await voteService.cast({
         battleCode: code,
         participantId,
         fingerprint: generateFingerprint(),
-        voterName: voterName.trim(),
-        voterDocument: voterDocument.trim() || undefined,
-        voterPhone: voterPhone.trim() || undefined,
+        voterName,
       });
       setHasVoted(true);
       setVotedFor(participantId);
-      toast.success("¡Voto registrado!");
+
+      const participant = battle?.participants?.find(p => p.id === participantId);
+      if (participant) triggerVoteConfetti(participant.color);
+
+      toast.success("¡Voto registrado!", { icon: "🎉", duration: 2500 });
     } catch (err) {
       if ((err as ApiError).status === 409) {
         setHasVoted(true);
@@ -107,7 +132,7 @@ export default function VotePage() {
   };
 
   const changeVote = async (participantId: number) => {
-    if (!code || !hasVoted || !voterReady || votedFor === participantId) return;
+    if (!code || !hasVoted || votedFor === participantId) return;
     setVoting(participantId);
     try {
       await voteService.change({
@@ -116,21 +141,16 @@ export default function VotePage() {
         fingerprint: generateFingerprint(),
       });
       setVotedFor(participantId);
-      toast.success("Voto actualizado");
+
+      const participant = battle?.participants?.find(p => p.id === participantId);
+      if (participant) triggerVoteConfetti(participant.color);
+
+      toast.success("Voto actualizado", { icon: "🔄" });
     } catch {
       toast.error("No se pudo cambiar el voto");
     } finally {
       setVoting(null);
     }
-  };
-
-  // ---- Voter identification handler ----------------------------------------
-
-  const handleVoterSubmit = (data: { name: string; document: string; phone: string }) => {
-    setVoterName(data.name);
-    setVoterDocument(data.document);
-    setVoterPhone(data.phone);
-    setVoterReady(true);
   };
 
   // ---- Loading state -------------------------------------------------------
@@ -148,17 +168,6 @@ export default function VotePage() {
 
   if (error || !battle || battle.status === BATTLE_STATUS.DRAFT || battle.status === BATTLE_STATUS.CLOSED || battle.status === BATTLE_STATUS.TIED) {
     return <BattleStatusScreen code={code || ""} battle={battle} error={error} />;
-  }
-
-  // ---- Voter identification form -------------------------------------------
-
-  if (!voterReady && !hasVoted) {
-    return (
-      <VoterIdentificationForm
-        battleTitle={battle?.title || ""}
-        onSubmit={handleVoterSubmit}
-      />
-    );
   }
 
   // ---- Main voting screen --------------------------------------------------

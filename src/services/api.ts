@@ -8,6 +8,7 @@
 import {
   API_AUTH,
   API_BATTLES,
+  API_RANKINGS,
   API_VOTES,
   API_USERS,
 } from "@/constants";
@@ -19,6 +20,7 @@ import type {
   CastVotePayload,
   ChangeVotePayload,
   VoteCheckResponse,
+  GlobalRankingEntry,
   QRResponse,
   ApiError,
 } from "@/types";
@@ -273,6 +275,18 @@ export const voteService = {
    */
   check(code: string, fingerprint: string) {
     return request<VoteCheckResponse>(API_VOTES.CHECK(code, fingerprint));
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Ranking Service
+// ---------------------------------------------------------------------------
+
+/** Servicio de ranking global. */
+export const rankingService = {
+  /** Obtiene el ranking global agregado de participantes. */
+  global() {
+    return request<{ ranking: GlobalRankingEntry[] }>(API_RANKINGS.GLOBAL);
   },
 };
 

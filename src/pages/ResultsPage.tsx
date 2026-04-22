@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { Battle, Participant, VoteUpdate } from "@/types";
-import { useSSE } from "@/hooks/useSSE";
+import { useWebSocket } from "@/hooks/useWebSocket";
 import { useCountdown } from "@/hooks/useCountdown";
 import { Header } from "@/components/Header";
 import { battleService } from "@/services/api";
@@ -30,10 +30,11 @@ export default function ResultsPage() {
     fetchBattle();
   }, [fetchBattle]);
 
-  useSSE(code, {
+  useWebSocket(code, {
     enabled: !!battle,
     onMessage: (data) => {
       const update = data as VoteUpdate;
+
       if (update.type === "vote_update") {
         setBattle((prev) =>
           prev
@@ -66,7 +67,7 @@ export default function ResultsPage() {
     );
   }
 
-  const sorted = [...battle.participants].sort((a, b) => b.votes - a.votes);
+  const sorted = [...(battle.participants ?? [])].sort((a, b) => b.votes - a.votes);
   const maxVotes = sorted[0]?.votes ?? 1;
 
   return (

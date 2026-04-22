@@ -50,8 +50,13 @@ export const API_USERS = {
   DELETE: (id: number) => `${API_BASE}/users/${id}`,
 } as const;
 
-/** Endpoint SSE para actualizaciones en tiempo real. */
-export const SSE_ENDPOINT = (code: string) => `/sse/battles/${code}`;
+/** Endpoints de rankings globales. */
+export const API_RANKINGS = {
+  GLOBAL: `${API_BASE}/rankings/global`,
+} as const;
+
+/** Path base de Socket.IO para actualizaciones en tiempo real. */
+export const WS_PATH = "/ws/socket.io";
 
 // ---------------------------------------------------------------------------
 // Rutas del Frontend
@@ -63,6 +68,7 @@ export const ROUTES = {
   LOGIN: "/login",
   ADMIN: "/admin",
   ADMIN_USERS: "/admin/usuarios",
+  RANKINGS: "/ranking",
   VOTE: (code: string) => `/votar/${code}`,
   RESULTS: (code: string) => `/resultados/${code}`,
 } as const;
@@ -110,11 +116,11 @@ export const STORAGE_KEY_FINGERPRINT = "batalla-fp";
 export const STORAGE_KEY_THEME = "fcknews-theme";
 
 // ---------------------------------------------------------------------------
-// SSE & Timers
+// Realtime & Timers
 // ---------------------------------------------------------------------------
 
-/** Intervalo de reconexión SSE en milisegundos. */
-export const SSE_RECONNECT_INTERVAL_MS = 3000;
+/** Intervalo de reconexión WebSocket en milisegundos. */
+export const WS_RECONNECT_INTERVAL_MS = 3000;
 
 /** Intervalo de actualización del countdown en milisegundos. */
 export const COUNTDOWN_INTERVAL_MS = 1000;

@@ -90,6 +90,26 @@ sqlite.exec(`
     ON votes(battle_id, fingerprint);
 `);
 
+sqlite.exec(`
+  CREATE INDEX IF NOT EXISTS idx_votes_participant_id
+    ON votes(participant_id);
+`);
+
+sqlite.exec(`
+  CREATE INDEX IF NOT EXISTS idx_votes_battle_participant
+    ON votes(battle_id, participant_id);
+`);
+
+sqlite.exec(`
+  CREATE INDEX IF NOT EXISTS idx_participants_battle_position
+    ON participants(battle_id, position);
+`);
+
+sqlite.exec(`
+  CREATE INDEX IF NOT EXISTS idx_battles_status_created
+    ON battles(status, created_at);
+`);
+
 // Migrate: add tie-related columns if they don't exist yet
 const tieColumns = [
   "ALTER TABLE battles ADD COLUMN tied_participant_ids TEXT",

@@ -22,7 +22,7 @@ const TypewriterText = ({ text, className }: { text: string; className?: string 
       opacity: 1,
       y: 0,
       filter: "blur(0px)",
-      transition: { type: "spring", damping: 14, stiffness: 180 },
+      transition: { type: "spring" as const, damping: 14, stiffness: 180 },
     },
     hidden: { opacity: 0, y: 20, filter: "blur(6px)" },
   };
@@ -105,17 +105,17 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden text-foreground flex flex-col relative selection:bg-campaign-blue/30">
+    <div className="min-h-screen w-full max-w-[100vw] text-foreground flex flex-col relative selection:bg-campaign-blue/30">
 
 
       <Header showAdminButton={true} />
 
       <main className="flex-1 flex flex-col items-center justify-center p-6 text-center mt-6 relative">
         <div className="w-full max-w-3xl mx-auto">
-          <div className="animate-spring-up inline-flex items-center gap-2 px-4 py-2 rounded-full border border-campaign-blue/20 bg-campaign-blue/5 text-campaign-blue font-medium text-sm mb-8">
+          <div className="animate-spring-up inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-gradient-to-r from-primary/10 to-secondary/10 text-gray-100 font-medium text-sm mb-8">
             <span className="relative flex items-center justify-center h-2 w-2">
-              <span className="animate-ping absolute inset-0 h-full w-full rounded-full bg-campaign-blue opacity-75" />
-              <span className="relative h-2 w-2 rounded-full bg-campaign-blue" />
+              <span className="animate-ping absolute inset-0 h-full w-full rounded-full bg-primary opacity-75" />
+              <span className="relative h-2 w-2 rounded-full bg-gradient-to-r from-primary to-secondary" />
             </span>
             Sistema de Votación Interactivo
           </div>
@@ -168,6 +168,13 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link to="/ranking">
+              <Button variant="secondary" className="rounded-xl gap-2">
+                <Trophy className="h-4 w-4" />
+                Ver Ranking Global
+              </Button>
+            </Link>
+
             <a href="https://github.com/JhonatanLpzz/BatallaTitularesF-ckNews" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" className="rounded-xl gap-2">
                 <ExternalLink className="h-4 w-4" />

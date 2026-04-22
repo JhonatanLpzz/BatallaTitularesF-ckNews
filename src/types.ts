@@ -89,11 +89,11 @@ export interface AdminUser {
 }
 
 // ---------------------------------------------------------------------------
-// SSE Events
+// WebSocket Events
 // ---------------------------------------------------------------------------
 
 /**
- * Evento SSE de actualización de votos.
+ * Evento WebSocket de actualización de votos.
  * Emitido cada vez que se registra o cambia un voto en una batalla activa.
  */
 export interface VoteUpdate {
@@ -105,16 +105,18 @@ export interface VoteUpdate {
   totalVotes: number;
 }
 
-/** Evento SSE de conexión exitosa. */
-export interface SSEConnectedEvent {
+/** Evento WebSocket de conexión a room exitosa. */
+export interface WSConnectedEvent {
   /** Discriminador de tipo de evento. */
   type: "connected";
-  /** ID único del cliente SSE asignado por el servidor. */
-  clientId: string;
+  /** ID único del socket asignado por el servidor. */
+  socketId: string;
+  /** Código de batalla asociado al room. */
+  battleCode: string;
 }
 
-/** Unión de todos los eventos SSE posibles. */
-export type SSEEvent = VoteUpdate | SSEConnectedEvent;
+/** Unión de todos los eventos WebSocket posibles. */
+export type WSEvent = VoteUpdate | WSConnectedEvent;
 
 // ---------------------------------------------------------------------------
 // API Payloads (Request)
@@ -150,8 +152,8 @@ export interface CastVotePayload {
   participantId: number;
   /** Fingerprint único del dispositivo del votante. */
   fingerprint: string;
-  /** Nombre completo del votante (obligatorio). */
-  voterName: string;
+  /** Nombre del votante (opcional, backend aplica fallback anónimo). */
+  voterName?: string;
   /** Documento de identidad (opcional). */
   voterDocument?: string;
   /** Número de celular (opcional). */
@@ -178,6 +180,16 @@ export interface VoteCheckResponse {
   hasVoted: boolean;
   /** ID del participante por el que votó (`null` si no ha votado). */
   participantId: number | null;
+}
+
+/** Fila de ranking global agregada por nombre de participante. */
+export interface GlobalRankingEntry {
+  rank: number;
+  participantName: string;
+  participantColor: string;
+  totalVotes: number;
+  battlesParticipated: number;
+  wins: number;
 }
 
 /** Respuesta de generación de código QR. */

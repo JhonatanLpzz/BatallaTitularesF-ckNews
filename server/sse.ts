@@ -43,16 +43,25 @@ export function removeClient(id: string) {
 /**
  * Envía un evento SSE a todos los clientes suscritos a una batalla.
  * Formato SSE: `data: {json}\n\n`
+ * Ignora errores de escritura en conexiones ya cerradas.
  * @param battleId - ID de la batalla destino.
  * @param data - Payload del evento (se serializa a JSON).
  */
 export function broadcastToBattle(battleId: number, data: unknown) {
   const event = `data: ${JSON.stringify(data)}\n\n`;
+  const dead: string[] = [];
+
   for (const client of clients) {
     if (client.battleId === battleId) {
-      client.reply.raw.write(event);
+      try {
+        client.reply.raw.write(event);
+      } catch {
+        dead.push(client.id);
+      }
     }
   }
+
+  for (const id of dead) removeClient(id);
 }
 
 /**
@@ -63,3 +72,18 @@ export function broadcastToBattle(battleId: number, data: unknown) {
 export function getClientCount(battleId: number): number {
   return clients.filter((c) => c.battleId === battleId).length;
 }
+
+// ---------------------------------------------------------------------------
+// Heartbeat: ping every 25s to keep connections alive through proxies
+// ---------------------------------------------------------------------------
+setInterval(() => {
+  const dead: string[] = [];
+  for (const client of clients) {
+    try {
+      client.reply.raw.write(": heartbeat\n\n");
+    } catch {
+      dead.push(client.id);
+    }
+  }
+  for (const id of dead) removeClient(id);
+}, 25_000);

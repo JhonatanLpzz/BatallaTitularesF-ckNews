@@ -36,6 +36,7 @@ import { Header } from "@/components/Header";
 import { AdminTimer } from "@/components/AdminTimer";
 import { CreateBattleDialog } from "@/components/CreateBattleDialog";
 import { QRDialog } from "@/components/QRDialog";
+import { AppDialog } from "@/components/AppDialog";
 
 // ---------------------------------------------------------------------------
 // Componente principal
@@ -48,6 +49,8 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [qrData, setQrData] = useState<QRResponse | null>(null);
+  const [battleToDelete, setBattleToDelete] = useState<Battle | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // ---- Data fetching -------------------------------------------------------
 
@@ -87,14 +90,18 @@ export default function AdminPage() {
     }
   };
 
-  const deleteBattle = async (id: number) => {
-    if (!confirm("Eliminar esta batalla?") || !token) return;
+  const deleteBattle = async () => {
+    if (!battleToDelete || !token) return;
+    setIsDeleting(true);
     try {
-      await battleService.delete(token, id);
-      toast.success("Batalla eliminada");
+      await battleService.delete(token, battleToDelete.id);
+      toast.success("Batalla eliminada correctamente");
+      setBattleToDelete(null);
       fetchBattles();
     } catch {
-      toast.error("Error al eliminar");
+      toast.error("Error al eliminar la batalla");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -387,7 +394,7 @@ export default function AdminPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => deleteBattle(battle.id)}
+                          onClick={() => setBattleToDelete(battle)}
                           className="h-12 sm:h-11 w-12 sm:w-11 p-0 hover:bg-destructive/10 hover:text-destructive rounded-xl"
                           title="Eliminar batalla"
                         >
@@ -411,6 +418,48 @@ export default function AdminPage() {
         onCreated={fetchBattles}
       />
       <QRDialog qrData={qrData} onClose={() => setQrData(null)} />
+
+      {/* Delete Confirmation Dialog */}
+      <AppDialog
+        isOpen={!!battleToDelete}
+        onClose={() => !isDeleting && setBattleToDelete(null)}
+        title="¿Eliminar Batalla?"
+        description={`Esta acción eliminará "${battleToDelete?.title}" de forma permanente, incluyendo todos sus participantes y votos registrados.`}
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button
+              variant="outline"
+              onClick={() => setBattleToDelete(null)}
+              disabled={isDeleting}
+              className="flex-1 h-12 rounded-xl"
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={deleteBattle}
+              disabled={isDeleting}
+              className="flex-1 h-12 rounded-xl shadow-lg shadow-destructive/20"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Eliminando...
+                </>
+              ) : (
+                "Eliminar Ahora"
+              )}
+            </Button>
+          </div>
+        }
+      >
+        <div className="bg-destructive/10 border border-destructive/20 p-4 rounded-xl flex gap-3 items-start">
+          <Trash2 className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <p className="text-sm text-destructive/90 leading-relaxed">
+            Esta es una acción <strong>irreversible</strong>. No podrás recuperar los datos una vez borrados.
+          </p>
+        </div>
+      </AppDialog>
     </div>
   );
 }

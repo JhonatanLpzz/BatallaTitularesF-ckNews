@@ -18,7 +18,7 @@
 
 import type { FastifyInstance } from "fastify";
 import { db, schema } from "../db/index.js";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import QRCode from "qrcode";
 import { requireAuth, requireAdminRole } from "./auth.js";
@@ -38,19 +38,26 @@ function isBattleExpired(battle: { status: string; durationMinutes: number | nul
 
 /**
  * Detecta participantes empatados con la mayor cantidad de votos.
+ * Usa una sola query JOIN para evitar N+1.
  * @param battleId - ID de la batalla.
  * @returns Array de IDs de participantes empatados en primer lugar.
  */
 function detectTieWinners(battleId: number): number[] {
-  const participants = db.select().from(schema.participants).where(eq(schema.participants.battleId, battleId)).all();
-  if (participants.length === 0) return [];
-  const counts: Record<number, number> = {};
-  for (const p of participants) {
-    counts[p.id] = db.select().from(schema.votes).where(eq(schema.votes.participantId, p.id)).all().length;
-  }
-  const max = Math.max(...Object.values(counts));
+  const rows = db
+    .select({
+      id: schema.participants.id,
+      votes: sql<number>`COUNT(${schema.votes.id})`,
+    })
+    .from(schema.participants)
+    .leftJoin(schema.votes, eq(schema.votes.participantId, schema.participants.id))
+    .where(eq(schema.participants.battleId, battleId))
+    .groupBy(schema.participants.id)
+    .all();
+
+  if (rows.length === 0) return [];
+  const max = Math.max(...rows.map(r => Number(r.votes)));
   if (max === 0) return [];
-  return participants.filter(p => counts[p.id] === max).map(p => p.id);
+  return rows.filter(r => Number(r.votes) === max).map(r => r.id);
 }
 
 function autoCloseIfExpired(battle: { id: number; status: string; durationMinutes: number | null; activatedAt: string | null }) {
@@ -110,23 +117,24 @@ export async function battleRoutes(app: FastifyInstance) {
     }
 
     const battleParticipants = db
-      .select()
+      .select({
+        id: schema.participants.id,
+        battleId: schema.participants.battleId,
+        name: schema.participants.name,
+        headline: schema.participants.headline,
+        avatarUrl: schema.participants.avatarUrl,
+        color: schema.participants.color,
+        position: schema.participants.position,
+        votes: sql<number>`COUNT(${schema.votes.id})`,
+      })
       .from(schema.participants)
+      .leftJoin(schema.votes, eq(schema.votes.participantId, schema.participants.id))
       .where(eq(schema.participants.battleId, battle.id))
+      .groupBy(schema.participants.id)
       .orderBy(schema.participants.position)
       .all();
 
-    const voteCounts: Record<number, number> = {};
-    for (const p of battleParticipants) {
-      const count = db
-        .select()
-        .from(schema.votes)
-        .where(eq(schema.votes.participantId, p.id))
-        .all().length;
-      voteCounts[p.id] = count;
-    }
-
-    const totalVotes = Object.values(voteCounts).reduce((a, b) => a + b, 0);
+    const totalVotes = battleParticipants.reduce((sum, p) => sum + Number(p.votes), 0);
 
     // Auto-close if timer expired, then re-read actual status (may be "tied" or "closed")
     const expired = autoCloseIfExpired(battle);
@@ -154,8 +162,8 @@ export async function battleRoutes(app: FastifyInstance) {
       tiedParticipantIds: tiedIds,
       participants: battleParticipants.map((p) => ({
         ...p,
-        votes: voteCounts[p.id] || 0,
-        percentage: totalVotes > 0 ? Math.round(((voteCounts[p.id] || 0) / totalVotes) * 100) : 0,
+        votes: Number(p.votes),
+        percentage: totalVotes > 0 ? Math.round((Number(p.votes) / totalVotes) * 100) : 0,
       })),
       totalVotes,
     };
@@ -270,7 +278,13 @@ export async function battleRoutes(app: FastifyInstance) {
   app.delete<{ Params: { id: string } }>("/api/battles/:id", { preHandler: [requireAuth, requireAdminRole] }, async (req, reply) => {
     const id = parseIdParam(req.params.id, reply);
     if (!id) return;
-    db.delete(schema.battles).where(eq(schema.battles.id, id)).run();
+    // Safe Deletion: manually cleanup associated data to bypass potential constraint issues
+    db.transaction((tx) => {
+      tx.delete(schema.votes).where(eq(schema.votes.battleId, id)).run();
+      tx.delete(schema.participants).where(eq(schema.participants.battleId, id)).run();
+      tx.delete(schema.battles).where(eq(schema.battles.id, id)).run();
+    });
+
     return { success: true };
   });
 

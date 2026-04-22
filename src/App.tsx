@@ -16,6 +16,7 @@ import AdminPage from "./pages/AdminPage";
 import UserManagementPage from "./pages/UserManagementPage";
 import VotePage from "./pages/VotePage";
 import ResultsPage from "./pages/ResultsPage";
+import RankingPage from "./pages/RankingPage";
 import { STORAGE_KEY_THEME } from "./constants";
 import { useEffect } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from "framer-motion";
@@ -90,6 +91,7 @@ export default function App() {
               {/* Public routes */}
               <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
               <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
+              <Route path="/ranking" element={<PageTransition><RankingPage /></PageTransition>} />
               <Route path="/votar/:code" element={<PageTransition><VotePage /></PageTransition>} />
               <Route path="/resultados/:code" element={<PageTransition><ResultsPage /></PageTransition>} />
 

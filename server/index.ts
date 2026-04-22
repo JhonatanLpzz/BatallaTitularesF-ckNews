@@ -16,7 +16,8 @@ import fastifyStatic from "@fastify/static";
 import { authRoutes } from "./routes/auth.js";
 import { battleRoutes } from "./routes/battles.js";
 import { voteRoutes } from "./routes/votes.js";
-import { sseRoutes } from "./routes/sse.js";
+import { rankingRoutes } from "./routes/rankings.js";
+import { initWebSocketServer } from "./realtime/websocket.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import config from "./config.js";
@@ -39,7 +40,8 @@ await app.register(cors, {
 await app.register(authRoutes);
 await app.register(battleRoutes);
 await app.register(voteRoutes);
-await app.register(sseRoutes);
+await app.register(rankingRoutes);
+initWebSocketServer(app);
 
 // Health check endpoint for Railway
 app.get("/health", async () => {
