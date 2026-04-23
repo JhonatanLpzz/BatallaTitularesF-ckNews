@@ -70,7 +70,7 @@ export default function ResultsPage() {
   const maxVotes = sorted[0]?.votes ?? 1;
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="min-h-screen bg-transparent text-foreground flex flex-col">
 
       <main className="max-w-4xl mx-auto w-full px-4 pt-3 pb-10 flex-1">
 

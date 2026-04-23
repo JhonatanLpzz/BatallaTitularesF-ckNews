@@ -217,7 +217,7 @@
 /* Base Variables */
 @layer base {
   :root {
-    --background: 0 0% 98%;
+    --background: 0 0% 100%;
     --foreground: 0 0% 10%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 10%;
@@ -228,7 +228,7 @@
     --secondary: 0 0% 90%;
     --secondary-foreground: 0 0% 9%;
     --muted: 0 0% 92%;
-    --muted-foreground: 0 0% 30%;
+    --muted-foreground: 0 0% 25%;
     --accent: 0 0% 90%;
     --accent-foreground: 0 0% 9%;
     --destructive: 0 84% 45%;
@@ -249,6 +249,9 @@
     --fn-blue: 217 78% 25%;
     --fn-red: 0 72% 25%;
     --vote-gradient: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(0 0% 90%) 50%, hsl(0 0% 98%) 100%);
+    --foreground-rgb: 25, 25, 25;
+    --background-rgb: 255, 255, 255;
+    --gold-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
   }
 
   .dark {
@@ -283,6 +286,9 @@
     --fn-blue: 217 78% 35%;
     --fn-red: 0 72% 35%;
     --vote-gradient: linear-gradient(135deg, hsl(0 0% 8%) 0%, hsl(0 0% 15%) 50%, hsl(0 0% 8%) 100%);
+    --foreground-rgb: 250, 250, 250;
+    --background-rgb: 8, 8, 8;
+    --gold-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
   }
 }
 
@@ -293,7 +299,8 @@ body {
 }
 
 body {
-  @apply bg-background text-foreground font-sans antialiased;
+  @apply text-foreground font-sans antialiased;
+  background-color: transparent;
   min-height: 100dvh;
 }
 
@@ -328,6 +335,7 @@ body {
   --campaign-gold: 60 100% 50% !important;
   --campaign-blue: 210 100% 70% !important;
   --campaign-red: 0 100% 70% !important;
+  --radius: 0 !important;
 }
 
 .a11y-high-contrast #global-background,
@@ -340,7 +348,10 @@ body {
   backdrop-filter: none !important;
   box-shadow: none !important;
   border: 2px solid white !important;
-  display: none !important;
+}
+
+.a11y-high-contrast body {
+  background-color: black !important;
 }
 
 .a11y-high-contrast .glass-card,
@@ -351,6 +362,15 @@ body {
 
 .a11y-high-contrast #global-background {
   display: none !important;
+}
+
+.a11y-high-contrast button,
+.a11y-high-contrast input,
+.a11y-high-contrast select,
+.a11y-high-contrast textarea {
+  border: 2px solid white !important;
+  background: black !important;
+  color: white !important;
 }
 
 .a11y-high-contrast * {
@@ -368,6 +388,7 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+    backdrop-filter: none !important;
   }
 }
 
@@ -392,7 +413,7 @@ body {
 }
 
 @utility campaign-gold-gradient {
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
+  background: var(--gold-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -403,11 +424,11 @@ body {
 }
 
 @utility glass-medium {
-  @apply backdrop-blur-xl bg-card/60 border border-white/10 shadow-xl saturate-[1.5];
+  @apply backdrop-blur-xl bg-card/40 border border-white/10 shadow-xl saturate-[1.8];
 }
 
 @utility glass-heavy {
-  @apply backdrop-blur-[40px] bg-card/80 border border-white/10 shadow-2xl saturate-[1.5];
+  @apply backdrop-blur-[40px] bg-card/60 border border-white/10 shadow-2xl saturate-[1.8];
 }
 
 @utility glass-card {

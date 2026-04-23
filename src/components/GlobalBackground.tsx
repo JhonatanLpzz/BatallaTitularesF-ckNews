@@ -7,7 +7,7 @@ export function GlobalBackground() {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const blurValue = Math.min(scrollY / 100, 8); // Max 8px blur
-      const opacityValue = Math.max(0.6 - scrollY / 1000, 0.3); // Fade slightly as scroll
+      const opacityValue = Math.max(0.7 - scrollY / 1200, 0.4); // Slightly more opaque
       
       if (containerRef.current) {
         const img = containerRef.current.querySelector("img");
@@ -15,7 +15,7 @@ export function GlobalBackground() {
           // Si el cuerpo tiene la clase de blur forzado, respetamos el !important de CSS
           // Si no, aplicamos el blur dinámico
           if (!document.body.classList.contains("a11y-blur-bg")) {
-            img.style.filter = `blur(${blurValue}px) brightness(0.7)`;
+            img.style.filter = `blur(${blurValue}px) brightness(0.85)`; // Increased brightness
           }
           img.style.opacity = opacityValue.toString();
         }
@@ -41,9 +41,9 @@ export function GlobalBackground() {
       />
       
       {/* Soft overlay to improve text contrast on dark background */}
-      <div className="absolute inset-0 bg-black/20" />
+      <div className="absolute inset-0 bg-black/10" />
       
-      <div className="absolute inset-0 bg-gradient-to-b from-background/10 via-transparent to-background/60" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/5 via-transparent to-background/40" />
       
       {/* Dynamic light effects */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-blue/10 rounded-full blur-[120px] animate-pulse" />

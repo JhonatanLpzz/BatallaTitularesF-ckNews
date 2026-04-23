@@ -41,13 +41,15 @@ function MouseGlowEffect() {
   useEffect(() => {
     // Verificar si reduce-motion está activo
     const checkMotion = () => {
-      const isReduced = document.body.classList.contains("a11y-reduce-motion") || 
+      const isReduced = document.documentElement.classList.contains("a11y-reduce-motion") ||
+                       document.body.classList.contains("a11y-reduce-motion") ||
                        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       setEnabled(!isReduced);
     };
 
     checkMotion();
     const observer = new MutationObserver(checkMotion);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -67,8 +69,8 @@ function MouseGlowEffect() {
   if (!enabled) return null;
 
   const background = useMotionTemplate`
-    radial-gradient(1200px circle at ${smoothX}px ${smoothY}px, rgba(26, 91, 184, 0.12), transparent 40%),
-    radial-gradient(800px circle at ${smoothX}px ${smoothY}px, rgba(255, 255, 255, 0.05), transparent 50%)
+    radial-gradient(1200px circle at ${smoothX}px ${smoothY}px, rgba(var(--campaign-blue-rgb), 0.12), transparent 40%),
+    radial-gradient(800px circle at ${smoothX}px ${smoothY}px, rgba(var(--foreground-rgb), 0.05), transparent 50%)
   `;
 
   return (
@@ -102,11 +104,11 @@ export default function App() {
       <AuthProvider>
         <HeaderProvider>
           {/* Fondo oscuro profundo base para enmarcar las transiciones */}
-          <div className="fixed inset-0 -z-50 bg-black" />
+          <div className="fixed inset-0 -z-50 bg-background" />
 
           {/* Contrastes Avanzados: Luces directas y sombras Vignette */}
           <div className="fixed inset-0 -z-40 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_10%,rgba(0,0,0,0.85)_100%)] mix-blend-multiply" />
-          <div className="fixed top-0 inset-x-0 h-[60vh] -z-40 pointer-events-none bg-gradient-to-b from-white/[0.04] to-transparent mix-blend-screen" />
+          <div className="fixed top-0 inset-x-0 h-[60vh] -z-40 pointer-events-none bg-gradient-to-b from-foreground/[0.04] to-transparent mix-blend-screen" />
 
           <GlobalBackground />
           <MouseGlowEffect />

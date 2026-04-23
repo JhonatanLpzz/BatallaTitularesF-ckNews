@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Trophy, Medal, ArrowLeft } from "lucide-react";
-import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { rankingService } from "@/services/api";
 import type { GlobalRankingEntry } from "@/types";
@@ -18,7 +17,7 @@ export default function RankingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="min-h-screen bg-transparent text-foreground flex flex-col">
 
       <main className="max-w-4xl mx-auto w-full px-4 py-8 flex-1">
         <div className="flex items-center justify-between mb-8">

@@ -198,7 +198,7 @@ export default function VotePage() {
   // ---- Main voting screen --------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/30 pt-6">
+    <div className="min-h-screen bg-transparent text-foreground flex flex-col font-sans selection:bg-primary/30 pt-6">
       <div className="fixed inset-0 -z-10 pointer-events-none">
         <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-primary/5 blur-[150px] rounded-full" />
         <div className="absolute bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/5 blur-[150px] rounded-full" />

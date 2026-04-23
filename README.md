@@ -49,6 +49,23 @@ Plataforma web que permite a **F\*cks News Noticreo** (comediantes colombianos) 
 
 ---
 
+## 🎨 Auditoría de Estilo y Accesibilidad (Abril 2026)
+
+Se ha completado un ciclo de optimización enfocado en el cumplimiento de estándares **WCAG 2.1 AA** y refinamiento de la UI:
+
+- **Accesibilidad Core**:
+  - Ajuste de ratios de contraste en modo claro (Background/Muted Foreground).
+  - Implementación de **Alto Contraste** robusto: forzado de bordes, eliminación de ruido visual y fondos negros puros.
+  - Sistema global de **Pausar Efectos**: Desactivación sincronizada de animaciones, filtros de desenfoque y efectos de seguimiento de cursor mediante `MutationObserver`.
+- **Estabilidad de UI**:
+  - Centralización del `Header` en `App.tsx` para evitar regresiones de posicionamiento `sticky` durante transiciones de página (`AnimatePresence`).
+  - Optimización de efectos "Glass" (transparencia y saturación) para mejorar la visibilidad del wallpaper global.
+- **Arquitectura de Estilos**:
+  - Centralización de colores de marca y gradientes mediante variables CSS nativas en `index.css`.
+  - Soporte para opacidad dinámica mediante variables RGB.
+
+---
+
 ## Stack Tecnologico
 
 | Capa | Tecnologia | Proposito |
