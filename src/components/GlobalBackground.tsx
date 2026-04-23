@@ -34,11 +34,13 @@ export function GlobalBackground() {
       id="global-background" 
       ref={containerRef}
       className="fixed inset-0 -z-10 bg-background pointer-events-none transition-opacity duration-500 overflow-hidden"
+      style={{ height: "var(--app-height)" }}
     >
       <img 
         src="/6903870~large.jpg"
         alt="NASA Artemis II"
-        className="absolute inset-0 w-full h-full object-cover scale-105"
+        className="absolute inset-0 w-full h-full object-cover scale-105 select-none"
+        loading="eager"
       />
       
       {/* Soft overlay to improve text contrast on dark background */}

@@ -252,6 +252,23 @@
     --foreground-rgb: 25, 25, 25;
     --background-rgb: 255, 255, 255;
     --gold-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
+    --app-height: 100vh;
+
+    /* Nuevos tokens para legibilidad Glass */
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --text-primary: rgba(20, 20, 25, 0.9);
+    --text-secondary: rgba(20, 20, 25, 0.6);
+    --text-muted: rgba(20, 20, 25, 0.4);
+    --accent: #3b82f6;
+    --accent-soft: rgba(59, 130, 246, 0.1);
+    --accent-glow: rgba(59, 130, 246, 0.3);
+  }
+
+  @supports (height: 100dvh) {
+    :root {
+      --app-height: 100dvh;
+    }
   }
 
   .dark {
@@ -263,6 +280,16 @@
     --popover-foreground: 0 0% 98%;
     --primary: 0 0% 98%;
     --primary-foreground: 0 0% 9%;
+
+    /* Glass en modo oscuro */
+    --glass-bg: rgba(15, 23, 42, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --text-primary: rgba(255, 255, 255, 0.95);
+    --text-secondary: rgba(255, 255, 255, 0.65);
+    --text-muted: rgba(255, 255, 255, 0.45);
+    --accent: #22d3ee;
+    --accent-soft: rgba(34, 211, 238, 0.1);
+    --accent-glow: rgba(34, 211, 238, 0.4);
 
     --secondary: 0 0% 18%;
     --secondary-foreground: 0 0% 98%;
@@ -292,16 +319,18 @@
   }
 }
 
-/* Global resets and styles */
-html,
-body {
+/* Global resets and styles */html {
+  scrollbar-gutter: stable;
   width: 100%;
 }
 
 body {
   @apply text-foreground font-sans antialiased;
   background-color: transparent;
-  min-height: 100dvh;
+  min-height: var(--app-height);
+  /* Prevenir saltos de scroll horizontal por scrollbars */
+  overflow-x: hidden;
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 /* Accessibility overrides */
@@ -464,6 +493,10 @@ body {
   animation: fade-in-up 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
 .animate-scale-in {
   animation: scale-in 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
@@ -473,4 +506,47 @@ body {
     @apply p-4 rounded-xl;
     box-shadow: 0 8px 32px -6px hsl(220 25% 4% / 0.9);
   }
+}
+
+/* Glass REAL: Layering correcto */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 
+    0 10px 30px rgba(0,0,0,0.1),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* Sombra correcta y profundidad */
+.glass-shadow {
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px rgba(255,255,255,0.05);
+}
+
+/* Detalle iOS con luz interna */
+.glass-ios {
+  position: relative;
+  border-radius: 28px;
+}
+
+.glass-ios::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.12),
+    rgba(255,255,255,0.02)
+  );
+  pointer-events: none;
+}
+
+/* Ajuste para barra de scroll en desktop */
+.safe-right {
+  right: calc(env(safe-area-inset-right, 0px) + 12px);
 }

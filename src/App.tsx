@@ -76,7 +76,8 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => {
       animate={{ opacity: 1, filter: "blur(0px)", scale: 1, y: 0 }}
       exit={{ opacity: 0, filter: "blur(2px)", scale: 1, y: -3 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
-      className="flex flex-col flex-1 w-full max-w-[100vw] overflow-x-visible min-h-screen"
+      className="flex flex-col flex-1 w-full max-w-[100vw] overflow-x-visible"
+      style={{ minHeight: "var(--app-height)" }}
     >
       {children}
     </motion.div>
