@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
+import { useAccessibility } from "@/context/AccessibilityContext";
 
 export function GlobalBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { blurBackground } = useAccessibility();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -12,10 +14,9 @@ export function GlobalBackground() {
       if (containerRef.current) {
         const img = containerRef.current.querySelector("img");
         if (img) {
-          // Si el cuerpo tiene la clase de blur forzado, respetamos el !important de CSS
-          // Si no, aplicamos el blur dinámico
-          if (!document.body.classList.contains("a11y-blur-bg")) {
-            img.style.filter = `blur(${blurValue}px) brightness(0.85)`; // Increased brightness
+          // Si el contexto indica blur forzado, no aplicamos el dinámico (el CSS se encarga del !important)
+          if (!blurBackground) {
+            img.style.filter = `blur(${blurValue}px) brightness(0.85)`;
           }
           img.style.opacity = opacityValue.toString();
         }

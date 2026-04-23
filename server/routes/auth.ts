@@ -227,7 +227,10 @@ export async function authRoutes(app: FastifyInstance) {
       const { username, password, role } = req.body;
       
       if (!username?.trim() || !password || password.length < 4) {
-        return reply.status(400).send({ error: "Usuario y contraseña (min 4 chars) requeridos" });
+        console.warn("[AUTH] Create user failed - Invalid input:", { username, role, passwordLength: password?.length });
+        return reply.status(400).send({ 
+          error: !username?.trim() ? "Usuario requerido" : "La contraseña debe tener al menos 4 caracteres" 
+        });
       }
 
       const existing = db.select().from(schema.adminUsers).where(eq(schema.adminUsers.username, username.trim())).get();
@@ -255,7 +258,8 @@ export async function authRoutes(app: FastifyInstance) {
       const { password } = req.body;
 
       if (!password || password.length < 4) {
-        return reply.status(400).send({ error: "Contraseña (min 4 chars) requerida" });
+        console.warn("[AUTH] Update password failed - Too short:", { userId: id, passwordLength: password?.length });
+        return reply.status(400).send({ error: "La contraseña debe tener al menos 4 caracteres" });
       }
 
       const user = db.select().from(schema.adminUsers).where(eq(schema.adminUsers.id, id)).get();

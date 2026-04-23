@@ -91,6 +91,10 @@ export default function UserManagementPage() {
       return toast.error("Usuario y contraseña requeridos");
     }
 
+    if (newPassword.trim().length < 4) {
+      return toast.error("La contraseña debe tener al menos 4 caracteres");
+    }
+
     setCreating(true);
     try {
       await userService.create(token, newUsername.trim(), newPassword.trim(), newRole);
@@ -111,14 +115,21 @@ export default function UserManagementPage() {
   const updateUser = async () => {
     if (!editUser || !token) return;
 
+    const trimmedPassword = editPassword.trim();
+    if (trimmedPassword && trimmedPassword.length < 4) {
+      return toast.error("La nueva contraseña debe tener al menos 4 caracteres");
+    }
+
     setUpdating(true);
     try {
-      if (editUsername.trim() !== editUser.username) {
+      const usernameChanged = editUsername.trim() !== editUser.username;
+      
+      if (usernameChanged) {
         await userService.updateUsername(token, editUser.id, editUsername.trim());
       }
 
-      if (editPassword.trim()) {
-        await userService.updatePassword(token, editUser.id, editPassword.trim());
+      if (trimmedPassword) {
+        await userService.updatePassword(token, editUser.id, trimmedPassword);
       }
 
       toast.success("Usuario actualizado");

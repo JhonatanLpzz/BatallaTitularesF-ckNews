@@ -381,21 +381,32 @@ body {
 
 .a11y-reduce-motion *,
 .a11y-reduce-motion *:before,
-.a11y-reduce-motion *:after,
+.a11y-reduce-motion *:after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
-    backdrop-filter: none !important;
   }
 }
 
+/* Solo quitamos el blur si no hay alto contraste, para mantener legibilidad */
+.a11y-reduce-motion:not(.a11y-high-contrast) * {
+  backdrop-filter: none !important;
+}
+
+/* En lugar de display:none, simplemente quitamos la animación para no romper el layout */
 .a11y-reduce-motion .animate-ping,
 .a11y-reduce-motion .animate-float,
 .a11y-reduce-motion .animate-shimmer {
-  display: none !important;
+  animation: none !important;
 }
 
 :root.a11y-text-large {
