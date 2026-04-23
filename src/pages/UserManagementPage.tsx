@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AppDialog } from "@/components/AppDialog";
 import { useAuth } from "@/context/AuthContext";
-import { Header } from "@/components/Header";
+import { useHeader } from "@/context/HeaderContext";
 import { userService } from "@/services/api";
 import type { ApiError } from "@/types";
 
@@ -22,6 +22,40 @@ export default function UserManagementPage() {
   const { token, logout, isDemo } = useAuth();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const { setHeaderContent, resetHeader } = useHeader();
+
+  useEffect(() => {
+    setHeaderContent({
+      leftContent: (
+        <div className="hidden sm:block min-w-0">
+          <h1 className="font-bold text-foreground truncate tracking-tight text-lg">PANEL ADMIN</h1>
+          <p className="text-muted-foreground text-xs">Gestión de Usuarios</p>
+        </div>
+      ),
+      rightContent: (
+        <>
+          <Button
+            variant="outline"
+            size="toggle-icon"
+            onClick={() => navigate('/admin')}
+            title="Ver Batallas"
+          >
+            <Swords className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors h-9 px-3"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Salir</span>
+          </Button>
+        </>
+      )
+    });
+    return () => resetHeader();
+  }, [navigate, setHeaderContent, resetHeader]);
 
   // Create user dialog
   const [showCreate, setShowCreate] = useState(false);
@@ -126,35 +160,6 @@ export default function UserManagementPage() {
 
   return (
     <div className="min-h-screen text-foreground flex flex-col relative selection:bg-campaign-blue/30">
-      <Header
-        leftContent={
-          <div className="hidden sm:block min-w-0">
-            <h1 className="font-bold text-foreground truncate tracking-tight text-lg">PANEL ADMIN</h1>
-            <p className="text-muted-foreground text-xs">Gestión de Usuarios</p>
-          </div>
-        }
-        rightContent={
-          <>
-            <Button
-              variant="outline"
-              size="toggle-icon"
-              onClick={() => navigate('/admin')}
-              title="Ver Batallas"
-            >
-              <Swords className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors h-9 px-3"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Salir</span>
-            </Button>
-          </>
-        }
-      />
 
       {isDemo && (
         <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 text-center">

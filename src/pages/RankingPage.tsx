@@ -19,7 +19,6 @@ export default function RankingPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <Header />
 
       <main className="max-w-4xl mx-auto w-full px-4 py-8 flex-1">
         <div className="flex items-center justify-between mb-8">

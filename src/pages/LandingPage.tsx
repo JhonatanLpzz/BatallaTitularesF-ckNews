@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { Swords, Play, LogIn, Trophy, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Battle } from "@/types";
-import { Header } from "@/components/Header";
 import { motion } from "framer-motion";
+import { useHeader } from "@/context/HeaderContext";
 
 const TypewriterText = ({ text, className }: { text: string; className?: string }) => {
   const letters = Array.from(text);
@@ -78,6 +78,13 @@ export default function LandingPage() {
   const [activeBattles, setActiveBattles] = useState<Battle[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const { setHeaderContent, resetHeader } = useHeader();
+
+  useEffect(() => {
+    setHeaderContent({ showAdminButton: true });
+    return () => resetHeader();
+  }, [setHeaderContent, resetHeader]);
+
   useEffect(() => {
     const controller = new AbortController();
 
@@ -105,10 +112,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full max-w-[100vw] text-foreground flex flex-col relative selection:bg-campaign-blue/30">
-
-
-      <Header showAdminButton={true} />
+      <div className="min-h-screen w-full max-w-[100vw] text-foreground flex flex-col relative selection:bg-campaign-blue/30">
 
       <main className="flex-1 flex flex-col items-center justify-center p-6 text-center mt-6 relative">
         <div className="w-full max-w-3xl mx-auto">

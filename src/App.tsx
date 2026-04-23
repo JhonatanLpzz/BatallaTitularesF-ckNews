@@ -8,6 +8,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { HeaderProvider, useHeader } from "./context/HeaderContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
@@ -18,12 +19,19 @@ import VotePage from "./pages/VotePage";
 import ResultsPage from "./pages/ResultsPage";
 import RankingPage from "./pages/RankingPage";
 import { STORAGE_KEY_THEME } from "./constants";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from "framer-motion";
 import { AccessibilityMenu } from "./components/AccessibilityMenu";
 import { GlobalBackground } from "./components/GlobalBackground";
+import { Header } from "./components/Header";
+
+function GlobalHeader() {
+  const { leftContent, rightContent, showAdminButton } = useHeader();
+  return <Header leftContent={leftContent} rightContent={rightContent} showAdminButton={showAdminButton} />;
+}
 
 function MouseGlowEffect() {
+  const [enabled, setEnabled] = useState(true);
   const mouseX = useMotionValue(window.innerWidth / 2);
   const mouseY = useMotionValue(window.innerHeight / 2);
 
@@ -31,14 +39,32 @@ function MouseGlowEffect() {
   const smoothY = useSpring(mouseY, { stiffness: 50, damping: 20, mass: 0.5 });
 
   useEffect(() => {
+    // Verificar si reduce-motion está activo
+    const checkMotion = () => {
+      const isReduced = document.body.classList.contains("a11y-reduce-motion") || 
+                       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      setEnabled(!isReduced);
+    };
+
+    checkMotion();
+    const observer = new MutationObserver(checkMotion);
+    observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
     const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
+      if (enabled) {
+        mouseX.set(e.clientX);
+        mouseY.set(e.clientY);
+      }
     };
 
     window.addEventListener("pointermove", handleMouseMove);
-    return () => window.removeEventListener("pointermove", handleMouseMove);
-  }, [mouseX, mouseY]);
+    return () => {
+      window.removeEventListener("pointermove", handleMouseMove);
+      observer.disconnect();
+    };
+  }, [mouseX, mouseY, enabled]);
+
+  if (!enabled) return null;
 
   const background = useMotionTemplate`
     radial-gradient(1200px circle at ${smoothX}px ${smoothY}px, rgba(26, 91, 184, 0.12), transparent 40%),
@@ -74,47 +100,50 @@ export default function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey={STORAGE_KEY_THEME}>
       <AuthProvider>
-        {/* Fondo oscuro profundo base para enmarcar las transiciones */}
-        <div className="fixed inset-0 -z-50 bg-black" />
+        <HeaderProvider>
+          {/* Fondo oscuro profundo base para enmarcar las transiciones */}
+          <div className="fixed inset-0 -z-50 bg-black" />
 
-        {/* Contrastes Avanzados: Luces directas y sombras Vignette */}
-        <div className="fixed inset-0 -z-40 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_10%,rgba(0,0,0,0.85)_100%)] mix-blend-multiply" />
-        <div className="fixed top-0 inset-x-0 h-[60vh] -z-40 pointer-events-none bg-gradient-to-b from-white/[0.04] to-transparent mix-blend-screen" />
+          {/* Contrastes Avanzados: Luces directas y sombras Vignette */}
+          <div className="fixed inset-0 -z-40 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_10%,rgba(0,0,0,0.85)_100%)] mix-blend-multiply" />
+          <div className="fixed top-0 inset-x-0 h-[60vh] -z-40 pointer-events-none bg-gradient-to-b from-white/[0.04] to-transparent mix-blend-screen" />
 
-        <GlobalBackground />
-        <MouseGlowEffect />
-        <AccessibilityMenu />
-        <Toaster theme="dark" position="top-center" richColors />
-        <ErrorBoundary>
-          <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
-              {/* Public routes */}
-              <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
-              <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
-              <Route path="/ranking" element={<PageTransition><RankingPage /></PageTransition>} />
-              <Route path="/votar/:code" element={<PageTransition><VotePage /></PageTransition>} />
-              <Route path="/resultados/:code" element={<PageTransition><ResultsPage /></PageTransition>} />
+          <GlobalBackground />
+          <MouseGlowEffect />
+          <GlobalHeader />
+          <AccessibilityMenu />
+          <Toaster theme="dark" position="top-center" richColors />
+          <ErrorBoundary>
+            <AnimatePresence mode="wait">
+              <Routes location={location} key={location.pathname}>
+                {/* Public routes */}
+                <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
+                <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
+                <Route path="/ranking" element={<PageTransition><RankingPage /></PageTransition>} />
+                <Route path="/votar/:code" element={<PageTransition><VotePage /></PageTransition>} />
+                <Route path="/resultados/:code" element={<PageTransition><ResultsPage /></PageTransition>} />
 
-              {/* Private routes */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute>
-                    <PageTransition><AdminPage /></PageTransition>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/usuarios"
-                element={
-                  <ProtectedRoute>
-                    <PageTransition><UserManagementPage /></PageTransition>
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
-          </AnimatePresence>
-        </ErrorBoundary>
+                {/* Private routes */}
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute>
+                      <PageTransition><AdminPage /></PageTransition>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/usuarios"
+                  element={
+                    <ProtectedRoute>
+                      <PageTransition><UserManagementPage /></PageTransition>
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
+            </AnimatePresence>
+          </ErrorBoundary>
+        </HeaderProvider>
       </AuthProvider>
     </ThemeProvider>
   );

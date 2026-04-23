@@ -217,34 +217,34 @@
 /* Base Variables */
 @layer base {
   :root {
-    --background: 0 0% 70%;
-    --foreground: 0 0% 5%;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 5%;
+    --card-foreground: 0 0% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 5%;
+    --popover-foreground: 0 0% 10%;
     --primary: 0 0% 9%;
     --primary-foreground: 0 0% 98%;
     --secondary: 0 0% 90%;
     --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 15%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 30%;
     --accent: 0 0% 90%;
     --accent-foreground: 0 0% 9%;
-    --destructive: 0 0% 20%;
+    --destructive: 0 84% 45%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    --border: 0 0% 85%;
+    --input: 0 0% 85%;
     --ring: 0 0% 9%;
     --radius: 0.875rem;
-    --status-success: 142 76% 36%;
-    --status-warning: 38 92% 50%;
-    --status-info: 199 89% 48%;
+    --status-success: 142 76% 30%;
+    --status-warning: 38 92% 45%;
+    --status-info: 199 89% 40%;
     --campaign-blue: 221 83% 45%;
     --campaign-blue-rgb: 26, 91, 184;
     --campaign-red: 355 84% 45%;
-    --campaign-red-rgb: 212, 18, 45%;
-    --campaign-gold: 45 100% 60%;
+    --campaign-red-rgb: 212, 18, 45;
+    --campaign-gold: 45 100% 45%;
     --campaign-gold-rgb: 255, 215, 0;
     --fn-blue: 217 78% 25%;
     --fn-red: 0 72% 25%;
@@ -290,7 +290,6 @@
 html,
 body {
   width: 100%;
-  overflow-x: hidden;
 }
 
 body {
@@ -315,16 +314,75 @@ body {
 }
 
 .a11y-high-contrast {
-  --border: 0 0% 50% !important;
-  --muted-foreground: 0 0% 100% !important;
+  --background: 0 0% 0% !important;
   --foreground: 0 0% 100% !important;
+  --card: 0 0% 0% !important;
+  --card-foreground: 0 0% 100% !important;
+  --primary: 0 0% 100% !important;
+  --primary-foreground: 0 0% 0% !important;
+  --muted: 0 0% 10% !important;
+  --muted-foreground: 0 0% 100% !important;
+  --border: 0 0% 100% !important;
+  --accent: 0 0% 20% !important;
+  --accent-foreground: 0 0% 100% !important;
+  --campaign-gold: 60 100% 50% !important;
+  --campaign-blue: 210 100% 70% !important;
+  --campaign-red: 0 100% 70% !important;
 }
 
-.a11y-reduce-motion * {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
-  scroll-behavior: auto !important;
+.a11y-high-contrast #global-background,
+.a11y-high-contrast .glass-medium,
+.a11y-high-contrast .glass-light,
+.a11y-high-contrast .glass-heavy,
+.a11y-high-contrast .glass-card,
+.a11y-high-contrast [class*="backdrop-blur"] {
+  background: black !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  border: 2px solid white !important;
+  display: none !important;
+}
+
+.a11y-high-contrast .glass-card,
+.a11y-high-contrast .glass-medium,
+.a11y-high-contrast .glass-heavy {
+  display: block !important; /* Keep cards visible but black */
+}
+
+.a11y-high-contrast #global-background {
+  display: none !important;
+}
+
+.a11y-high-contrast * {
+  text-shadow: none !important;
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+.a11y-reduce-motion *,
+.a11y-reduce-motion *:before,
+.a11y-reduce-motion *:after,
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.a11y-reduce-motion .animate-ping,
+.a11y-reduce-motion .animate-float,
+.a11y-reduce-motion .animate-shimmer {
+  display: none !important;
+}
+
+:root.a11y-text-large {
+  font-size: 115%;
+}
+
+:root.a11y-text-xl {
+  font-size: 130%;
 }
 
 /* Custom Utilities for @apply compatibility in v4 */

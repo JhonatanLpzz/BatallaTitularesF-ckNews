@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import type { Battle, Participant, VoteUpdate } from "@/types";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useCountdown } from "@/hooks/useCountdown";
-import { Header } from "@/components/Header";
 import { battleService } from "@/services/api";
 
 export default function ResultsPage() {
@@ -72,7 +71,6 @@ export default function ResultsPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <Header />
 
       <main className="max-w-4xl mx-auto w-full px-4 pt-3 pb-10 flex-1">
 

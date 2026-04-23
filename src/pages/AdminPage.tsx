@@ -32,7 +32,7 @@ import { battleService } from "@/services/api";
 import { ROUTES, LIVE_STATUSES, BATTLE_STATUS, DEFAULT_TIEBREAKER_DURATION } from "@/constants";
 import type { Battle, QRResponse } from "@/types";
 import type { BattleStatusType } from "@/constants";
-import { Header } from "@/components/Header";
+import { useHeader } from "@/context/HeaderContext";
 import { AdminTimer } from "@/components/AdminTimer";
 import { CreateBattleDialog } from "@/components/CreateBattleDialog";
 import { QRDialog } from "@/components/QRDialog";
@@ -51,6 +51,40 @@ export default function AdminPage() {
   const [qrData, setQrData] = useState<QRResponse | null>(null);
   const [battleToDelete, setBattleToDelete] = useState<Battle | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { setHeaderContent, resetHeader } = useHeader();
+
+  useEffect(() => {
+    setHeaderContent({
+      leftContent: (
+        <div className="hidden sm:block min-w-0">
+          <h1 className="font-bold text-foreground truncate tracking-tight text-lg">PANEL ADMIN</h1>
+          <p className="text-muted-foreground text-xs">Gestión de Batallas</p>
+        </div>
+      ),
+      rightContent: (
+        <>
+          <Button
+            variant="outline"
+            size="toggle-icon"
+            onClick={() => navigate(location.pathname === ROUTES.ADMIN ? ROUTES.ADMIN_USERS : ROUTES.ADMIN)}
+            title={location.pathname === ROUTES.ADMIN ? "Ver Usuarios" : "Ver Batallas"}
+          >
+            {location.pathname === ROUTES.ADMIN ? <Users className="h-5 w-5" /> : <Swords className="h-5 w-5" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors h-9 px-3"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Salir</span>
+          </Button>
+        </>
+      )
+    });
+    return () => resetHeader();
+  }, [location.pathname, navigate, setHeaderContent, resetHeader]);
 
   // ---- Data fetching -------------------------------------------------------
 
@@ -153,37 +187,6 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen text-foreground flex flex-col relative selection:bg-campaign-blue/30">
-
-
-      <Header
-        leftContent={
-          <div className="hidden sm:block min-w-0">
-            <h1 className="font-bold text-foreground truncate tracking-tight text-lg">PANEL ADMIN</h1>
-            <p className="text-muted-foreground text-xs">Gestión de Batallas</p>
-          </div>
-        }
-        rightContent={
-          <>
-            <Button
-              variant="outline"
-              size="toggle-icon"
-              onClick={() => navigate(location.pathname === ROUTES.ADMIN ? ROUTES.ADMIN_USERS : ROUTES.ADMIN)}
-              title={location.pathname === ROUTES.ADMIN ? "Ver Usuarios" : "Ver Batallas"}
-            >
-              {location.pathname === ROUTES.ADMIN ? <Users className="h-5 w-5" /> : <Swords className="h-5 w-5" />}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors h-9 px-3"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Salir</span>
-            </Button>
-          </>
-        }
-      />
 
       {isDemo && (
         <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 text-center">

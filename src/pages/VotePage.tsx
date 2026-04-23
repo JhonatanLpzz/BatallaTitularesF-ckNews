@@ -22,7 +22,7 @@ import { battleService, voteService } from "@/services/api";
 import { BATTLE_STATUS, LIVE_STATUSES } from "@/constants";
 import type { Battle, Participant, VoteUpdate, ApiError } from "@/types";
 import { useWebSocket } from "@/hooks/useWebSocket";
-import { Header } from "@/components/Header";
+import { useHeader } from "@/context/HeaderContext";
 import { VoteTimer } from "@/components/VoteTimer";
 import { BattleStatusScreen } from "@/components/BattleStatusScreen";
 
@@ -65,6 +65,31 @@ export default function VotePage() {
   const [votedFor, setVotedFor] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [expired, setExpired] = useState(false);
+  const { setHeaderContent, resetHeader } = useHeader();
+
+  useEffect(() => {
+    if (battle) {
+      setHeaderContent({
+        leftContent: (
+          <div className="hidden sm:flex flex-col">
+            <h2 className="text-sm font-black tracking-tighter uppercase leading-none text-foreground">{battle.title}</h2>
+            <span className="text-[10px] tracking-widest mt-1">SISTEMA DE VOTACIÓN</span>
+          </div>
+        ),
+        rightContent: (
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <span className="block text-[9px] uppercase">Total Votos</span>
+              <span className="text-2xl font-black font-mono text-destructive tabular-nums tracking-tighter leading-none">
+                {battle.totalVotes || 0}</span>
+            </div>
+            <VoteTimer expiresAt={battle.expiresAt} expired={expired} onExpire={() => setExpired(true)} />
+          </div>
+        )
+      });
+    }
+    return () => resetHeader();
+  }, [battle, expired, setHeaderContent, resetHeader]);
 
   // ---- Data fetching -------------------------------------------------------
 
@@ -173,31 +198,11 @@ export default function VotePage() {
   // ---- Main voting screen --------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/30 overflow-x-hidden pt-6">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/30 pt-6">
       <div className="fixed inset-0 -z-10 pointer-events-none">
         <div className="absolute top-[30%] -right-[10%] w-[50%] h-[50%] bg-primary/5 blur-[150px] rounded-full" />
         <div className="absolute bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/5 blur-[150px] rounded-full" />
       </div>
-
-      <Header
-        leftContent={
-          <div className="hidden sm:flex flex-col">
-            <h2 className="text-sm font-black tracking-tighter uppercase leading-none text-foreground">{battle?.title}</h2>
-            <span className="text-[10px] tracking-widest mt-1">SISTEMA DE VOTACIÓN</span>
-          </div>
-        }
-        rightContent={
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <span className="block text-[9px] uppercase">Total Votos</span>
-              <span className="text-2xl font-black font-mono text-destructive tabular-nums tracking-tighter leading-none">
-                {battle?.totalVotes || 0}</span>
-            </div>
-            <VoteTimer expiresAt={battle?.expiresAt} expired={expired} onExpire={() => setExpired(true)} />
-          </div>
-        }
-        containerClassName="max-w-4xl"
-      />
 
       {battle?.status === BATTLE_STATUS.TIEBREAKER && (
         <div className="bg-primary text-primary-foreground py-2 relative">
