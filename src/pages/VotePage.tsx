@@ -285,7 +285,7 @@ export default function VotePage() {
                       <span className="text-4xl sm:text-5xl font-black tracking-tighter block leading-none mb-1" style={{ color: participant.color }}>
                         {participant.percentage}%
                       </span>
-                      <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+                      <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                         {participant.votes.toLocaleString()} VOTOS
                       </span>
                     </div>

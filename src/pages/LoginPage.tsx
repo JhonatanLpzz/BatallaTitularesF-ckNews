@@ -49,14 +49,14 @@ export default function LoginPage() {
 
         <div className="p-8 sm:p-10 flex flex-col items-center">
           <img src="/logo_fn.png" alt="F*cks News" className="h-16 sm:h-20 mb-8 drop-shadow-2xl hover:scale-105 transition-transform" />
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-center text-white mb-2">Panel Admin</h1>
-          <p className="text-zinc-400 text-center text-sm mb-8 leading-relaxed">Ingresa tus credenciales para acceder al panel de control.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-center text-foreground mb-2">Panel Admin</h1>
+          <p className="text-muted-foreground text-center text-sm mb-8 leading-relaxed">Ingresa tus credenciales para acceder al panel de control.</p>
 
           <form onSubmit={handleSubmit} className="w-full space-y-5">
             <div className="space-y-1.5 font-medium relative">
-              <label className="text-[13px] text-zinc-400 ml-1">Usuario</label>
+              <label className="text-[13px] text-muted-foreground ml-1">Usuario</label>
               <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -68,9 +68,9 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-1.5 font-medium relative">
-              <label className="text-[13px] text-zinc-400 ml-1">Contraseña</label>
+              <label className="text-[13px] text-muted-foreground ml-1">Contraseña</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   type={showPassword ? "text" : "password"}
                   value={password}
@@ -82,7 +82,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors focus:outline-none"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
                   aria-label={showPassword ? "Ocultar Contraseña" : "Ver Contraseña"}
                   tabIndex={-1}
                 >
@@ -114,7 +114,7 @@ export default function LoginPage() {
           {!needsSetup && (
             <Button
               variant="ghost"
-              className="mt-8 text-zinc-500 hover:text-white text-sm h-10 px-4 rounded-xl"
+              className="mt-8 text-muted-foreground hover:text-foreground text-sm h-10 px-4 rounded-xl"
               onClick={() => navigate("/")}
             >
               Volver al inicio

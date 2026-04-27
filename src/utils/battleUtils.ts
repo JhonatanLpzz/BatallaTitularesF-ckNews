@@ -137,9 +137,9 @@ export function getBattleStatusColors(battle: Battle) {
   switch (battle.status) {
     case "draft":
       return {
-        bg: "bg-gray-100",
-        text: "text-gray-600",
-        border: "border-gray-300"
+        bg: "bg-muted",
+        text: "text-muted-foreground",
+        border: "border-border"
       };
     case "active":
       return {
@@ -167,9 +167,9 @@ export function getBattleStatusColors(battle: Battle) {
       };
     default:
       return {
-        bg: "bg-gray-100",
-        text: "text-gray-600",
-        border: "border-gray-300"
+        bg: "bg-muted",
+        text: "text-muted-foreground",
+        border: "border-border"
       };
   }
 }

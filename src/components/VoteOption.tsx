@@ -53,7 +53,7 @@ export function VoteOption({
     const baseClass = "w-full transition-all duration-300 font-semibold rounded-lg px-6 py-4 min-h-[56px] flex items-center justify-center gap-2";
     
     if (disabled || (hasVoted && !isSelected)) {
-      return `${baseClass} bg-gray-100 text-gray-400 cursor-not-allowed`;
+      return `${baseClass} bg-muted text-muted-foreground/50 cursor-not-allowed`;
     }
 
     if (isSelected && hasVoted) {
@@ -144,7 +144,7 @@ export function VoteOption({
             <span className="text-sm text-muted-foreground">Votos: {participant.votes}</span>
             <span className="text-sm font-semibold text-foreground">{participant.percentage}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+          <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-1000 ease-out rounded-full"
               style={{ width: getProgressWidth() }}
@@ -188,7 +188,7 @@ export function VoteOption({
               </p>
             </div>
           ) : (
-            <div className="p-2 bg-gray-100 rounded-lg">
+            <div className="p-2 bg-muted rounded-lg">
               <p className="text-muted-foreground text-sm">
                 Batalla finalizada
               </p>

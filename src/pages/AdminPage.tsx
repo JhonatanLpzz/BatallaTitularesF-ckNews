@@ -219,7 +219,7 @@ export default function AdminPage() {
             </div>
             <h3 className="text-2xl font-bold text-foreground mb-4 tracking-tight">No hay batallas activas</h3>
             <p className="text-muted-foreground mb-8 max-w-md mx-auto leading-relaxed text-base">Crea tu primera batalla épica para comenzar la competencia</p>
-            <Button onClick={() => setShowCreate(true)} className="h-14 px-8 rounded-2xl bg-white text-black hover:bg-zinc-200 font-semibold shadow-xl hover:-translate-y-1 transition-all">
+            <Button onClick={() => setShowCreate(true)} size="lg" className="shadow-xl hover:-translate-y-1 transition-all">
               <Plus className="h-5 w-5 mr-2" />
               Crear Primera Batalla
             </Button>
@@ -347,7 +347,7 @@ export default function AdminPage() {
                         }
                         className={cn(
                           "w-full sm:w-auto h-12 px-6 sm:px-8 font-semibold rounded-xl border-0 transition-all",
-                          battle.status !== BATTLE_STATUS.ACTIVE ? "bg-white text-black hover:bg-zinc-200" : "",
+                          battle.status !== BATTLE_STATUS.ACTIVE ? "" : "",
                         )}
                       >
                         {battle.status === BATTLE_STATUS.ACTIVE ? (

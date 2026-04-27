@@ -116,7 +116,7 @@ export default function LandingPage() {
 
       <main className="flex-1 flex flex-col items-center justify-center p-6 text-center mt-6 relative">
         <div className="w-full max-w-3xl mx-auto">
-          <div className="animate-spring-up inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-gradient-to-r from-primary/10 to-secondary/10 text-gray-100 font-medium text-sm mb-8">
+          <div className="animate-spring-up inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-gradient-to-r from-primary/10 to-secondary/10 text-foreground font-medium text-sm mb-8">
             <span className="relative flex items-center justify-center h-2 w-2">
               <span className="animate-ping absolute inset-0 h-full w-full rounded-full bg-primary opacity-75" />
               <span className="relative h-2 w-2 rounded-full bg-gradient-to-r from-primary to-secondary" />
