@@ -67,10 +67,14 @@ export interface Battle {
   totalVotes?: number;
   /** IDs de participantes empatados (cuando `status === 'tied'`). */
   tiedParticipantIds?: number[];
+  /** Participantes empatados (alias para compatibilidad). */
+  tiedParticipants?: number[];
   /** Número de ronda de desempate actual. */
   tiebreakRound?: number;
   /** ID del participante ganador (cuando la batalla se cierra con ganador claro). */
   winnerId?: number;
+  /** Participante ganador (alias para compatibilidad). */
+  winner?: Participant | null;
 }
 
 /**

@@ -33,6 +33,9 @@ export const API_BATTLES = {
   TIEBREAKER: (id: number) => `${API_BASE}/battles/${id}/tiebreaker`,
 } as const;
 
+/** Endpoint para Server-Sent Events (actualizaciones en tiempo real). */
+export const SSE_ENDPOINT = (code: string) => `${API_BASE}/battles/${code}/stream`;
+
 /** Endpoints de votación pública. */
 export const API_VOTES = {
   CAST: `${API_BASE}/votes`,
@@ -121,6 +124,9 @@ export const STORAGE_KEY_THEME = "fcknews-theme";
 
 /** Intervalo de reconexión WebSocket en milisegundos. */
 export const WS_RECONNECT_INTERVAL_MS = 3000;
+
+/** Intervalo de reconexión SSE en milisegundos. */
+export const SSE_RECONNECT_INTERVAL_MS = 3000;
 
 /** Intervalo de actualización del countdown en milisegundos. */
 export const COUNTDOWN_INTERVAL_MS = 1000;
