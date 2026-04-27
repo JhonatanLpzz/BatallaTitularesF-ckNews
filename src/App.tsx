@@ -94,7 +94,7 @@ export default function App() {
         <AuthProvider>
           <HeaderProvider>
             {/* Fondo oscuro profundo base para enmarcar las transiciones */}
-            <div className="fixed inset-0 -z-50 bg-background" />
+            <div className="fixed inset-0 -z-50 bg-black" />
 
             {/* Contrastes Avanzados: Luces directas y sombras Vignette */}
             <div className="fixed inset-0 -z-40 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_10%,rgba(0,0,0,0.85)_100%)] mix-blend-multiply" />

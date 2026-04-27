@@ -41,12 +41,8 @@ export default function LoginPage() {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 selection:bg-campaign-gold/30">
-      {/* Background blobs decorativos */}
-      <div className="fixed inset-0 -z-10 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-campaign-gold/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-campaign-red/5 rounded-full blur-[120px] animate-pulse delay-1000" />
-      </div>
+    <div className="min-h-screen bg-transparent flex flex-col items-center justify-center p-4 selection:bg-campaign-gold/30">
+      {/* Background blobs decorativos eliminados */}
 
       <div className="w-full max-w-[440px] relative animate-fade-in-up">
         <div className="glass-card absolute inset-0 rounded-[32px] -z-10" />

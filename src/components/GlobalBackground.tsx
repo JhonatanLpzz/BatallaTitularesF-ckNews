@@ -16,7 +16,7 @@ export function GlobalBackground() {
         if (img) {
           // Si el contexto indica blur forzado, no aplicamos el dinámico (el CSS se encarga del !important)
           if (!blurBackground) {
-            img.style.filter = `blur(${blurValue}px) brightness(0.85)`;
+            img.style.filter = `blur(${blurValue}px) brightness(0.5)`;
           }
           img.style.opacity = opacityValue.toString();
         }
@@ -44,7 +44,7 @@ export function GlobalBackground() {
       />
       
       {/* Soft overlay to improve text contrast on dark background */}
-      <div className="absolute inset-0 bg-black/10" />
+      <div className="absolute inset-0 bg-black/40" />
       
       <div className="absolute inset-0 bg-gradient-to-b from-background/5 via-transparent to-background/40" />
       

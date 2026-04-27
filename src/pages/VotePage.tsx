@@ -181,7 +181,7 @@ export default function VotePage() {
   // ---- Loading state -------------------------------------------------------
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="min-h-screen flex items-center justify-center bg-transparent">
       <div className="relative flex items-center justify-center">
         <div className="absolute h-20 w-20 border-t-2 rounded-full animate-spin opacity-20" />
         <Loader2 className="h-8 w-8 animate-spin" />

@@ -50,7 +50,7 @@ export default function ResultsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-transparent">
         <Loader2 className="animate-spin text-primary" />
       </div>
     );
