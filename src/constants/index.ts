@@ -92,8 +92,8 @@ export const DEFAULT_PARTICIPANT_COLORS = [
 
 /** Participantes predeterminados al crear una batalla nueva. */
 export const DEFAULT_PARTICIPANTS = [
-  { name: "Camilo Pardo 'El Mago'", headline: "Titulares en vivo...", color: DEFAULT_PARTICIPANT_COLORS[1] },
-  { name: "Camilo Sanchez 'El Inquieto'", headline: "Titulares en vivo...", color: DEFAULT_PARTICIPANT_COLORS[0] },
+  { name: "Participante 1", headline: "Titulares en vivo...", color: DEFAULT_PARTICIPANT_COLORS[1] },
+  { name: "Participante 2", headline: "Titulares en vivo...", color: DEFAULT_PARTICIPANT_COLORS[0] },
 ] as const;
 
 /** Número mínimo de participantes por batalla. */
@@ -116,7 +116,7 @@ export const STORAGE_KEY_TOKEN = "batalla-admin-token";
 export const STORAGE_KEY_FINGERPRINT = "batalla-fp";
 
 /** Clave de localStorage para la preferencia de tema. */
-export const STORAGE_KEY_THEME = "fcknews-theme";
+export const STORAGE_KEY_THEME = "batalla-titulares-theme";
 
 // ---------------------------------------------------------------------------
 // Realtime & Timers

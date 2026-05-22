@@ -185,7 +185,7 @@ Documentacion detallada con JSDoc en `server/db/schema.ts`.
 ### Admin
 1. Accede a `/login` → se autentica (o crea admin si es primera vez via auto-setup)
 2. En `/admin` crea una batalla con titulo, descripcion, timer opcional, y participantes
-   - **Defaults:** Camilo Pardo 'El Mago' y Camilo Sanchez 'El Inquieto'
+   - **Defaults:** Participante 1 y Participante 2
 3. Activa la batalla → inicia countdown automatico
 4. Muestra el QR al publico (proyector/pantalla)
 5. Ve resultados en tiempo real con countdown visible

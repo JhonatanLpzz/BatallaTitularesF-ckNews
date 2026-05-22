@@ -21,7 +21,7 @@ export interface Participant {
   id: number;
   /** ID de la batalla a la que pertenece. */
   battleId: number;
-  /** Nombre del participante (ej: "Camilo Pardo 'El Mago'"). */
+  /** Nombre del participante (ej: "Participante 1"). */
   name: string;
   /** Titular/noticia con el que compite. */
   headline: string;

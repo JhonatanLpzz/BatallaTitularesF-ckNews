@@ -125,7 +125,7 @@ Los shows de comedia interactivos necesitan sistemas de votación rápidos, intu
 **Prioridad:** P1 (Alta)
 - Logo integrado
 - Paleta de colores corporativa
-- Participantes predeterminados (Camilo Pardo, Camilo Sanchez)
+- Participantes predeterminados (Participante 1, Participante 2)
 
 ### 3.3 Funcionalidades Futuras
 
@@ -247,7 +247,7 @@ GET/POST    /api/users           # Gestión administradores
    - Título (ej: "Batalla #5 - Noticias Absurdas")
    - Descripción opcional
    - Duración (ej: 5 minutos)
-   - Participantes (pre-llenados: Camilo Pardo, Camilo Sanchez)
+   - Participantes (pre-llenados: Participante 1, Participante 2)
 3. Guardar como "Draft"
 4. Activar batalla → inicia countdown
 5. Generar QR para proyectar

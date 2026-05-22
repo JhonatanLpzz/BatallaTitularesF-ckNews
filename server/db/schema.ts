@@ -97,7 +97,7 @@ export const participants = sqliteTable("participants", {
   battleId: integer("battle_id")
     .notNull()
     .references(() => battles.id, { onDelete: "cascade" }),
-  /** Nombre del participante (ej: "Camilo Pardo 'El Mago'"). */
+  /** Nombre del participante (ej: "Participante 1"). */
   name: text("name").notNull(),
   /** Titular/noticia con el que compite. */
   headline: text("headline").notNull(),
