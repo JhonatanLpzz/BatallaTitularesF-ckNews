@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import type { Battle } from "@/types";
 import { motion } from "framer-motion";
 import { useHeader } from "@/context/HeaderContext";
+import { API_BATTLES } from "@/constants";
 
 const TypewriterText = ({ text, className }: { text: string; className?: string }) => {
   const letters = Array.from(text);
@@ -88,7 +89,7 @@ export default function LandingPage() {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetch("/api/battles/active", {
+    fetch(API_BATTLES.ACTIVE, {
       signal: controller.signal,
       credentials: "include",
     })

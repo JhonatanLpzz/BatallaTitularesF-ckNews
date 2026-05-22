@@ -23,6 +23,7 @@ export const API_AUTH = {
 /** Endpoints de batallas (admin y público). */
 export const API_BATTLES = {
   LIST: `${API_BASE}/battles`,
+  ACTIVE: `${API_BASE}/battles/active`,
   BY_CODE: (code: string) => `${API_BASE}/battles/${code}`,
   CREATE: `${API_BASE}/battles`,
   STATUS: (id: number) => `${API_BASE}/battles/${id}/status`,

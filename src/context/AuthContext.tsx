@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { API_AUTH } from "@/constants";
 
 /** Roles de usuario del sistema. */
 type UserRole = "admin" | "demo";
@@ -39,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Check if setup is needed
     try {
-      const setupRes = await fetch("/api/auth/needs-setup");
+      const setupRes = await fetch(API_AUTH.NEEDS_SETUP);
       const { needsSetup } = await setupRes.json();
       if (needsSetup) {
         setState({
@@ -62,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const res = await fetch("/api/auth/me", {
+      const res = await fetch(API_AUTH.ME, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -97,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [checkAuth]);
 
   const login = async (username: string, password: string) => {
-    const res = await fetch("/api/auth/login", {
+    const res = await fetch(API_AUTH.LOGIN, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -123,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     const token = localStorage.getItem(STORAGE_KEY);
     if (token) {
-      await fetch("/api/auth/logout", {
+      await fetch(API_AUTH.LOGOUT, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       }).catch(() => {});
@@ -140,7 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const setup = async (username: string, password: string) => {
-    const res = await fetch("/api/auth/setup", {
+    const res = await fetch(API_AUTH.SETUP, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
