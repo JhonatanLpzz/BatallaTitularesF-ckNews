@@ -67,7 +67,7 @@ export function AdminTieControls({ battle, onStatusUpdate, token }: AdminTieCont
     <div className="space-y-4">
       {/* Tie Detection Status */}
       {battle.status === "closed" && tieDetection.hasTie && (
-        <div className="fn-card p-4 bg-yellow-50 border-yellow-200">
+        <div className="bt-card p-4 bg-yellow-50 border-yellow-200">
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
@@ -89,7 +89,7 @@ export function AdminTieControls({ battle, onStatusUpdate, token }: AdminTieCont
 
       {/* Active Tie State */}
       {battle.status === "tied" && (
-        <div className="fn-card p-4 bg-orange-50 border-orange-200">
+        <div className="bt-card p-4 bg-orange-50 border-orange-200">
           <div className="flex items-start gap-3">
             <Zap className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
@@ -116,7 +116,7 @@ export function AdminTieControls({ battle, onStatusUpdate, token }: AdminTieCont
 
       {/* Active Tiebreaker */}
       {battle.status === "tiebreaker" && (
-        <div className="fn-card p-4 bg-red-50 border-red-200">
+        <div className="bt-card p-4 bg-red-50 border-red-200">
           <div className="flex items-start gap-3">
             <Crown className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
@@ -147,7 +147,7 @@ export function AdminTieControls({ battle, onStatusUpdate, token }: AdminTieCont
 
       {/* Manual Controls */}
       {battle.status === "active" && (
-        <div className="fn-card p-4 bg-blue-50 border-blue-200">
+        <div className="bt-card p-4 bg-blue-50 border-blue-200">
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
@@ -176,7 +176,7 @@ export function AdminTieControls({ battle, onStatusUpdate, token }: AdminTieCont
 
       {/* Current Standings Preview */}
       {tieDetection.hasTie && battle.participants && (
-        <div className="fn-card p-4">
+        <div className="bt-card p-4">
           <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
             <Crown className="w-4 h-4" />
             Estado Actual

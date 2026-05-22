@@ -32,7 +32,7 @@ import { BattleStatusScreen } from "@/components/BattleStatusScreen";
 
 const ANONYMOUS_NAMES = [
   "Fan Anónimo", "Votante Rápido", "Espectador", "Voz del Público",
-  "Participante", "Fan F*ckNews", "Ninja Anónimo", "Votante Secreto",
+  "Participante", "Fan de Titulares", "Ninja Anónimo", "Votante Secreto",
 ];
 
 function getAnonymousName(): string {
@@ -314,7 +314,7 @@ export default function VotePage() {
       <footer className="mt-auto border-t border-border py-16 px-6 bg-muted/5">
         <div className="max-w-3xl mx-auto text-center">
           <p className=" text-sm font-medium leading-relaxed max-w-md mx-auto mb-8">
-            Un tributo a la comedia de <span className="text-foreground font-bold">F*cks News Noticreo</span>.
+            Una plataforma para elegir el mejor titular de comedia.
             Hecho con código y muchas risas.
           </p>
           <div className="flex flex-col items-center gap-1">

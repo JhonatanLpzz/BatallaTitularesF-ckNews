@@ -113,7 +113,7 @@ export function ResultsChart({
 
   if (participants.length === 0) {
     return (
-      <div className="fn-card p-8 text-center">
+      <div className="bt-card p-8 text-center">
         <Users className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
         <p className="text-muted-foreground">No hay participantes</p>
       </div>
@@ -146,7 +146,7 @@ export function ResultsChart({
       </div>
 
       {/* Results Chart */}
-      <div className="fn-card p-6">
+      <div className="bt-card p-6">
         <div className="space-y-4">
           {sortedParticipants.map((participant, index) => {
             const currentVotes = animatedVotes[participant.id] || 0;

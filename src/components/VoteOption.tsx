@@ -61,10 +61,10 @@ export function VoteOption({
     }
 
     if (battleStatus === "tiebreaker" && isInTie) {
-      return `${baseClass} fn-button-accent hover:scale-[1.02] shadow-lg`;
+      return `${baseClass} bt-button-accent hover:scale-[1.02] shadow-lg`;
     }
 
-    return `${baseClass} fn-button-primary hover:scale-[1.02] shadow-lg`;
+    return `${baseClass} bt-button-primary hover:scale-[1.02] shadow-lg`;
   };
 
   const getButtonText = () => {
@@ -76,7 +76,7 @@ export function VoteOption({
   };
 
   const getCardClass = () => {
-    let baseClass = "fn-card p-6 transition-all duration-300";
+    let baseClass = "bt-card p-6 transition-all duration-300";
     
     if (isInTie && battleStatus === "tied") {
       baseClass += " border-2 border-status-warning/40 bg-status-warning/5";

@@ -40,8 +40,8 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        "fn-blue": "hsl(var(--fn-blue))",
-        "fn-red": "hsl(var(--fn-red))",
+        "bt-blue": "hsl(var(--bt-blue))",
+        "bt-red": "hsl(var(--bt-red))",
         // Campaign-inspired colors
         "campaign-gold": "hsl(var(--campaign-gold))",
         "campaign-blue": "hsl(var(--campaign-blue))",

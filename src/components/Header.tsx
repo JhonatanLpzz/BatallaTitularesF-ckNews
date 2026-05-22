@@ -39,21 +39,21 @@ export function Header({
     >
       <div
         className={cn(
-          "mx-auto transition-all duration-300 ease-in-out flex items-center justify-between glass-heavy",
+          "w-full mx-auto transition-all duration-300 ease-in-out flex items-center justify-between glass-heavy",
           scrolled
             ? "max-w-4xl h-14 rounded-3xl shadow-2xl px-4 sm:px-6"
-            : "max-w-6xl h-16 rounded-sm border-x-0 border-t-0 px-6",
+            : "max-w-full h-16 rounded-b-sm border-x-0 border-t-0 px-6",
           containerClassName
         )}
       >
         <div className="flex items-center gap-3 sm:gap-5 flex-1 min-w-0">
           <Link to="/" className="shrink-0 flex items-center">
             <img
-              src="/logo_fn.png"
-              alt="F*cks News"
+              src="/favicon.svg"
+              alt="Batalla de Titulares"
               className={cn(
                 "drop-shadow-lg transition-all duration-300 hover:scale-105",
-                scrolled ? "h-8" : "h-10 sm:h-12"
+                scrolled ? "h-8 w-8" : "h-10 w-10 sm:h-12 sm:w-12"
               )}
             />
           </Link>

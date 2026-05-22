@@ -2,7 +2,7 @@
   "name": "batalla-de-titulares",
   "version": "1.0.0",
   "private": true,
-  "description": "Batalla de Titulares - Votación en vivo para F*ck News",
+  "description": "Batalla de Titulares - Votación en vivo",
   "author": "Jhonatan Lopez Conde <Bogotá, Colombia>",
   "type": "module",
   "scripts": {

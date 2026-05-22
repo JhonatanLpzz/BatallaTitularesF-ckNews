@@ -179,12 +179,7 @@ export default function LandingPage() {
               </Button>
             </Link>
 
-            <a href="https://github.com/JhonatanLpzz/BatallaTitularesF-ckNews" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" className="rounded-xl gap-2">
-                <ExternalLink className="h-4 w-4" />
-                Ver Repositorio
-              </Button>
-            </a>
+
 
             <Link to="/login">
               <Button variant="ghost" className="rounded-xl gap-2">
@@ -198,10 +193,6 @@ export default function LandingPage() {
       </main>
 
       <footer className="border-t border-border backdrop-blur-lg bg-background/80 px-6 py-6 mt-auto text-center">
-        <p className="text-xs text-muted-foreground mb-3">
-          Gracias a <strong className="campaign-gold-gradient">F*cks News Noticreo</strong>
-        </p>
-
         <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
           <span>Jhonatan Lopez Conde</span>
           <span>•</span>
@@ -209,10 +200,6 @@ export default function LandingPage() {
           <span>•</span>
           <a href="https://science.nasa.gov/image-detail/amf-6903870/" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition">
             NASA Artemis II
-          </a>
-          <span>•</span>
-          <a href="https://github.com/JhonatanLpzz/BatallaTitularesF-ckNews" target="_blank" rel="noopener noreferrer">
-            <ExternalLink className="h-3 w-3" />
           </a>
         </div>
       </footer>

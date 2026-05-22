@@ -54,12 +54,12 @@ function MouseGlowEffect() {
     };
   }, [mouseX, mouseY, reduceMotion]);
 
-  if (reduceMotion) return null;
-
   const background = useMotionTemplate`
     radial-gradient(1200px circle at ${smoothX}px ${smoothY}px, rgba(var(--campaign-blue-rgb), 0.12), transparent 40%),
     radial-gradient(800px circle at ${smoothX}px ${smoothY}px, rgba(var(--foreground-rgb), 0.05), transparent 50%)
   `;
+
+  if (reduceMotion) return null;
 
   return (
     <motion.div

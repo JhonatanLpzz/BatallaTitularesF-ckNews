@@ -1,6 +1,6 @@
 <div align="center">
 
-# Batalla de Titulares — F\*cks News Noticreo
+# Batalla de Titulares
 
 **Sistema de votación interactiva en tiempo real para shows de comedia en vivo**
 
@@ -10,14 +10,11 @@
 [![TypeScript](https://img.shields.io/badge/lang-TypeScript-3178c6?logo=typescript&logoColor=white)](https://typescriptlang.org)
 [![SQLite](https://img.shields.io/badge/db-SQLite-003b57?logo=sqlite&logoColor=white)](https://sqlite.org)
 [![License](https://img.shields.io/badge/license-Proprietary-red)](#licencia)
-[![Live Demo](https://img.shields.io/badge/DEMO_EN_VIVO-Probar_Ahora-ff6b35?style=for-the-badge&logo=railway&logoColor=white)](https://batallatitularesf-cknews-production.up.railway.app/)
-[![GitHub](https://img.shields.io/badge/Repo-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/JhonatanLpzz/BatallaTitularesF-ckNews)
 
-| | Link |
+| Pagina | Ruta |
 |---|---|
-| **Landing** | [batallatitularesf-cknews-production.up.railway.app](https://batallatitularesf-cknews-production.up.railway.app/) |
-| **Login Admin** | [/login](https://batallatitularesf-cknews-production.up.railway.app/login) |
-| **Repositorio** | [github.com/JhonatanLpzz/BatallaTitularesF-ckNews](https://github.com/JhonatanLpzz/BatallaTitularesF-ckNews) |
+| **Landing** | [/](/) |
+| **Login Admin** | [/login](/login) |
 
 **Credenciales Demo (solo lectura):** `demo` / `demo123`
 
@@ -43,7 +40,7 @@
 
 ## Resumen
 
-Plataforma web que permite a **F\*cks News Noticreo** (comediantes colombianos) crear competencias de titulares absurdos donde el publico vota en tiempo real escaneando un QR desde su celular. Sin instalacion de apps, sin registro — solo escanea, vota y ve los resultados en vivo.
+Plataforma web que permite crear competencias de titulares absurdos donde el publico vota en tiempo real escaneando un QR desde su celular. Sin instalacion de apps, sin registro — solo escanea, vota y ve los resultados en vivo.
 
 **Desarrollado por:** [Jhonatan Lopez Conde](https://github.com/JhonatanLpzz) — Bogota, Colombia
 
@@ -121,8 +118,8 @@ Se ha completado un ciclo de optimización enfocado en el cumplimiento de están
 
 ```bash
 # Clonar repositorio
-git clone https://github.com/JhonatanLpzz/BatallaTitularesF-ckNews.git
-cd BatallaTitularesF-ckNews
+git clone https://github.com/JhonatanLpzz/BatallaDeTitulares.git
+cd BatallaDeTitulares
 
 # Instalar dependencias
 bun install
@@ -164,14 +161,14 @@ Quieres ver como funciona el panel admin sin tocar nada? Usa las credenciales de
 
 > El usuario demo puede navegar por todo el panel de administracion y ver batallas, resultados, usuarios y QRs, pero **no puede crear, editar ni eliminar nada**. Perfecto para que los fans vean la calidad del software sin riesgo.
 
-**[Probar ahora](https://batallatitularesf-cknews-production.up.railway.app/login)** con las credenciales demo.
+**[Probar ahora](/login)** con las credenciales demo.
 
 ---
 
 ## Estructura del Proyecto
 
 ```
-batalla-titulares-fcknews/
+batalla-titulares/
 ├── server/                     # Backend Fastify
 │   ├── index.ts                # Entry point, CORS, static serving
 │   ├── config.ts               # Configuracion centralizada (env vars)
@@ -188,7 +185,7 @@ batalla-titulares-fcknews/
 │   ├── App.tsx                 # Router principal + providers
 │   ├── main.tsx                # Entry point React
 │   ├── types.ts                # Interfaces compartidas (documentadas)
-│   ├── index.css               # Tema dark F*cks News
+│   ├── index.css               # Tema dark
 │   ├── constants/
 │   │   └── index.ts            # Endpoints, rutas, defaults, storage keys
 │   ├── services/
@@ -220,7 +217,6 @@ batalla-titulares-fcknews/
 │   └── lib/
 │       └── utils.ts            # cn(), generateFingerprint(), formatNumber()
 ├── public/
-│   └── logo_fn.png             # Logo F*cks News Noticreo
 ├── PRD.md                      # Product Requirements Document
 ├── CONTEXT.md                  # Documentacion tecnica detallada
 ├── Dockerfile                  # Build de contenedor
@@ -367,6 +363,6 @@ JWT_SECRET=tu-secret NODE_ENV=production bun start
 
 ## Licencia
 
-Este proyecto fue desarrollado especificamente para **F\*cks News Noticreo** por **Jhonatan Lopez Conde**.
+Este proyecto fue desarrollado por **Jhonatan Lopez Conde**.
 
-Todos los derechos reservados. &copy; 2026 F\*cks News Noticreo — Bogota, Colombia
+Todos los derechos reservados. &copy; 2026 — Bogota, Colombia

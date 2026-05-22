@@ -3,7 +3,7 @@
 > Documento de contexto tecnico para desarrolladores. Para una vista general del proyecto, ver [`README.md`](./README.md).
 > Para requisitos de producto, ver [`PRD.md`](./PRD.md).
 
-**Proyecto:** Batalla de Titulares — F\*cks News Noticreo  
+**Proyecto:** Batalla de Titulares  
 **Desarrollado por:** Jhonatan Lopez Conde — Bogota, Colombia  
 **Ultima actualizacion:** Abril 2026 — Arquitectura WebSocket, Ranking Global, N+1 fixes
 
@@ -30,7 +30,7 @@
 ## Arquitectura del Proyecto
 
 ```
-batalla-titulares-fcknews/
+batalla-titulares/
 ├── server/                          # === BACKEND (Fastify) ===
 │   ├── index.ts                     # Entry point, CORS, static serve, health check
 │   ├── config.ts                    # Configuracion env vars centralizada
@@ -52,7 +52,7 @@ batalla-titulares-fcknews/
 │   ├── App.tsx                      # Router principal + ThemeProvider + AuthProvider
 │   ├── main.tsx                     # Entry point React
 │   ├── types.ts                     # Interfaces compartidas (con JSDoc completo)
-│   ├── index.css                    # CSS custom: tema dark F*cks News
+│   ├── index.css                    # CSS custom: tema dark
 │   │
 │   ├── constants/
 │   │   └── index.ts                # Endpoints API, rutas, defaults, storage keys
@@ -102,7 +102,6 @@ batalla-titulares-fcknews/
 │       └── RankingPage.tsx          # Ranking global de participantes (/ranking)
 │
 ├── public/
-│   └── logo_fn.png                  # Logo F*cks News Noticreo
 ├── PRD.md                           # Product Requirements Document
 ├── CONTEXT.md                       # Este archivo
 ├── Dockerfile                       # Build Docker

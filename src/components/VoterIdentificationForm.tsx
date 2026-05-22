@@ -62,7 +62,7 @@ export function VoterIdentificationForm({ battleTitle, onSubmit }: VoterIdentifi
           </div>
 
           <div className="flex flex-col items-center text-center">
-            <img src="/logo_fn.png" alt="Logo" className="h-14 mb-10 drop-shadow-2xl" />
+            <img src="/favicon.svg" alt="Logo" className="h-14 w-14 mb-10 drop-shadow-2xl" />
 
             <h1 className="text-3xl font-black">{battleTitle}</h1>
             <p className=" text-sm mb-10 font-medium">Completa tus datos para habilitar el voto.</p>

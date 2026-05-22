@@ -33,7 +33,7 @@ function Dialog({ open, onOpenChange, children }: DialogProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm" 
+              className="fixed inset-0 bg-black/40 backdrop-blur-[6px] transition-all" 
               onClick={() => onOpenChange(false)} 
               aria-hidden="true"
             />
@@ -64,37 +64,11 @@ function DialogContent({
   animation?: "top" | "bottom";
 }) {
   const context = React.useContext(DialogContext);
-  const scrollRef = React.useRef<HTMLDivElement>(null);
-  const [canScrollUp, setCanScrollUp] = React.useState(false);
-  const [canScrollDown, setCanScrollDown] = React.useState(false);
 
   const handleClose = () => {
     if (onClose) onClose();
     if (context) context.onOpenChange(false);
   };
-
-  const handleScroll = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollUp(el.scrollTop > 5);
-    setCanScrollDown(Math.ceil(el.scrollTop + el.clientHeight) < el.scrollHeight - 5);
-  };
-
-  React.useEffect(() => {
-    handleScroll();
-    window.addEventListener('resize', handleScroll);
-    return () => window.removeEventListener('resize', handleScroll);
-  }, [children]);
-
-  // Dynamic edge mask depending on scroll state
-  let maskStyle = "none";
-  if (canScrollUp && canScrollDown) {
-    maskStyle = "linear-gradient(to bottom, transparent, black 24px, black calc(100% - 24px), transparent 100%)";
-  } else if (canScrollUp) {
-    maskStyle = "linear-gradient(to bottom, transparent, black 24px, black 100%)";
-  } else if (canScrollDown) {
-    maskStyle = "linear-gradient(to bottom, black 0%, black calc(100% - 24px), transparent 100%)";
-  }
 
   const variants = {
     top: {
@@ -124,20 +98,12 @@ function DialogContent({
     >
       <button
         onClick={handleClose}
-        className="absolute right-4 top-4 rounded-full p-2 bg-secondary text-muted-foreground opacity-70 transition-all hover:opacity-100 hover:bg-accent hover:text-foreground focus:outline-none focus:ring-2 focus:ring-campaign-gold focus:ring-offset-2 focus:ring-offset-background z-10"
+        className="absolute right-4 top-4 rounded-full p-2 bg-black/5 dark:bg-white/5 text-muted-foreground opacity-70 transition-all hover:opacity-100 hover:bg-black/10 dark:hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-campaign-gold z-10"
         aria-label="Close"
       >
         <X className="h-4 w-4" />
       </button>
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="flex-1 overflow-y-auto overflow-x-hidden p-6 sm:p-8 no-scrollbar transition-[mask-image] duration-300"
-        style={{
-          maskImage: maskStyle,
-          WebkitMaskImage: maskStyle
-        }}
-      >
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 sm:p-8 subtle-scrollbar">
         {children}
       </div>
     </motion.div>

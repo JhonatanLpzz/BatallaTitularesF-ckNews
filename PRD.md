@@ -1,17 +1,17 @@
 # Product Requirements Document (PRD)
-# Batalla de Titulares — F*cks News Noticreo
+# Batalla de Titulares
 
 **Versión:** 1.0  
 **Fecha:** Abril 2026  
 **Desarrollado por:** Jhonatan Lopez Conde — Bogotá, Colombia  
-**Cliente:** F*cks News Noticreo
+**Cliente:** Batalla de Titulares
 
 ---
 
 ## 1. Resumen Ejecutivo
 
 ### 1.1 Descripción del Producto
-Sistema de votación interactiva en tiempo real para la **Batalla de Titulares** de **F*cks News Noticreo**, comediantes colombianos. Permite crear competencias donde los participantes compiten con titulares absurdos y el público vota en vivo escaneando un código QR desde su dispositivo móvil.
+Sistema de votación interactiva en tiempo real para la **Batalla de Titulares**. Permite crear competencias donde los participantes compiten con titulares absurdos y el público vota en vivo escaneando un código QR desde su dispositivo móvil.
 
 ### 1.2 Objetivos del Producto
 - **Primario:** Facilitar votación en tiempo real durante shows en vivo
@@ -33,7 +33,7 @@ Los shows de comedia interactivos necesitan sistemas de votación rápidos, intu
 
 ### 2.2 Audiencia Objetivo
 - **Usuarios Primarios:** Público asistente a shows (18-45 años, móvil-nativos)
-- **Usuarios Secundarios:** Administradores de F*cks News (comediantes, staff técnico)
+- **Usuarios Secundarios:** Administradores (staff técnico, moderadores)
 - **Contexto de Uso:** Teatros, bares, eventos en vivo, iluminación reducida
 
 ### 2.3 Restricciones
@@ -123,7 +123,7 @@ Los shows de comedia interactivos necesitan sistemas de votación rápidos, intu
 
 #### 3.2.3 Branding Personalizado 🔸
 **Prioridad:** P1 (Alta)
-- Logo F*cks News integrado
+- Logo integrado
 - Paleta de colores corporativa
 - Participantes predeterminados (Camilo Pardo, Camilo Sanchez)
 
@@ -210,7 +210,7 @@ GET/POST    /api/users           # Gestión administradores
 
 ## 5. Diseño y UX
 
-### 5.1 Paleta de Colores F*cks News
+### 5.1 Paleta de Colores
 
 | Color | Valor | Uso |
 |-------|-------|-----|
@@ -238,7 +238,7 @@ GET/POST    /api/users           # Gestión administradores
 ## 6. Casos de Uso Detallados
 
 ### 6.1 UC01: Administrador Crea Batalla
-**Actor:** Administrador de F*cks News  
+**Actor:** Administrador  
 **Precondición:** Usuario autenticado en `/admin`
 
 **Flujo Principal:**
@@ -322,7 +322,7 @@ GET/POST    /api/users           # Gestión administradores
 
 #### Fase 3: Integración y UX (Completado)
 - ✅ QR generation y scanning
-- ✅ Branding F*cks News
+- ✅ Branding personalizado
 - ✅ Responsive design móvil
 - ✅ Testing en dispositivos reales
 
@@ -369,7 +369,7 @@ GET/POST    /api/users           # Gestión administradores
 |--------|--------------|---------|------------|
 | **Baja adopción del público** | Baja | Alto | UX testing + flujo simplificado |
 | **Cambios en formato de show** | Media | Medio | Arquitectura flexible + configuración |
-| **Competencia con soluciones existentes** | Baja | Bajo | Funcionalidades específicas para F*cks News |
+| **Competencia con soluciones existentes** | Baja | Bajo | Funcionalidades específicas |
 
 ---
 
@@ -436,18 +436,18 @@ batalla-titulares/
 
 ### 12.1 Estado Actual: ✅ PRODUCTO COMPLETAMENTE FUNCIONAL
 
-El sistema **Batalla de Titulares** ha sido desarrollado completamente y está listo para uso en producción durante shows en vivo de F*cks News Noticreo.
+El sistema **Batalla de Titulares** ha sido desarrollado completamente y está listo para uso en producción durante shows en vivo.
 
 **Funcionalidades Implementadas:**
 - ✅ Sistema completo de votación en tiempo real
 - ✅ Panel de administración con gestión de usuarios
 - ✅ Timer automático con countdown visual
 - ✅ Interfaz móvil optimizada con QR scanning
-- ✅ Branding personalizado F*cks News
+- ✅ Branding personalizado
 - ✅ Arquitectura escalable y mantenible
 
 ### 12.2 Valor Entregado
-- **Para F*cks News:** Herramienta profesional que mejora la interacción con su audiencia
+- **Para el Show:** Herramienta profesional que mejora la interacción con su audiencia
 - **Para el Público:** Experiencia intuitiva y divertida de participación
 - **Para el Negocio:** Datos de participación y engagement measurable
 
@@ -459,4 +459,4 @@ El sistema **Batalla de Titulares** ha sido desarrollado completamente y está l
 
 ---
 
-**© 2026 F*cks News Noticreo - Desarrollado por Jhonatan Lopez Conde, Bogotá, Colombia**
+**© 2026 - Desarrollado por Jhonatan Lopez Conde, Bogotá, Colombia**

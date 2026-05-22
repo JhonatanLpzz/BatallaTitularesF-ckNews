@@ -48,7 +48,7 @@ export default function LoginPage() {
         <div className="glass-card absolute inset-0 rounded-[32px] -z-10" />
 
         <div className="p-8 sm:p-10 flex flex-col items-center">
-          <img src="/logo_fn.png" alt="F*cks News" className="h-16 sm:h-20 mb-8 drop-shadow-2xl hover:scale-105 transition-transform" />
+          <img src="/favicon.svg" alt="Batalla de Titulares" className="h-16 sm:h-20 mb-8 drop-shadow-2xl hover:scale-105 transition-transform" />
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-center text-foreground mb-2">Panel Admin</h1>
           <p className="text-muted-foreground text-center text-sm mb-8 leading-relaxed">Ingresa tus credenciales para acceder al panel de control.</p>
 

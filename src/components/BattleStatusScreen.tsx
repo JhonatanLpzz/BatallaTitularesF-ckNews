@@ -47,7 +47,7 @@ export function BattleStatusScreen({ code, battle, error }: BattleStatusScreenPr
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] blur-[120px] rounded-full" />
 
       <div className="glass-card rounded-[40px] border border-border bg-card/40 p-10 text-center max-w-sm w-full z-10 backdrop-blur-3xl animate-in fade-in zoom-in duration-700">
-        <img src="/logo_fn.png" alt="Logo" className="h-16 mx-auto mb-8 drop-shadow-2xl" />
+        <img src="/favicon.svg" alt="Logo" className="h-16 w-16 mx-auto mb-8 drop-shadow-2xl" />
 
         {error && <XCircle className="h-14 w-14 text-error mx-auto mb-4 opacity-80" />}
         {isDraft && <Clock className="h-14 w-14 text-muted-foreground mx-auto mb-4 opacity-80" />}

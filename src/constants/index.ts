@@ -9,7 +9,7 @@
 // ---------------------------------------------------------------------------
 
 /** Prefijo base para todos los endpoints de la API REST. */
-export const API_BASE = "/api";
+export const API_BASE = import.meta.env.VITE_API_URL || "/api";
 
 /** Endpoints de autenticación y gestión de sesiones. */
 export const API_AUTH = {

@@ -183,8 +183,10 @@ export async function authRoutes(app: FastifyInstance) {
   app.post<{ Body: { username: string; password: string } }>(
     "/api/auth/setup",
     async (req, reply) => {
-      const existing = db.select().from(schema.adminUsers).all();
-      if (existing.length > 0) {
+      const existingAdmins = db.select().from(schema.adminUsers)
+        .where(eq(schema.adminUsers.role, "admin"))
+        .all();
+      if (existingAdmins.length > 0) {
         return reply.status(403).send({ error: "Ya existe un administrador" });
       }
 
@@ -193,9 +195,16 @@ export async function authRoutes(app: FastifyInstance) {
         return reply.status(400).send({ error: "Usuario y contraseña (min 4 chars) requeridos" });
       }
 
+      const existingUser = db.select().from(schema.adminUsers)
+        .where(eq(schema.adminUsers.username, username.trim()))
+        .get();
+      if (existingUser) {
+        return reply.status(409).send({ error: "El usuario ya existe" });
+      }
+
       const passwordHash = await hashPassword(password);
       db.insert(schema.adminUsers)
-        .values({ username: sanitizeText(username, 50), passwordHash })
+        .values({ username: sanitizeText(username, 50), passwordHash, role: "admin" })
         .run();
 
       return { success: true, message: "Administrador creado" };

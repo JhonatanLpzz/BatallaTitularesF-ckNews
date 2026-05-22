@@ -71,9 +71,9 @@ export function TieManager({ battle, onVote, userVote, showLogo = true }: TieMan
       {showLogo && (
         <div className="text-center">
           <img 
-            src="/logo_fn.png" 
-            alt="F*cks News" 
-            className="h-16 mx-auto mb-4"
+            src="/favicon.svg" 
+            alt="Batalla de Titulares" 
+            className="h-16 w-16 mx-auto mb-4"
           />
         </div>
       )}
@@ -116,7 +116,7 @@ export function TieManager({ battle, onVote, userVote, showLogo = true }: TieMan
 
       {/* Instructions */}
       {battle.status === "tiebreaker" && (
-        <div className="fn-card p-4">
+        <div className="bt-card p-4">
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
             <div>
@@ -162,7 +162,7 @@ export function TieManager({ battle, onVote, userVote, showLogo = true }: TieMan
           
           <div className="space-y-3 opacity-60">
             {eliminatedParticipants.map((participant) => (
-              <div key={participant.id} className="fn-card p-4 grayscale">
+              <div key={participant.id} className="bt-card p-4 grayscale">
                 <div className="flex items-center gap-3">
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
@@ -186,7 +186,7 @@ export function TieManager({ battle, onVote, userVote, showLogo = true }: TieMan
 
       {/* Voting Status */}
       {userVote && battle.status === "tiebreaker" && (
-        <div className="fn-card p-4 bg-green-50 border-green-200">
+        <div className="bt-card p-4 bg-green-50 border-green-200">
           <div className="flex items-center gap-3 justify-center">
             <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
               <Crown className="w-4 h-4 text-white" />
@@ -203,7 +203,7 @@ export function TieManager({ battle, onVote, userVote, showLogo = true }: TieMan
 
       {/* Final Results */}
       {battle.status === "closed" && battle.winner && (
-        <div className="fn-card p-6 bg-gradient-to-r from-accent/10 to-primary/10 border-accent">
+        <div className="bt-card p-6 bg-gradient-to-r from-accent/10 to-primary/10 border-accent">
           <div className="text-center">
             <Crown className="w-12 h-12 text-accent mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-accent mb-2">

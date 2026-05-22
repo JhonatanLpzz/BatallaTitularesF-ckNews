@@ -18,9 +18,12 @@ export function useWebSocket(battleCode: string | undefined, options: WSOptions)
   const connect = useCallback(() => {
     if (!battleCode || !enabled) return;
 
-    socketRef.current?.disconnect();
+    const wsOrigin = import.meta.env.VITE_WS_URL || 
+      (import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.startsWith("http") 
+        ? new URL(import.meta.env.VITE_API_URL).origin 
+        : window.location.origin);
 
-    const socket = io(window.location.origin, {
+    const socket = io(wsOrigin, {
       path: WS_PATH,
       transports: ["websocket", "polling"],
       reconnection: true,

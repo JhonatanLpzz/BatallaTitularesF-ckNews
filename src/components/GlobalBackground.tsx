@@ -43,8 +43,8 @@ export function GlobalBackground() {
         loading="eager"
       />
       
-      {/* Soft overlay to improve text contrast on dark background */}
-      <div className="absolute inset-0 bg-black/40" />
+      {/* Soft overlay to improve text contrast. White in light mode, dark in dark mode. */}
+      <div className="absolute inset-0 bg-white/45 dark:bg-black/40 transition-colors duration-300" />
       
       <div className="absolute inset-0 bg-gradient-to-b from-background/5 via-transparent to-background/40" />
       
